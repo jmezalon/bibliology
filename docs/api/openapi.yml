@@ -1,0 +1,1305 @@
+openapi: 3.1.0
+info:
+  title: Bibliology API
+  description: |
+    Bilingual (EN/FR) Bible study learning management system API.
+
+    ## Authentication
+    All protected endpoints require a JWT token in an HttpOnly cookie named `accessToken`.
+
+    ## Rate Limiting
+    - Anonymous: 10 requests/minute
+    - Authenticated: 100 requests/minute
+
+    ## Pagination
+    List endpoints support pagination with `page` and `limit` query parameters.
+
+  version: 1.0.0
+  contact:
+    name: Bibliology Support
+    email: support@bibliology.com
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://api-staging.bibliology.com
+    description: Staging environment
+  - url: https://api.bibliology.com
+    description: Production environment
+
+tags:
+  - name: Auth
+    description: Authentication and authorization
+  - name: Users
+    description: User management
+  - name: Courses
+    description: Course management
+  - name: Lessons
+    description: Lesson management
+  - name: Slides
+    description: Slide management
+  - name: Content Blocks
+    description: Content block management
+  - name: Quizzes
+    description: Quiz and assessment management
+  - name: Progress
+    description: Student progress tracking
+  - name: Enrollments
+    description: Course enrollments
+  - name: Uploads
+    description: File uploads
+  - name: Imports
+    description: PowerPoint import
+  - name: Certificates
+    description: Completion certificates
+  - name: Analytics
+    description: Teacher analytics
+  - name: Health
+    description: System health checks
+
+paths:
+  # ============================================================================
+  # AUTHENTICATION
+  # ============================================================================
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name, role]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: student@example.com
+                password:
+                  type: string
+                  format: password
+                  minLength: 8
+                  example: SecurePassword123!
+                name:
+                  type: string
+                  example: John Doe
+                role:
+                  type: string
+                  enum: [STUDENT, TEACHER]
+                  example: STUDENT
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Email already exists
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  format: password
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: accessToken=eyJhbGc...; HttpOnly; Secure; SameSite=Strict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Invalid credentials
+
+  /auth/logout:
+    post:
+      tags: [Auth]
+      summary: Logout user
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: accessToken=; HttpOnly; Secure; SameSite=Strict; Max-Age=0
+
+  /auth/refresh:
+    post:
+      tags: [Auth]
+      summary: Refresh access token
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Token refreshed
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Get current user
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+
+  # ============================================================================
+  # COURSES
+  # ============================================================================
+  /courses:
+    get:
+      tags: [Courses]
+      summary: List all published courses
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+        - name: category
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of courses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CourseListItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Courses]
+      summary: Create new course (Teacher only)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCourseDto'
+      responses:
+        '201':
+          description: Course created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+
+  /courses/{courseId}:
+    get:
+      tags: [Courses]
+      summary: Get course details
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      responses:
+        '200':
+          description: Course details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+
+    patch:
+      tags: [Courses]
+      summary: Update course (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCourseDto'
+      responses:
+        '200':
+          description: Course updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+
+    delete:
+      tags: [Courses]
+      summary: Delete course (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      responses:
+        '204':
+          description: Course deleted
+
+  /courses/{courseId}/publish:
+    post:
+      tags: [Courses]
+      summary: Publish course (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/CourseId'
+      responses:
+        '200':
+          description: Course published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CourseDetail'
+
+  # ============================================================================
+  # LESSONS
+  # ============================================================================
+  /lessons:
+    get:
+      tags: [Lessons]
+      summary: List lessons
+      parameters:
+        - name: courseId
+          in: query
+          required: true
+          schema:
+            type: string
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/LessonListItem'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Lessons]
+      summary: Create new lesson (Teacher only)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLessonDto'
+      responses:
+        '201':
+          description: Lesson created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonDetail'
+
+  /lessons/{lessonId}:
+    get:
+      tags: [Lessons]
+      summary: Get lesson with slides and content
+      parameters:
+        - $ref: '#/components/parameters/LessonId'
+      responses:
+        '200':
+          description: Full lesson data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LessonDetail'
+
+    patch:
+      tags: [Lessons]
+      summary: Update lesson (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LessonId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLessonDto'
+      responses:
+        '200':
+          description: Lesson updated
+
+    delete:
+      tags: [Lessons]
+      summary: Delete lesson (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LessonId'
+      responses:
+        '204':
+          description: Lesson deleted
+
+  /lessons/{lessonId}/publish:
+    post:
+      tags: [Lessons]
+      summary: Publish lesson (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/LessonId'
+      responses:
+        '200':
+          description: Lesson published
+
+  # ============================================================================
+  # SLIDES
+  # ============================================================================
+  /slides:
+    post:
+      tags: [Slides]
+      summary: Create slide (Teacher only)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSlideDto'
+      responses:
+        '201':
+          description: Slide created
+
+  /slides/{slideId}:
+    get:
+      tags: [Slides]
+      summary: Get slide details
+      parameters:
+        - $ref: '#/components/parameters/SlideId'
+      responses:
+        '200':
+          description: Slide data
+
+    patch:
+      tags: [Slides]
+      summary: Update slide (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SlideId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSlideDto'
+      responses:
+        '200':
+          description: Slide updated
+
+    delete:
+      tags: [Slides]
+      summary: Delete slide (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - $ref: '#/components/parameters/SlideId'
+      responses:
+        '204':
+          description: Slide deleted
+
+  # ============================================================================
+  # CONTENT BLOCKS
+  # ============================================================================
+  /content-blocks:
+    post:
+      tags: [Content Blocks]
+      summary: Create content block (Teacher only)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContentBlockDto'
+      responses:
+        '201':
+          description: Content block created
+
+  /content-blocks/{blockId}:
+    patch:
+      tags: [Content Blocks]
+      summary: Update content block (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: blockId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContentBlockDto'
+      responses:
+        '200':
+          description: Content block updated
+
+    delete:
+      tags: [Content Blocks]
+      summary: Delete content block (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: blockId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Content block deleted
+
+  # ============================================================================
+  # QUIZZES
+  # ============================================================================
+  /quizzes:
+    post:
+      tags: [Quizzes]
+      summary: Create quiz (Teacher only)
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateQuizDto'
+      responses:
+        '201':
+          description: Quiz created
+
+  /quizzes/{quizId}:
+    get:
+      tags: [Quizzes]
+      summary: Get quiz with questions
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quiz data
+
+    patch:
+      tags: [Quizzes]
+      summary: Update quiz (Teacher only)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Quiz updated
+
+  /quizzes/{quizId}/submit:
+    post:
+      tags: [Quizzes]
+      summary: Submit quiz answers (Student)
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: quizId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubmitQuizDto'
+      responses:
+        '200':
+          description: Quiz submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QuizResultResponse'
+
+  # ============================================================================
+  # PROGRESS TRACKING
+  # ============================================================================
+  /progress/me:
+    get:
+      tags: [Progress]
+      summary: Get my progress
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: courseId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Progress data
+
+  /progress/track:
+    post:
+      tags: [Progress]
+      summary: Track lesson progress
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lessonId, slideIndex, timeSpent]
+              properties:
+                lessonId:
+                  type: string
+                slideIndex:
+                  type: integer
+                timeSpent:
+                  type: integer
+                  description: Time in seconds
+      responses:
+        '200':
+          description: Progress updated
+
+  /progress/complete:
+    post:
+      tags: [Progress]
+      summary: Mark lesson as complete
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lessonId]
+              properties:
+                lessonId:
+                  type: string
+      responses:
+        '200':
+          description: Lesson completed
+
+  # ============================================================================
+  # ENROLLMENTS
+  # ============================================================================
+  /enrollments:
+    get:
+      tags: [Enrollments]
+      summary: Get my enrollments
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: List of enrollments
+
+    post:
+      tags: [Enrollments]
+      summary: Enroll in course
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [courseId]
+              properties:
+                courseId:
+                  type: string
+      responses:
+        '201':
+          description: Enrolled successfully
+
+  # ============================================================================
+  # UPLOADS
+  # ============================================================================
+  /uploads/image:
+    post:
+      tags: [Uploads]
+      summary: Upload image
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: Image uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: https://cdn.bibliology.com/images/abc123.webp
+                  width:
+                    type: integer
+                  height:
+                    type: integer
+
+  /uploads/pptx:
+    post:
+      tags: [Uploads]
+      summary: Upload PowerPoint file
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          description: File uploaded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileId:
+                    type: string
+                  filename:
+                    type: string
+
+  # ============================================================================
+  # IMPORTS
+  # ============================================================================
+  /imports/parse:
+    post:
+      tags: [Imports]
+      summary: Parse PowerPoint file
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: .pptx file
+      responses:
+        '202':
+          description: Parsing started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                  status:
+                    type: string
+                    enum: [queued, processing]
+
+  /imports/{jobId}/status:
+    get:
+      tags: [Imports]
+      summary: Get import job status
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [queued, processing, completed, failed]
+                  progress:
+                    type: integer
+                    minimum: 0
+                    maximum: 100
+
+  /imports/{jobId}/preview:
+    get:
+      tags: [Imports]
+      summary: Get import preview
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Preview data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  slides:
+                    type: array
+                    items:
+                      type: object
+
+  /imports/confirm:
+    post:
+      tags: [Imports]
+      summary: Confirm import
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [jobId, lessonMetadata]
+              properties:
+                jobId:
+                  type: string
+                lessonMetadata:
+                  type: object
+                  properties:
+                    courseId:
+                      type: string
+                    title_en:
+                      type: string
+                    title_fr:
+                      type: string
+      responses:
+        '201':
+          description: Lesson created from import
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lessonId:
+                    type: string
+
+  # ============================================================================
+  # HEALTH CHECK
+  # ============================================================================
+  /health:
+    get:
+      tags: [Health]
+      summary: Health check
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  timestamp:
+                    type: string
+                    format: date-time
+                  services:
+                    type: object
+                    properties:
+                      database:
+                        type: string
+                        example: ok
+                      redis:
+                        type: string
+                        example: ok
+                      storage:
+                        type: string
+                        example: ok
+
+# ============================================================================
+# COMPONENTS
+# ============================================================================
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+      description: JWT token stored in HttpOnly cookie
+
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    CourseId:
+      name: courseId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: clxyz123abc
+
+    LessonId:
+      name: lessonId
+      in: path
+      required: true
+      schema:
+        type: string
+
+    SlideId:
+      name: slideId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        name:
+          type: string
+        role:
+          type: string
+          enum: [STUDENT, TEACHER, ADMIN]
+        avatar_url:
+          type: string
+        language_pref:
+          type: string
+          enum: [en, fr]
+        created_at:
+          type: string
+          format: date-time
+
+    CourseListItem:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        description_en:
+          type: string
+        description_fr:
+          type: string
+        thumbnail_url:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+        estimated_hours:
+          type: integer
+        lesson_count:
+          type: integer
+
+    CourseDetail:
+      allOf:
+        - $ref: '#/components/schemas/CourseListItem'
+        - type: object
+          properties:
+            teacher:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+            lessons:
+              type: array
+              items:
+                $ref: '#/components/schemas/LessonListItem'
+
+    CreateCourseDto:
+      type: object
+      required: [title_en, description_en]
+      properties:
+        title_en:
+          type: string
+          minLength: 3
+          maxLength: 200
+        title_fr:
+          type: string
+        description_en:
+          type: string
+        description_fr:
+          type: string
+        category:
+          type: string
+        tags:
+          type: array
+          items:
+            type: string
+
+    UpdateCourseDto:
+      type: object
+      properties:
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        description_en:
+          type: string
+        description_fr:
+          type: string
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+
+    LessonListItem:
+      type: object
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        lesson_order:
+          type: integer
+        status:
+          type: string
+          enum: [DRAFT, PUBLISHED, ARCHIVED]
+        estimated_minutes:
+          type: integer
+        slide_count:
+          type: integer
+
+    LessonDetail:
+      allOf:
+        - $ref: '#/components/schemas/LessonListItem'
+        - type: object
+          properties:
+            description_en:
+              type: string
+            description_fr:
+              type: string
+            slides:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  slide_order:
+                    type: integer
+                  layout:
+                    type: string
+                  title_en:
+                    type: string
+                  content_blocks:
+                    type: array
+                    items:
+                      type: object
+
+    CreateLessonDto:
+      type: object
+      required: [course_id, title_en, lesson_order]
+      properties:
+        course_id:
+          type: string
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        description_en:
+          type: string
+        description_fr:
+          type: string
+        lesson_order:
+          type: integer
+
+    UpdateLessonDto:
+      type: object
+      properties:
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        description_en:
+          type: string
+        description_fr:
+          type: string
+        status:
+          type: string
+
+    CreateSlideDto:
+      type: object
+      required: [lesson_id, slide_order]
+      properties:
+        lesson_id:
+          type: string
+        slide_order:
+          type: integer
+        layout:
+          type: string
+          enum: [TITLE, CONTENT, TWO_COLUMN, IMAGE_FOCUS, QUIZ, BLANK]
+        title_en:
+          type: string
+        title_fr:
+          type: string
+
+    UpdateSlideDto:
+      type: object
+      properties:
+        layout:
+          type: string
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        notes_en:
+          type: string
+        notes_fr:
+          type: string
+
+    CreateContentBlockDto:
+      type: object
+      required: [slide_id, block_type, block_order, content_en]
+      properties:
+        slide_id:
+          type: string
+        block_type:
+          type: string
+          enum: [HEADING, TEXT, IMAGE, VERSE, VOCABULARY, LIST, CALLOUT, QUIZ, DIVIDER]
+        block_order:
+          type: integer
+        content_en:
+          type: object
+        content_fr:
+          type: object
+        style_config:
+          type: object
+
+    UpdateContentBlockDto:
+      type: object
+      properties:
+        content_en:
+          type: object
+        content_fr:
+          type: object
+        style_config:
+          type: object
+
+    CreateQuizDto:
+      type: object
+      required: [lesson_id, title_en]
+      properties:
+        lesson_id:
+          type: string
+        slide_id:
+          type: string
+        title_en:
+          type: string
+        title_fr:
+          type: string
+        passing_score_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+        time_limit_minutes:
+          type: integer
+        shuffle_questions:
+          type: boolean
+
+    SubmitQuizDto:
+      type: object
+      required: [answers]
+      properties:
+        answers:
+          type: array
+          items:
+            type: object
+            properties:
+              question_id:
+                type: string
+              answer_given:
+                oneOf:
+                  - type: string
+                  - type: array
+                  - type: object
+
+    QuizResultResponse:
+      type: object
+      properties:
+        submission_id:
+          type: string
+        score_percentage:
+          type: integer
+        passed:
+          type: boolean
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              question_id:
+                type: string
+              is_correct:
+                type: boolean
+              points_earned:
+                type: integer
+              explanation_en:
+                type: object
+              explanation_fr:
+                type: object
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+        total:
+          type: integer
+        totalPages:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        statusCode:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+security:
+  - cookieAuth: []

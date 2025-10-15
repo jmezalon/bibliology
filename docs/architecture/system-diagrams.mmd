@@ -1,0 +1,1019 @@
+# System Architecture Diagrams
+
+**Project:** Bibliology - Bible Study Learning Platform
+**Purpose:** Visual representation of system architecture, data flows, and interactions
+**Format:** Mermaid diagrams
+**Date:** 2025-10-15
+
+---
+
+## 1. High-Level System Architecture
+
+```mermaid
+flowchart TB
+    subgraph Client["Client Layer"]
+        Browser["Web Browser<br/>(Student/Teacher)"]
+        Mobile["Mobile App<br/>(Future Phase 2)"]
+    end
+
+    subgraph Frontend["Frontend (Vercel)"]
+        WebApp["React SPA<br/>(Vite)"]
+        Router["React Router"]
+        StateManagement["State Management<br/>React Query + Zustand"]
+    end
+
+    subgraph Backend["Backend (Render)"]
+        API["NestJS API<br/>REST Endpoints"]
+        Auth["Auth Service<br/>JWT"]
+        LessonService["Lesson Service"]
+        QuizService["Quiz Service"]
+        ImportService["Import Service"]
+        UploadService["Upload Service"]
+        WorkerService["Background Worker<br/>BullMQ"]
+    end
+
+    subgraph Data["Data Layer (Render)"]
+        DB[(PostgreSQL<br/>Database)]
+        Redis[(Redis<br/>Cache & Queues)]
+    end
+
+    subgraph Storage["Storage Layer"]
+        S3[("S3-Compatible Storage<br/>Cloudflare R2")]
+    end
+
+    subgraph External["External Services"]
+        BibleAPI["Bible API<br/>(optional)"]
+        EmailService["Email Service<br/>(Phase 2)"]
+    end
+
+    Browser --> WebApp
+    Mobile -.-> API
+
+    WebApp --> Router
+    Router --> StateManagement
+    StateManagement --> API
+
+    API --> Auth
+    API --> LessonService
+    API --> QuizService
+    API --> ImportService
+    API --> UploadService
+
+    Auth --> DB
+    LessonService --> DB
+    QuizService --> DB
+    ImportService --> WorkerService
+    UploadService --> S3
+
+    WorkerService --> Redis
+    WorkerService --> DB
+    WorkerService --> S3
+
+    LessonService -.-> Redis
+    QuizService -.-> Redis
+
+    ImportService -.-> BibleAPI
+    WorkerService -.-> EmailService
+
+    style Client fill:#e1f5ff
+    style Frontend fill:#fff4e6
+    style Backend fill:#f3e5f5
+    style Data fill:#e8f5e9
+    style Storage fill:#fff3e0
+    style External fill:#fce4ec
+```
+
+---
+
+## 2. Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant WebApp
+    participant API
+    participant AuthService
+    participant DB
+    participant Redis
+
+    Note over User,Redis: Login Flow
+
+    User->>WebApp: Enter credentials
+    WebApp->>API: POST /auth/login
+    API->>AuthService: Validate credentials
+    AuthService->>DB: Query user by email
+    DB-->>AuthService: Return user data
+    AuthService->>AuthService: Verify password (bcrypt)
+
+    alt Valid credentials
+        AuthService->>AuthService: Generate JWT tokens
+        AuthService->>Redis: Store refresh token
+        AuthService->>API: Return tokens
+        API->>WebApp: Set HttpOnly cookies<br/>(accessToken, refreshToken)
+        WebApp->>User: Redirect to dashboard
+    else Invalid credentials
+        AuthService->>API: Return 401 error
+        API->>WebApp: Authentication failed
+        WebApp->>User: Show error message
+    end
+
+    Note over User,Redis: Protected Route Access
+
+    User->>WebApp: Access protected route
+    WebApp->>API: GET /lessons (with cookie)
+    API->>AuthService: Verify JWT from cookie
+
+    alt Valid token
+        AuthService->>API: User authenticated
+        API->>DB: Fetch lessons
+        DB-->>API: Return lessons
+        API->>WebApp: Return lessons
+        WebApp->>User: Display lessons
+    else Expired token
+        AuthService->>API: Token expired
+        API->>WebApp: 401 Unauthorized
+        WebApp->>API: POST /auth/refresh
+        API->>Redis: Validate refresh token
+        alt Valid refresh token
+            Redis-->>API: Token valid
+            API->>AuthService: Generate new access token
+            AuthService->>API: Return new token
+            API->>WebApp: Set new cookie
+            WebApp->>API: Retry original request
+            API->>WebApp: Return data
+        else Invalid refresh token
+            API->>WebApp: 401 Unauthorized
+            WebApp->>User: Redirect to login
+        end
+    end
+
+    Note over User,Redis: Logout Flow
+
+    User->>WebApp: Click logout
+    WebApp->>API: POST /auth/logout
+    API->>Redis: Revoke refresh token
+    API->>WebApp: Clear cookies
+    WebApp->>User: Redirect to login
+```
+
+---
+
+## 3. PowerPoint Import Flow
+
+```mermaid
+sequenceDiagram
+    participant Teacher
+    participant WebApp
+    participant API
+    participant ImportService
+    participant WorkerQueue
+    participant Worker
+    participant Parser
+    participant Analyzer
+    participant DB
+    participant S3
+
+    Note over Teacher,S3: Phase 1: Upload & Parse
+
+    Teacher->>WebApp: Upload .pptx file
+    WebApp->>API: POST /imports/parse<br/>(multipart/form-data)
+    API->>ImportService: Validate file
+
+    alt File valid
+        ImportService->>S3: Store temp file
+        ImportService->>WorkerQueue: Enqueue parse job
+        ImportService->>API: Return job ID
+        API->>WebApp: Return { jobId, status: 'queued' }
+        WebApp->>Teacher: Show "Processing..."
+
+        WorkerQueue->>Worker: Process parse job
+        Worker->>S3: Fetch .pptx file
+        Worker->>Parser: Parse PowerPoint
+        Parser->>Parser: Extract slides
+        Parser->>Parser: Extract images
+        Parser->>Parser: Extract text & formatting
+        Parser->>Worker: Return parsed slides
+
+        Worker->>Analyzer: Analyze content
+        Analyzer->>Analyzer: Detect verses
+        Analyzer->>Analyzer: Detect vocabulary
+        Analyzer->>Analyzer: Detect quizzes
+        Analyzer->>Worker: Return analyzed slides
+
+        Worker->>S3: Upload extracted images
+        Worker->>Redis: Store preview data
+        Worker->>WorkerQueue: Mark job complete
+
+        Note over Teacher,S3: WebApp polls for status
+
+        loop Every 2 seconds
+            WebApp->>API: GET /imports/status/:jobId
+            API->>Redis: Check job status
+            Redis-->>API: Return status
+            API->>WebApp: Return status
+        end
+
+        WorkerQueue-->>WebApp: Job complete
+        WebApp->>API: GET /imports/preview/:jobId
+        API->>Redis: Fetch preview data
+        Redis-->>API: Return preview
+        API->>WebApp: Return slide previews
+        WebApp->>Teacher: Show preview UI
+
+    else File invalid
+        ImportService->>API: Return error
+        API->>WebApp: Return error
+        WebApp->>Teacher: Show error message
+    end
+
+    Note over Teacher,S3: Phase 2: Review & Adjust
+
+    Teacher->>WebApp: Review slides
+    Teacher->>WebApp: Make adjustments
+    Teacher->>WebApp: Click "Import"
+
+    WebApp->>API: POST /imports/confirm
+    API->>ImportService: Create lesson
+    ImportService->>DB: Insert lesson
+    ImportService->>DB: Insert slides
+    ImportService->>DB: Insert content blocks
+    DB-->>ImportService: Return lesson ID
+    ImportService->>Redis: Clear temp data
+    ImportService->>S3: Delete temp file
+    ImportService->>API: Return lesson
+    API->>WebApp: Return { lessonId, status: 'success' }
+    WebApp->>Teacher: Redirect to lesson editor
+```
+
+---
+
+## 4. Lesson Viewer Flow (Student)
+
+```mermaid
+sequenceDiagram
+    participant Student
+    participant WebApp
+    participant API
+    participant LessonService
+    participant ProgressService
+    participant DB
+    participant Redis
+
+    Note over Student,Redis: Load Lesson
+
+    Student->>WebApp: Click "Start Lesson"
+    WebApp->>API: GET /lessons/:id
+    API->>Redis: Check cache
+
+    alt Cache hit
+        Redis-->>API: Return cached lesson
+        API->>WebApp: Return lesson data
+    else Cache miss
+        API->>LessonService: Fetch lesson
+        LessonService->>DB: Query lesson with slides
+        DB-->>LessonService: Return full lesson
+        LessonService->>Redis: Cache lesson (15min TTL)
+        LessonService->>API: Return lesson
+        API->>WebApp: Return lesson data
+    end
+
+    WebApp->>Student: Display first slide
+
+    Note over Student,Redis: Track Progress
+
+    loop For each slide
+        Student->>WebApp: Navigate to next slide
+        WebApp->>WebApp: Update local progress
+        WebApp->>Student: Display slide content
+
+        WebApp->>API: POST /progress/track<br/>{ lessonId, slideId, timeSpent }
+        API->>ProgressService: Update progress
+        ProgressService->>DB: Upsert progress record
+        DB-->>ProgressService: Confirm update
+        ProgressService->>API: Return updated progress
+        API->>WebApp: Return progress
+        WebApp->>WebApp: Update UI progress bar
+    end
+
+    Note over Student,Redis: Quiz Interaction
+
+    Student->>WebApp: Answer quiz question
+    WebApp->>WebApp: Validate answer
+
+    alt Correct answer
+        WebApp->>Student: Show "Correct!" feedback
+        WebApp->>API: POST /quizzes/submit-answer
+    else Incorrect answer
+        WebApp->>Student: Show explanation
+        WebApp->>Student: Allow retry (if enabled)
+    end
+
+    Note over Student,Redis: Complete Lesson
+
+    Student->>WebApp: Complete final slide
+    WebApp->>API: POST /progress/complete
+    API->>ProgressService: Mark lesson complete
+    ProgressService->>DB: Update completion status
+    ProgressService->>DB: Check course completion
+
+    alt Course complete
+        ProgressService->>WorkerQueue: Enqueue certificate job
+        ProgressService->>API: Return completion + certificate
+        API->>WebApp: Return success
+        WebApp->>Student: Show completion modal<br/>+ certificate link
+    else Course incomplete
+        ProgressService->>API: Return completion
+        API->>WebApp: Return success
+        WebApp->>Student: Show completion modal<br/>+ next lesson
+    end
+```
+
+---
+
+## 5. Lesson Builder Flow (Teacher)
+
+```mermaid
+sequenceDiagram
+    participant Teacher
+    participant WebApp
+    participant BuilderStore
+    participant API
+    participant LessonService
+    participant DB
+    participant S3
+
+    Note over Teacher,S3: Create New Lesson
+
+    Teacher->>WebApp: Click "Create Lesson"
+    WebApp->>BuilderStore: Initialize empty lesson
+    BuilderStore->>WebApp: Return lesson state
+    WebApp->>Teacher: Show lesson builder
+
+    Note over Teacher,S3: Add Content
+
+    loop Add slides and blocks
+        Teacher->>WebApp: Add slide
+        WebApp->>BuilderStore: Add slide to state
+
+        Teacher->>WebApp: Add content block
+        WebApp->>BuilderStore: Add block to slide
+
+        alt Image block
+            Teacher->>WebApp: Upload image
+            WebApp->>API: POST /uploads/image
+            API->>S3: Store image
+            S3-->>API: Return URL
+            API->>WebApp: Return image URL
+            WebApp->>BuilderStore: Update block with URL
+        end
+
+        BuilderStore->>WebApp: Update UI
+        WebApp->>Teacher: Show updated slide
+    end
+
+    Note over Teacher,S3: Auto-save
+
+    loop Every 30 seconds
+        BuilderStore->>BuilderStore: Check for changes
+
+        alt Has unsaved changes
+            BuilderStore->>API: PATCH /lessons/:id<br/>(auto-save)
+            API->>LessonService: Update lesson
+            LessonService->>DB: Save changes
+            DB-->>LessonService: Confirm save
+            LessonService->>API: Return success
+            API->>WebApp: Return success
+            WebApp->>BuilderStore: Mark as saved
+            WebApp->>Teacher: Show "Saved" indicator
+        end
+    end
+
+    Note over Teacher,S3: Reorder Slides
+
+    Teacher->>WebApp: Drag slide to new position
+    WebApp->>BuilderStore: Update slide order
+    BuilderStore->>API: PATCH /lessons/:id/reorder
+    API->>LessonService: Update slide orders
+    LessonService->>DB: Update order fields
+    DB-->>LessonService: Confirm update
+    LessonService->>API: Return success
+    API->>WebApp: Return success
+
+    Note over Teacher,S3: Publish Lesson
+
+    Teacher->>WebApp: Click "Publish"
+    WebApp->>BuilderStore: Get full lesson state
+    WebApp->>API: POST /lessons/:id/publish
+    API->>LessonService: Validate lesson
+
+    alt Validation passes
+        LessonService->>DB: Update status to 'published'
+        LessonService->>Redis: Clear cache
+        DB-->>LessonService: Confirm update
+        LessonService->>API: Return success
+        API->>WebApp: Return success
+        WebApp->>Teacher: Show "Published!" message
+        WebApp->>Teacher: Redirect to lesson list
+    else Validation fails
+        LessonService->>API: Return validation errors
+        API->>WebApp: Return errors
+        WebApp->>Teacher: Show error messages
+    end
+```
+
+---
+
+## 6. Database Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    USERS ||--o{ COURSES : creates
+    USERS ||--o{ ENROLLMENTS : enrolls
+    USERS ||--o{ LESSON_PROGRESS : tracks
+    USERS ||--o{ QUIZ_SUBMISSIONS : submits
+    USERS ||--o{ CERTIFICATES : receives
+
+    COURSES ||--o{ LESSONS : contains
+    COURSES ||--o{ ENROLLMENTS : has
+
+    LESSONS ||--o{ SLIDES : contains
+    LESSONS ||--o{ LESSON_PROGRESS : tracked_in
+    LESSONS ||--o{ CERTIFICATES : grants
+
+    SLIDES ||--o{ CONTENT_BLOCKS : contains
+    SLIDES ||--o{ QUIZZES : may_have
+
+    QUIZZES ||--o{ QUESTIONS : contains
+    QUIZZES ||--o{ QUIZ_SUBMISSIONS : has
+
+    QUESTIONS ||--o{ QUESTION_ANSWERS : has
+
+    QUIZ_SUBMISSIONS ||--o{ QUESTION_ANSWERS : includes
+
+    ENROLLMENTS ||--o{ LESSON_PROGRESS : tracks
+
+    USERS {
+        string id PK
+        string email UK
+        string password_hash
+        string name
+        enum role
+        datetime created_at
+        datetime updated_at
+    }
+
+    COURSES {
+        string id PK
+        string slug UK
+        string title_en
+        string title_fr
+        string description_en
+        string description_fr
+        string teacher_id FK
+        string thumbnail_url
+        enum status
+        int estimated_hours
+        datetime created_at
+        datetime updated_at
+    }
+
+    LESSONS {
+        string id PK
+        string slug UK
+        string course_id FK
+        string title_en
+        string title_fr
+        string description_en
+        string description_fr
+        int lesson_order
+        enum status
+        boolean imported_from_pptx
+        datetime created_at
+        datetime updated_at
+    }
+
+    SLIDES {
+        string id PK
+        string lesson_id FK
+        int slide_order
+        string layout
+        string title_en
+        string title_fr
+        jsonb notes_en
+        jsonb notes_fr
+        datetime created_at
+        datetime updated_at
+    }
+
+    CONTENT_BLOCKS {
+        string id PK
+        string slide_id FK
+        int block_order
+        enum block_type
+        jsonb content_en
+        jsonb content_fr
+        jsonb style_config
+        datetime created_at
+        datetime updated_at
+    }
+
+    QUIZZES {
+        string id PK
+        string lesson_id FK
+        string slide_id FK
+        string title_en
+        string title_fr
+        int passing_score_percentage
+        int time_limit_minutes
+        boolean shuffle_questions
+        datetime created_at
+        datetime updated_at
+    }
+
+    QUESTIONS {
+        string id PK
+        string quiz_id FK
+        int question_order
+        enum question_type
+        jsonb question_text_en
+        jsonb question_text_fr
+        jsonb options_en
+        jsonb options_fr
+        jsonb correct_answers
+        jsonb explanation_en
+        jsonb explanation_fr
+        int points
+        datetime created_at
+        datetime updated_at
+    }
+
+    ENROLLMENTS {
+        string id PK
+        string student_id FK
+        string course_id FK
+        enum status
+        int progress_percentage
+        int lessons_completed
+        int total_lessons
+        datetime enrolled_at
+        datetime last_accessed_at
+        datetime completed_at
+    }
+
+    LESSON_PROGRESS {
+        string id PK
+        string enrollment_id FK
+        string lesson_id FK
+        enum status
+        int current_slide_index
+        int total_slides_viewed
+        int time_spent_seconds
+        datetime started_at
+        datetime completed_at
+        datetime updated_at
+    }
+
+    QUIZ_SUBMISSIONS {
+        string id PK
+        string quiz_id FK
+        string student_id FK
+        int score_percentage
+        boolean passed
+        datetime started_at
+        datetime submitted_at
+    }
+
+    QUESTION_ANSWERS {
+        string id PK
+        string submission_id FK
+        string question_id FK
+        jsonb answer_given
+        boolean is_correct
+        int points_earned
+        datetime answered_at
+    }
+
+    CERTIFICATES {
+        string id PK
+        string user_id FK
+        string course_id FK
+        string lesson_id FK
+        string certificate_url
+        datetime issued_at
+    }
+```
+
+---
+
+## 7. API Route Structure
+
+```mermaid
+graph LR
+    API["/api"]
+
+    API --> Auth["/auth"]
+    API --> Users["/users"]
+    API --> Courses["/courses"]
+    API --> Lessons["/lessons"]
+    API --> Slides["/slides"]
+    API --> Blocks["/content-blocks"]
+    API --> Quizzes["/quizzes"]
+    API --> Progress["/progress"]
+    API --> Enrollments["/enrollments"]
+    API --> Uploads["/uploads"]
+    API --> Imports["/imports"]
+    API --> Certificates["/certificates"]
+    API --> Analytics["/analytics"]
+    API --> Health["/health"]
+
+    Auth --> AuthLogin["/login<br/>POST"]
+    Auth --> AuthRegister["/register<br/>POST"]
+    Auth --> AuthLogout["/logout<br/>POST"]
+    Auth --> AuthRefresh["/refresh<br/>POST"]
+    Auth --> AuthMe["/me<br/>GET"]
+
+    Users --> UsersList["/GET"]
+    Users --> UsersCreate["/POST"]
+    Users --> UsersGet["/:id<br/>GET"]
+    Users --> UsersUpdate["/:id<br/>PATCH"]
+    Users --> UsersDelete["/:id<br/>DELETE"]
+
+    Courses --> CoursesList["/GET"]
+    Courses --> CoursesCreate["/POST"]
+    Courses --> CoursesGet["/:id<br/>GET"]
+    Courses --> CoursesUpdate["/:id<br/>PATCH"]
+    Courses --> CoursesDelete["/:id<br/>DELETE"]
+    Courses --> CoursesPublish["/:id/publish<br/>POST"]
+
+    Lessons --> LessonsList["/GET"]
+    Lessons --> LessonsCreate["/POST"]
+    Lessons --> LessonsGet["/:id<br/>GET"]
+    Lessons --> LessonsUpdate["/:id<br/>PATCH"]
+    Lessons --> LessonsDelete["/:id<br/>DELETE"]
+    Lessons --> LessonsPublish["/:id/publish<br/>POST"]
+    Lessons --> LessonsReorder["/:id/reorder<br/>PATCH"]
+
+    Slides --> SlidesCreate["/POST"]
+    Slides --> SlidesGet["/:id<br/>GET"]
+    Slides --> SlidesUpdate["/:id<br/>PATCH"]
+    Slides --> SlidesDelete["/:id<br/>DELETE"]
+
+    Blocks --> BlocksCreate["/POST"]
+    Blocks --> BlocksUpdate["/:id<br/>PATCH"]
+    Blocks --> BlocksDelete["/:id<br/>DELETE"]
+
+    Quizzes --> QuizzesList["/GET"]
+    Quizzes --> QuizzesCreate["/POST"]
+    Quizzes --> QuizzesGet["/:id<br/>GET"]
+    Quizzes --> QuizzesUpdate["/:id<br/>PATCH"]
+    Quizzes --> QuizzesSubmit["/:id/submit<br/>POST"]
+    Quizzes --> QuizzesResults["/:id/results<br/>GET"]
+
+    Progress --> ProgressGet["/me<br/>GET"]
+    Progress --> ProgressTrack["/track<br/>POST"]
+    Progress --> ProgressComplete["/complete<br/>POST"]
+
+    Enrollments --> EnrollmentsList["/GET"]
+    Enrollments --> EnrollmentsEnroll["/POST"]
+    Enrollments --> EnrollmentsGet["/:id<br/>GET"]
+
+    Uploads --> UploadsImage["/image<br/>POST"]
+    Uploads --> UploadsPptx["/pptx<br/>POST"]
+
+    Imports --> ImportsParse["/parse<br/>POST"]
+    Imports --> ImportsStatus["/:jobId/status<br/>GET"]
+    Imports --> ImportsPreview["/:jobId/preview<br/>GET"]
+    Imports --> ImportsConfirm["/confirm<br/>POST"]
+
+    Certificates --> CertificatesList["/me<br/>GET"]
+    Certificates --> CertificatesDownload["/:id/download<br/>GET"]
+
+    Analytics --> AnalyticsOverview["/overview<br/>GET"]
+    Analytics --> AnalyticsCourse["/:courseId<br/>GET"]
+    Analytics --> AnalyticsLesson["/:lessonId<br/>GET"]
+
+    Health --> HealthCheck["/GET"]
+
+    style API fill:#4a90e2,color:#fff
+    style Auth fill:#7b68ee,color:#fff
+    style Courses fill:#50c878,color:#fff
+    style Lessons fill:#ff6b6b,color:#fff
+    style Quizzes fill:#ffa500,color:#fff
+    style Imports fill:#9370db,color:#fff
+```
+
+---
+
+## 8. Background Job Processing Flow
+
+```mermaid
+flowchart TB
+    subgraph API["API Server"]
+        ImportEndpoint["/imports/parse<br/>POST"]
+        EmailEndpoint["/notifications/send<br/>POST"]
+        CertEndpoint["/certificates/generate<br/>POST"]
+    end
+
+    subgraph Queue["BullMQ Queues (Redis)"]
+        ImportQueue["import-queue"]
+        EmailQueue["email-queue"]
+        CertQueue["certificate-queue"]
+        ImageQueue["image-queue"]
+    end
+
+    subgraph Worker["Worker Process"]
+        ImportProcessor["Import Processor"]
+        EmailProcessor["Email Processor"]
+        CertProcessor["Certificate Processor"]
+        ImageProcessor["Image Processor"]
+    end
+
+    subgraph Services["Services"]
+        PPTXParser["PowerPoint Parser"]
+        ContentAnalyzer["Content Analyzer"]
+        EmailService["Email Service"]
+        PDFGenerator["PDF Generator"]
+        ImageOptimizer["Image Optimizer"]
+    end
+
+    subgraph Storage["Storage"]
+        DB[(Database)]
+        S3[("S3 Storage")]
+        Redis[(Redis Cache)]
+    end
+
+    ImportEndpoint --> ImportQueue
+    EmailEndpoint --> EmailQueue
+    CertEndpoint --> CertQueue
+
+    ImportQueue --> ImportProcessor
+    EmailQueue --> EmailProcessor
+    CertQueue --> CertProcessor
+    ImageQueue --> ImageProcessor
+
+    ImportProcessor --> PPTXParser
+    ImportProcessor --> ContentAnalyzer
+    ImportProcessor --> ImageQueue
+
+    EmailProcessor --> EmailService
+    CertProcessor --> PDFGenerator
+    ImageProcessor --> ImageOptimizer
+
+    PPTXParser --> S3
+    ContentAnalyzer --> DB
+    ImageOptimizer --> S3
+    PDFGenerator --> S3
+
+    ImportProcessor --> Redis
+    EmailProcessor --> DB
+    CertProcessor --> DB
+
+    style API fill:#e1f5ff
+    style Queue fill:#fff4e6
+    style Worker fill:#f3e5f5
+    style Services fill:#e8f5e9
+    style Storage fill:#fff3e0
+```
+
+---
+
+## 9. Caching Strategy
+
+```mermaid
+flowchart LR
+    Request["API Request"]
+
+    Request --> CheckCache{Check Redis<br/>Cache}
+
+    CheckCache -->|Cache Hit| ReturnCached["Return Cached<br/>Response"]
+    CheckCache -->|Cache Miss| QueryDB["Query<br/>Database"]
+
+    QueryDB --> StoreCache["Store in Redis<br/>(with TTL)"]
+    StoreCache --> ReturnFresh["Return Fresh<br/>Response"]
+
+    Update["Data Update"] --> InvalidateCache["Invalidate<br/>Cache"]
+    InvalidateCache --> QueryDB
+
+    style CheckCache fill:#4a90e2,color:#fff
+    style ReturnCached fill:#50c878,color:#fff
+    style InvalidateCache fill:#ff6b6b,color:#fff
+
+    subgraph Cache Rules
+        direction TB
+        Rule1["Courses: 5 min TTL"]
+        Rule2["Lessons: 15 min TTL"]
+        Rule3["User Profile: 10 min TTL"]
+        Rule4["Progress: No cache<br/>(always fresh)"]
+        Rule5["Quiz Questions: 30 min TTL"]
+    end
+```
+
+---
+
+## 10. Deployment Architecture
+
+```mermaid
+flowchart TB
+    subgraph Developer["Developer"]
+        DevMachine["Local Machine"]
+        GitCommit["Git Commit"]
+    end
+
+    subgraph GitHub["GitHub"]
+        Repo["Repository"]
+        Actions["GitHub Actions"]
+    end
+
+    subgraph CI["CI/CD Pipeline"]
+        Lint["Lint & Type Check"]
+        Test["Run Tests"]
+        Build["Build Apps"]
+        Deploy["Deploy"]
+    end
+
+    subgraph Vercel["Vercel (Frontend)"]
+        VercelBuild["Build SPA"]
+        VercelDeploy["Deploy to CDN"]
+        VercelLive["Live Frontend"]
+    end
+
+    subgraph Render["Render (Backend)"]
+        RenderBuild["Build API & Worker"]
+        RenderDeploy["Deploy Containers"]
+        RenderAPI["API Server"]
+        RenderWorker["Worker Process"]
+        RenderDB[(PostgreSQL)]
+        RenderRedis[(Redis)]
+    end
+
+    subgraph CloudflareR2["Cloudflare R2"]
+        R2Storage[("Object Storage")]
+        R2CDN["CDN"]
+    end
+
+    DevMachine --> GitCommit
+    GitCommit --> Repo
+    Repo --> Actions
+
+    Actions --> Lint
+    Lint --> Test
+    Test --> Build
+    Build --> Deploy
+
+    Deploy --> VercelBuild
+    Deploy --> RenderBuild
+
+    VercelBuild --> VercelDeploy
+    VercelDeploy --> VercelLive
+
+    RenderBuild --> RenderDeploy
+    RenderDeploy --> RenderAPI
+    RenderDeploy --> RenderWorker
+
+    RenderAPI --> RenderDB
+    RenderAPI --> RenderRedis
+    RenderWorker --> RenderDB
+    RenderWorker --> RenderRedis
+    RenderWorker --> R2Storage
+
+    VercelLive --> RenderAPI
+    RenderAPI --> R2Storage
+    R2Storage --> R2CDN
+    R2CDN --> VercelLive
+
+    style Developer fill:#e1f5ff
+    style GitHub fill:#333,color:#fff
+    style CI fill:#fff4e6
+    style Vercel fill:#000,color:#fff
+    style Render fill:#4a90e2,color:#fff
+    style CloudflareR2 fill:#f38020,color:#fff
+```
+
+---
+
+## 11. Security Architecture
+
+```mermaid
+flowchart TB
+    User["User (Browser)"]
+
+    User -->|HTTPS Only| CloudFlare["CloudFlare<br/>(DDoS Protection)"]
+    CloudFlare --> Frontend["Frontend<br/>(Vercel)"]
+
+    Frontend -->|HTTPS + CORS| RateLimit["Rate Limiting<br/>Middleware"]
+    RateLimit --> Auth["Auth Guard"]
+
+    Auth -->|Valid JWT| RBAC["Role-Based<br/>Access Control"]
+    Auth -->|Invalid/Missing| Unauthorized["401 Unauthorized"]
+
+    RBAC -->|Authorized| Validation["Input Validation<br/>(Zod Schemas)"]
+    RBAC -->|Not Authorized| Forbidden["403 Forbidden"]
+
+    Validation -->|Valid| Sanitize["Sanitize Input<br/>(XSS Prevention)"]
+    Validation -->|Invalid| BadRequest["400 Bad Request"]
+
+    Sanitize --> Business["Business Logic"]
+    Business --> DB["Database<br/>(Parameterized Queries)"]
+
+    DB --> Encrypt["Encrypt Sensitive Data"]
+    Encrypt --> Response["Send Response"]
+    Response --> Frontend
+
+    subgraph Security Layers
+        Layer1["1. DDoS Protection"]
+        Layer2["2. Rate Limiting"]
+        Layer3["3. Authentication"]
+        Layer4["4. Authorization"]
+        Layer5["5. Input Validation"]
+        Layer6["6. SQL Injection Prevention"]
+        Layer7["7. XSS Prevention"]
+        Layer8["8. CSRF Protection (Cookies)"]
+    end
+
+    style Auth fill:#ff6b6b,color:#fff
+    style RBAC fill:#ffa500,color:#fff
+    style Validation fill:#50c878,color:#fff
+    style CloudFlare fill:#f38020,color:#fff
+```
+
+---
+
+## 12. Data Flow: Complete Lesson Creation Journey
+
+```mermaid
+flowchart TD
+    Start["Teacher starts<br/>lesson creation"]
+
+    Start --> Choice{Creation Method?}
+
+    Choice -->|Import PPTX| Upload["Upload PowerPoint"]
+    Choice -->|From Scratch| Builder["Open Lesson Builder"]
+
+    Upload --> Parse["Parse PPTX<br/>(Background Job)"]
+    Parse --> Preview["Review Parsed<br/>Content"]
+    Preview --> Adjust["Make Adjustments"]
+    Adjust --> Builder
+
+    Builder --> AddSlides["Add/Edit Slides"]
+    AddSlides --> AddBlocks["Add Content Blocks"]
+
+    AddBlocks --> BlockType{Block Type?}
+
+    BlockType -->|Text/Heading| TextEditor["Rich Text Editor"]
+    BlockType -->|Image| ImageUpload["Upload Image to S3"]
+    BlockType -->|Bible Verse| VersePicker["Bible Verse Picker"]
+    BlockType -->|Vocabulary| VocabForm["Term + Definition"]
+    BlockType -->|Quiz| QuizBuilder["Quiz Question Builder"]
+
+    TextEditor --> AutoSave
+    ImageUpload --> AutoSave
+    VersePicker --> AutoSave
+    VocabForm --> AutoSave
+    QuizBuilder --> AutoSave
+
+    AutoSave["Auto-save to DB<br/>(every 30s)"] --> AddBlocks
+
+    AddBlocks --> MoreSlides{Add more<br/>slides?}
+    MoreSlides -->|Yes| AddSlides
+    MoreSlides -->|No| Preview2["Preview Lesson"]
+
+    Preview2 --> Satisfied{Satisfied?}
+    Satisfied -->|No| Builder
+    Satisfied -->|Yes| Publish["Click Publish"]
+
+    Publish --> Validate["Validate Lesson"]
+
+    Validate -->|Invalid| ShowErrors["Show Validation<br/>Errors"]
+    ShowErrors --> Builder
+
+    Validate -->|Valid| UpdateDB["Update Status<br/>to 'Published'"]
+    UpdateDB --> ClearCache["Clear Redis Cache"]
+    ClearCache --> Notify["Notify Students<br/>(Background Job)"]
+    Notify --> Complete["Lesson Published!"]
+
+    style Start fill:#4a90e2,color:#fff
+    style Upload fill:#9370db,color:#fff
+    style Builder fill:#50c878,color:#fff
+    style Publish fill:#ffa500,color:#fff
+    style Complete fill:#32cd32,color:#fff
+```
+
+---
+
+## Usage Notes
+
+These diagrams are written in Mermaid format and can be rendered in:
+- GitHub Markdown
+- GitLab Markdown
+- VS Code (with Mermaid extension)
+- Documentation sites (Docusaurus, VuePress, etc.)
+- Mermaid Live Editor (https://mermaid.live)
+
+To render locally, install a Mermaid preview extension for your editor or use the Mermaid CLI:
+
+```bash
+npm install -g @mermaid-js/mermaid-cli
+mmdc -i system-diagrams.mmd -o diagrams/ -e png
+```
+
+These diagrams should be updated as the architecture evolves during development.
