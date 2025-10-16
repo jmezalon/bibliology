@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd ../.. && pnpm install --ignore-scripts && pnpm --filter @bibliology/web build",
+  "outputDirectory": "dist",
+  "installCommand": "pnpm install --ignore-scripts",
+  "framework": "vite"
+}
