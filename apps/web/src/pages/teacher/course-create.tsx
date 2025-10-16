@@ -79,10 +79,7 @@ export function CourseCreatePage() {
     }, 1000);
   };
 
-  const handleChange = (
-    field: keyof CreateCourseRequest,
-    value: string | CourseLevel
-  ) => {
+  const handleChange = (field: keyof CreateCourseRequest, value: string | CourseLevel) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error for this field when user starts typing
     if (errors[field]) {
@@ -119,9 +116,7 @@ export function CourseCreatePage() {
           <Card>
             <CardHeader>
               <CardTitle>Course Information</CardTitle>
-              <CardDescription>
-                Provide the basic information about your course
-              </CardDescription>
+              <CardDescription>Provide the basic information about your course</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* English Title */}
@@ -167,9 +162,7 @@ export function CourseCreatePage() {
                   placeholder="Describe what students will learn in this course..."
                   rows={4}
                   aria-invalid={!!errors.description_en}
-                  aria-describedby={
-                    errors.description_en ? 'description_en-error' : undefined
-                  }
+                  aria-describedby={errors.description_en ? 'description_en-error' : undefined}
                 />
                 {errors.description_en && (
                   <p id="description_en-error" className="text-sm text-destructive">
@@ -204,9 +197,7 @@ export function CourseCreatePage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value={CourseLevel.BEGINNER}>Beginner</SelectItem>
-                    <SelectItem value={CourseLevel.INTERMEDIATE}>
-                      Intermediate
-                    </SelectItem>
+                    <SelectItem value={CourseLevel.INTERMEDIATE}>Intermediate</SelectItem>
                     <SelectItem value={CourseLevel.ADVANCED}>Advanced</SelectItem>
                   </SelectContent>
                 </Select>
