@@ -131,10 +131,7 @@ function isValidUrl(url: string): boolean {
 /**
  * Validate a single field based on a rule
  */
-function validateField(
-  value: unknown,
-  rule: ValidationRule,
-): { isValid: boolean; error?: string } {
+function validateField(value: unknown, rule: ValidationRule): { isValid: boolean; error?: string } {
   switch (rule.rule) {
     case 'required': {
       if (typeof value === 'string') {
@@ -256,10 +253,6 @@ export function blockHasRequiredFields(blockType: ContentBlockType): boolean {
  */
 export function getBlockCharacterLimit(blockType: ContentBlockType): number | null {
   const rules = BLOCK_VALIDATION_RULES[blockType];
-  const maxLengthRule = rules.find(
-    (rule) => rule.field === 'content' && rule.rule === 'maxLength',
-  );
-  return maxLengthRule && typeof maxLengthRule.value === 'number'
-    ? maxLengthRule.value
-    : null;
+  const maxLengthRule = rules.find((rule) => rule.field === 'content' && rule.rule === 'maxLength');
+  return maxLengthRule && typeof maxLengthRule.value === 'number' ? maxLengthRule.value : null;
 }

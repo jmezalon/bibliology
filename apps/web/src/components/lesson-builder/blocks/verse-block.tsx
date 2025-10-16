@@ -2,13 +2,7 @@ import { BookOpen } from 'lucide-react';
 
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { RichTextEditor } from '../rich-text-editor';
 
 type BibleTranslation = 'KJV' | 'NIV' | 'ESV' | 'NKJV' | 'LSG' | 'NBS' | 'BDS';

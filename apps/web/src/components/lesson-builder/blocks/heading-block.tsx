@@ -5,13 +5,7 @@ import { cn } from '../../../lib/utils';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 type HeadingLevel = 1 | 2 | 3;
 type TextAlignment = 'left' | 'center' | 'right';
@@ -141,7 +135,11 @@ export function HeadingBlock({
           )}
 
           <div className="ml-auto text-xs text-gray-600 dark:text-gray-400">
-            <span className={cn(characterCount > maxLength && 'text-red-600 dark:text-red-400 font-semibold')}>
+            <span
+              className={cn(
+                characterCount > maxLength && 'text-red-600 dark:text-red-400 font-semibold',
+              )}
+            >
               {characterCount} / {maxLength}
             </span>
           </div>

@@ -13,11 +13,7 @@ import {
 import { cn } from '../../lib/utils';
 import { ContentBlockType } from '../../types/lesson-builder';
 import { Button } from '../ui/button';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '../ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
 interface BlockPaletteProps {
   open?: boolean;
@@ -99,11 +95,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   layout: 'Layout',
 };
 
-export function BlockPalette({
-  open,
-  onOpenChange,
-  onSelectBlockType,
-}: BlockPaletteProps) {
+export function BlockPalette({ open, onOpenChange, onSelectBlockType }: BlockPaletteProps) {
   const blocksByCategory = BLOCK_PALETTE.reduce(
     (acc, block) => {
       if (!acc[block.category]) {
@@ -126,12 +118,7 @@ export function BlockPalette({
             <Plus className="h-6 w-6" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent
-          align="end"
-          side="top"
-          className="w-80 p-4"
-          sideOffset={8}
-        >
+        <PopoverContent align="end" side="top" className="w-80 p-4" sideOffset={8}>
           <div className="space-y-4">
             <div>
               <h3 className="font-semibold text-lg mb-1">Add Content Block</h3>

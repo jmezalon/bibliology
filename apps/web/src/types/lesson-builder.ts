@@ -50,7 +50,16 @@ export interface VerseBlockMetadata {
 export interface VocabularyBlockMetadata {
   term_en?: string;
   term_fr?: string;
-  partOfSpeech?: 'noun' | 'verb' | 'adjective' | 'adverb' | 'pronoun' | 'preposition' | 'conjunction' | 'interjection' | 'other';
+  partOfSpeech?:
+    | 'noun'
+    | 'verb'
+    | 'adjective'
+    | 'adverb'
+    | 'pronoun'
+    | 'preposition'
+    | 'conjunction'
+    | 'interjection'
+    | 'other';
   pronunciation?: string;
 }
 

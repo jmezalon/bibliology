@@ -19,11 +19,7 @@ interface ImageBlockProps {
   language?: 'en' | 'fr';
 }
 
-export function ImageBlock({
-  metadata,
-  onUpdate,
-  editable = true,
-}: ImageBlockProps) {
+export function ImageBlock({ metadata, onUpdate, editable = true }: ImageBlockProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
@@ -216,7 +212,9 @@ export function ImageBlock({
             <p className="font-medium">Image block is incomplete</p>
             <ul className="list-disc list-inside mt-1 space-y-1">
               {!metadata.imageUrl && <li>Image URL is required</li>}
-              {metadata.imageUrl && !validateUrl(metadata.imageUrl) && <li>Image URL must be valid</li>}
+              {metadata.imageUrl && !validateUrl(metadata.imageUrl) && (
+                <li>Image URL must be valid</li>
+              )}
               {!metadata.imageAlt && <li>Alt text is required</li>}
             </ul>
           </div>

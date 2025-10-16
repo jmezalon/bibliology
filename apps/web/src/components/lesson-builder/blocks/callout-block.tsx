@@ -3,13 +3,7 @@ import { AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { RichTextEditor } from '../rich-text-editor';
 
 type CalloutType = 'info' | 'warning' | 'success' | 'error';
@@ -171,11 +165,7 @@ export function CalloutBlock({
           <div className="flex items-start gap-3">
             <Icon className={cn('h-6 w-6 flex-shrink-0 mt-1', config.iconColor)} />
             <div className="flex-1 min-w-0">
-              {title && (
-                <h4 className="text-lg font-semibold mb-2">
-                  {title}
-                </h4>
-              )}
+              {title && <h4 className="text-lg font-semibold mb-2">{title}</h4>}
               <div
                 className="prose prose-sm dark:prose-invert max-w-none"
                 dangerouslySetInnerHTML={{ __html: content }}
@@ -200,11 +190,7 @@ export function CalloutBlock({
             <div className="flex items-start gap-3">
               <Icon className={cn('h-6 w-6 flex-shrink-0 mt-1', config.iconColor)} />
               <div className="flex-1 min-w-0">
-                {title && (
-                  <h4 className="text-lg font-semibold mb-2">
-                    {title}
-                  </h4>
-                )}
+                {title && <h4 className="text-lg font-semibold mb-2">{title}</h4>}
                 <div
                   className="prose prose-sm dark:prose-invert max-w-none"
                   dangerouslySetInnerHTML={{ __html: content }}

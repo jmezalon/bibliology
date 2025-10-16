@@ -5,13 +5,7 @@ import { cn } from '../../../lib/utils';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 type ListStyle = 'bullet' | 'numbered';
 
@@ -123,9 +117,7 @@ export function ListBlock({
             )}
           </div>
 
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            {items.length} / 20 items
-          </div>
+          <div className="text-xs text-gray-600 dark:text-gray-400">{items.length} / 20 items</div>
         </div>
       )}
 

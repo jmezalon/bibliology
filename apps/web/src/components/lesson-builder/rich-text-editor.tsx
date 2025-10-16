@@ -38,13 +38,7 @@ import {
 } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 
 interface RichTextEditorProps {
   content: string;
@@ -96,9 +90,7 @@ const ToolbarButton = ({
   </Button>
 );
 
-const ToolbarDivider = () => (
-  <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
-);
+const ToolbarDivider = () => <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />;
 
 export function RichTextEditor({
   content,
@@ -155,10 +147,7 @@ export function RichTextEditor({
     },
     editorProps: {
       attributes: {
-        class: cn(
-          'prose prose-sm dark:prose-invert max-w-none focus:outline-none',
-          'px-4 py-3',
-        ),
+        class: cn('prose prose-sm dark:prose-invert max-w-none focus:outline-none', 'px-4 py-3'),
       },
     },
   });
@@ -387,10 +376,7 @@ export function RichTextEditor({
       )}
 
       {/* Editor Content */}
-      <div
-        className={cn('overflow-y-auto')}
-        style={{ minHeight }}
-      >
+      <div className={cn('overflow-y-auto')} style={{ minHeight }}>
         <EditorContent editor={editor} />
       </div>
 
@@ -410,7 +396,10 @@ export function RichTextEditor({
       )}
 
       {/* Link Dialog */}
-      <Dialog open={linkDialog.isOpen} onOpenChange={(open: boolean) => setLinkDialog({ ...linkDialog, isOpen: open })}>
+      <Dialog
+        open={linkDialog.isOpen}
+        onOpenChange={(open: boolean) => setLinkDialog({ ...linkDialog, isOpen: open })}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Insert Link</DialogTitle>

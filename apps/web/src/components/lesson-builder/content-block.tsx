@@ -1,19 +1,11 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  AlertCircle,
-  Copy,
-  GripVertical,
-  Settings,
-  Trash2,
-} from 'lucide-react';
+import { AlertCircle, Copy, GripVertical, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { validateBlock } from '../../lib/block-validation';
 import { cn } from '../../lib/utils';
-import type {
-  ContentBlock as ContentBlockType,
-} from '../../types/lesson-builder';
+import type { ContentBlock as ContentBlockType } from '../../types/lesson-builder';
 import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
 
@@ -66,7 +58,11 @@ export function ContentBlock({
   };
 
   // Validate block
-  const validation = validateBlock(block.type, block.content, block.metadata as Record<string, unknown>);
+  const validation = validateBlock(
+    block.type,
+    block.content,
+    block.metadata as Record<string, unknown>,
+  );
   const hasValidationErrors = !validation.isValid;
 
   // Render the appropriate block component
@@ -234,9 +230,7 @@ export function ContentBlock({
             <div className="space-y-3">
               <div className="space-y-1">
                 <h4 className="font-medium text-sm">Block Settings</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  {block.type} Block
-                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400">{block.type} Block</p>
               </div>
 
               {hasValidationErrors && (

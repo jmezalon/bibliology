@@ -3,13 +3,7 @@ import { Minus } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { ColorPicker } from '../../ui/color-picker';
 import { Label } from '../../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 
 type DividerStyle = 'solid' | 'dashed' | 'dotted';
 type DividerWidth = 'full' | 'half' | 'quarter';
@@ -38,11 +32,7 @@ const DIVIDER_WIDTHS: { value: DividerWidth; label: string; percent: string }[] 
   { value: 'quarter', label: '25%', percent: '25%' },
 ];
 
-export function DividerBlock({
-  metadata,
-  onUpdate,
-  editable = true,
-}: DividerBlockProps) {
+export function DividerBlock({ metadata, onUpdate, editable = true }: DividerBlockProps) {
   const style = metadata.style || 'solid';
   const width = metadata.width || 'full';
   const color = metadata.color || '#D1D5DB'; // Default gray-300
@@ -106,10 +96,7 @@ export function DividerBlock({
 
           <div className="space-y-2">
             <Label htmlFor="divider-color">Color</Label>
-            <ColorPicker
-              value={color}
-              onChange={handleColorChange}
-            />
+            <ColorPicker value={color} onChange={handleColorChange} />
           </div>
         </div>
       )}
@@ -133,8 +120,7 @@ export function DividerBlock({
           <Minus className="h-3 w-3" />
           <span>
             {DIVIDER_STYLES.find((s) => s.value === style)?.label} •{' '}
-            {DIVIDER_WIDTHS.find((w) => w.value === width)?.label} •{' '}
-            {color.toUpperCase()}
+            {DIVIDER_WIDTHS.find((w) => w.value === width)?.label} • {color.toUpperCase()}
           </span>
         </div>
       )}

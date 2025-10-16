@@ -2,16 +2,19 @@ import { Languages } from 'lucide-react';
 
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../ui/select';
 import { RichTextEditor } from '../rich-text-editor';
 
-type PartOfSpeech = 'noun' | 'verb' | 'adjective' | 'adverb' | 'pronoun' | 'preposition' | 'conjunction' | 'interjection' | 'other';
+type PartOfSpeech =
+  | 'noun'
+  | 'verb'
+  | 'adjective'
+  | 'adverb'
+  | 'pronoun'
+  | 'preposition'
+  | 'conjunction'
+  | 'interjection'
+  | 'other';
 
 export interface VocabularyBlockMetadata {
   term_en?: string;
@@ -82,14 +85,15 @@ export function VocabularyBlock({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="md:col-span-2 space-y-2">
           <Label htmlFor="vocab-term" className="flex items-center gap-2">
-            Term ({language.toUpperCase()})
-            <span className="text-red-500">*</span>
+            Term ({language.toUpperCase()})<span className="text-red-500">*</span>
           </Label>
           <div className="flex gap-2">
             <Input
               id="vocab-term"
               type="text"
-              placeholder={language === 'en' ? 'Enter term in English' : 'Entrez le terme en français'}
+              placeholder={
+                language === 'en' ? 'Enter term in English' : 'Entrez le terme en français'
+              }
               value={currentTerm}
               onChange={(e) => handleTermChange(e.target.value)}
               className="text-lg font-semibold"

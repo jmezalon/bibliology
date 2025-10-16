@@ -131,10 +131,7 @@ export function ColorPicker({
                   aria-label={color.label}
                 >
                   {value === color.value && (
-                    <Check
-                      className="h-4 w-4 mx-auto text-white drop-shadow-md"
-                      strokeWidth={3}
-                    />
+                    <Check className="h-4 w-4 mx-auto text-white drop-shadow-md" strokeWidth={3} />
                   )}
                 </button>
               ))}
