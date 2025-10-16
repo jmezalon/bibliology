@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './users/users.module';
+import { CoursesModule } from './courses/courses.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { UsersModule } from './users/users.module';
     // Features
     AuthModule,
     UsersModule,
+    CoursesModule,
   ],
   controllers: [AppController],
   providers: [
