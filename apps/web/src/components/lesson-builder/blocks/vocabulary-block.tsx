@@ -47,35 +47,123 @@ const PARTS_OF_SPEECH: { value: PartOfSpeech; label: string }[] = [
 export function VocabularyBlock({
   content,
   onUpdate,
-  metadata = {},
+  metadata,
   language = 'en',
   onLanguageChange,
   editable = true,
 }: VocabularyBlockProps) {
-  const term_en = metadata.term_en || '';
-  const term_fr = metadata.term_fr || '';
-  const partOfSpeech = metadata.partOfSpeech || 'noun';
-  const pronunciation = metadata.pronunciation || '';
+  // Ensure metadata is never null
+  const safeMetadata = metadata || {};
+
+  // Parse JSON content from backend
+  const parseContent = (
+    jsonContent: string,
+  ): {
+    html: string;
+    term_en: string;
+    term_fr: string;
+    partOfSpeech: PartOfSpeech;
+    pronunciation: string;
+  } => {
+    // Handle null/undefined content
+    if (!jsonContent) {
+      return {
+        html: '',
+        term_en: safeMetadata.term_en || '',
+        term_fr: safeMetadata.term_fr || '',
+        partOfSpeech: (safeMetadata.partOfSpeech || 'noun') as PartOfSpeech,
+        pronunciation: safeMetadata.pronunciation || '',
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(jsonContent) as {
+        html?: string;
+        definition?: string;
+        term_en?: string;
+        term_fr?: string;
+        partOfSpeech?: string;
+        pronunciation?: string;
+      } | null;
+      // Handle parsed null
+      if (!parsed || typeof parsed !== 'object') {
+        return {
+          html: '',
+          term_en: safeMetadata.term_en || '',
+          term_fr: safeMetadata.term_fr || '',
+          partOfSpeech: (safeMetadata.partOfSpeech || 'noun') as PartOfSpeech,
+          pronunciation: safeMetadata.pronunciation || '',
+        };
+      }
+      return {
+        html: parsed.html || parsed.definition || '',
+        term_en: parsed.term_en || safeMetadata.term_en || '',
+        term_fr: parsed.term_fr || safeMetadata.term_fr || '',
+        partOfSpeech: (parsed.partOfSpeech || safeMetadata.partOfSpeech || 'noun') as PartOfSpeech,
+        pronunciation: parsed.pronunciation || safeMetadata.pronunciation || '',
+      };
+    } catch {
+      // Fallback if content is not JSON - assume it's HTML definition
+      return {
+        html: jsonContent || '',
+        term_en: safeMetadata.term_en || '',
+        term_fr: safeMetadata.term_fr || '',
+        partOfSpeech: (safeMetadata.partOfSpeech || 'noun') as PartOfSpeech,
+        pronunciation: safeMetadata.pronunciation || '',
+      };
+    }
+  };
+
+  const parsedContent = parseContent(content);
+  const htmlContent = parsedContent.html;
+  const term_en = parsedContent.term_en;
+  const term_fr = parsedContent.term_fr;
+  const partOfSpeech = parsedContent.partOfSpeech;
+  const pronunciation = parsedContent.pronunciation;
 
   const currentTerm = language === 'en' ? term_en : term_fr;
 
   const handleTermChange = (value: string) => {
-    const newMetadata = {
-      ...metadata,
-      [language === 'en' ? 'term_en' : 'term_fr']: value,
-    };
-    onUpdate(content, newMetadata);
+    const newContent = JSON.stringify({
+      html: htmlContent,
+      term_en: language === 'en' ? value : term_en,
+      term_fr: language === 'fr' ? value : term_fr,
+      partOfSpeech,
+      pronunciation,
+    });
+    onUpdate(newContent, metadata);
   };
 
   const handlePartOfSpeechChange = (value: string) => {
-    onUpdate(content, { ...metadata, partOfSpeech: value as PartOfSpeech });
+    const newContent = JSON.stringify({
+      html: htmlContent,
+      term_en,
+      term_fr,
+      partOfSpeech: value,
+      pronunciation,
+    });
+    onUpdate(newContent, metadata);
   };
 
   const handlePronunciationChange = (value: string) => {
-    onUpdate(content, { ...metadata, pronunciation: value });
+    const newContent = JSON.stringify({
+      html: htmlContent,
+      term_en,
+      term_fr,
+      partOfSpeech,
+      pronunciation: value,
+    });
+    onUpdate(newContent, metadata);
   };
 
-  const handleDefinitionChange = (newContent: string) => {
+  const handleDefinitionChange = (newHtml: string) => {
+    const newContent = JSON.stringify({
+      html: newHtml,
+      term_en,
+      term_fr,
+      partOfSpeech,
+      pronunciation,
+    });
     onUpdate(newContent, metadata);
   };
 
@@ -153,7 +241,7 @@ export function VocabularyBlock({
           </Label>
         )}
         <RichTextEditor
-          content={content}
+          content={htmlContent}
           onUpdate={handleDefinitionChange}
           placeholder="Enter the definition and explanation..."
           editable={editable}
@@ -186,7 +274,7 @@ export function VocabularyBlock({
           </div>
           <div
             className="prose prose-sm dark:prose-invert max-w-none text-purple-900 dark:text-purple-100"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
         </div>
       )}

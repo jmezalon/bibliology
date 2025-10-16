@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { Container } from '../../components/layout/container';
+import { CreateLessonDialog } from '../../components/teacher/create-lesson-dialog';
 import { EmptyState } from '../../components/teacher/empty-state';
 import { LessonCard } from '../../components/teacher/lesson-card';
 import { StatCard } from '../../components/teacher/stat-card';
@@ -33,6 +34,8 @@ export function TeacherCourseDetailPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreatingLesson, setIsCreatingLesson] = useState(false);
 
   // Fetch course and lessons on mount
   useEffect(() => {
@@ -74,26 +77,48 @@ export function TeacherCourseDetailPage() {
     averageRating: 0,
   };
 
-  const handleAddLesson = async () => {
+  const handleAddLesson = () => {
+    setIsCreateDialogOpen(true);
+  };
+
+  const handleCreateLesson = async (data: {
+    title: string;
+    description: string;
+    duration: number;
+  }) => {
     if (!courseId) return;
 
-    // Prompt for lesson title
-    const title = prompt('Enter lesson title:');
-    if (!title) return;
+    // Generate slug from title
+    const slug = data.title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+
+    // Calculate next lesson order (last lesson order + 1)
+    const nextOrder = lessons.length > 0 ? Math.max(...lessons.map((l) => l.order)) + 1 : 1;
 
     try {
+      setIsCreatingLesson(true);
       const lesson = await lessonsApi.create({
         course_id: courseId,
-        title_en: title,
-        description_en: 'Add a description for this lesson',
-        duration_minutes: 30,
+        slug,
+        title_en: data.title,
+        description_en: data.description,
+        lesson_order: nextOrder,
+        estimated_minutes: data.duration,
       });
 
-      // Navigate to the lesson builder
+      // Close dialog and navigate to the lesson builder
+      setIsCreateDialogOpen(false);
       navigate(`/teacher/courses/${courseId}/lessons/${lesson.id}/edit`);
     } catch (error) {
       console.error('Failed to create lesson:', error);
       alert('Failed to create lesson. Please try again.');
+    } finally {
+      setIsCreatingLesson(false);
     }
   };
 
@@ -118,8 +143,8 @@ export function TeacherCourseDetailPage() {
     navigate(`/teacher/courses/${courseId}/lessons/${lesson.id}`);
   };
 
-  const handleTogglePublish = (lesson: Lesson) => {
-    console.log('Toggle publish:', lesson.id, !lesson.is_published);
+  const handleTogglePublish = (_lesson: Lesson) => {
+    // TODO: Implement publish toggle
   };
 
   const handleDragStart = (lesson: Lesson) => {
@@ -132,8 +157,7 @@ export function TeacherCourseDetailPage() {
 
   const handleDrop = (targetLesson: Lesson) => {
     if (draggedLesson && draggedLesson.id !== targetLesson.id) {
-      // Reorder lessons
-      console.log('Reorder:', draggedLesson.order, 'to', targetLesson.order);
+      // TODO: Implement lesson reordering
     }
   };
 
@@ -248,7 +272,7 @@ export function TeacherCourseDetailPage() {
                 <CardTitle>Course Lessons</CardTitle>
                 <CardDescription>Drag and drop to reorder lessons</CardDescription>
               </div>
-              <Button onClick={() => void handleAddLesson()}>
+              <Button onClick={handleAddLesson}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Lesson
               </Button>
@@ -261,7 +285,7 @@ export function TeacherCourseDetailPage() {
                   description="Create your first lesson to start building your course content"
                   action={{
                     label: 'Create First Lesson',
-                    onClick: () => void handleAddLesson(),
+                    onClick: handleAddLesson,
                   }}
                 />
               ) : (
@@ -292,6 +316,14 @@ export function TeacherCourseDetailPage() {
           </Card>
         </div>
       </Container>
+
+      {/* Create Lesson Dialog */}
+      <CreateLessonDialog
+        open={isCreateDialogOpen}
+        onOpenChange={setIsCreateDialogOpen}
+        onSubmit={(data) => void handleCreateLesson(data)}
+        isSubmitting={isCreatingLesson}
+      />
     </div>
   );
 }

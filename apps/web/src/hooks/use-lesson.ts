@@ -91,7 +91,7 @@ export function useCreateSlide(lessonId: string) {
 
   return useMutation({
     mutationFn: async (data: CreateSlideRequest): Promise<{ id: string }> => {
-      const response = await apiClient.post<{ id: string }>('/slides', data);
+      const response = await apiClient.post<{ id: string }>(`/lessons/${lessonId}/slides`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -119,7 +119,7 @@ export function useUpdateSlide(lessonId: string, slideId: string) {
 
   return useMutation({
     mutationFn: async (data: UpdateSlideRequest): Promise<{ id: string }> => {
-      const response = await apiClient.put<{ id: string }>(`/slides/${slideId}`, data);
+      const response = await apiClient.patch<{ id: string }>(`/slides/${slideId}`, data);
       return response.data;
     },
     onMutate: async (newData) => {
@@ -237,8 +237,8 @@ export function useReorderSlides(lessonId: string) {
 
   return useMutation({
     mutationFn: async (data: ReorderSlidesRequest): Promise<{ success: boolean }> => {
-      const response = await apiClient.patch<{ success: boolean }>(
-        `/lessons/${lessonId}/reorder`,
+      const response = await apiClient.put<{ success: boolean }>(
+        `/lessons/${lessonId}/slides/reorder`,
         data,
       );
       return response.data;

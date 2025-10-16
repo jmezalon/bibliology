@@ -70,26 +70,81 @@ const CALLOUT_CONFIGS: Record<
 export function CalloutBlock({
   content,
   onUpdate,
-  metadata = {},
+  metadata,
   language = 'en',
   onLanguageChange,
   editable = true,
 }: CalloutBlockProps) {
-  const calloutType = metadata.calloutType || 'info';
-  const title = metadata.title || '';
+  // Ensure metadata is never null
+  const safeMetadata = metadata || {};
+
+  // Parse JSON content from backend
+  const parseContent = (
+    jsonContent: string,
+  ): {
+    html: string;
+    calloutType: CalloutType;
+    title: string;
+  } => {
+    // Handle null/undefined content
+    if (!jsonContent) {
+      return {
+        html: '',
+        calloutType: (safeMetadata.calloutType || 'info') as CalloutType,
+        title: safeMetadata.title || '',
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(jsonContent) as {
+        html?: string;
+        text?: string;
+        calloutType?: string;
+        title?: string;
+      } | null;
+      // Handle parsed null
+      if (!parsed || typeof parsed !== 'object') {
+        return {
+          html: '',
+          calloutType: (safeMetadata.calloutType || 'info') as CalloutType,
+          title: safeMetadata.title || '',
+        };
+      }
+      return {
+        html: parsed.html || parsed.text || '',
+        calloutType: (parsed.calloutType || safeMetadata.calloutType || 'info') as CalloutType,
+        title: parsed.title || safeMetadata.title || '',
+      };
+    } catch {
+      // Fallback if content is not JSON - assume it's HTML
+      return {
+        html: jsonContent || '',
+        calloutType: (safeMetadata.calloutType || 'info') as CalloutType,
+        title: safeMetadata.title || '',
+      };
+    }
+  };
+
+  const parsedContent = parseContent(content);
+  const htmlContent = parsedContent.html;
+  const calloutType = parsedContent.calloutType;
+  const title = parsedContent.title;
 
   const config = CALLOUT_CONFIGS[calloutType];
   const Icon = config.icon;
 
   const handleTypeChange = (type: string) => {
-    onUpdate(content, { ...metadata, calloutType: type as CalloutType });
+    const newContent = JSON.stringify({ html: htmlContent, calloutType: type, title });
+    onUpdate(newContent, metadata);
   };
 
   const handleTitleChange = (newTitle: string) => {
-    onUpdate(content, { ...metadata, title: newTitle });
+    const newContent = JSON.stringify({ html: htmlContent, calloutType, title: newTitle });
+    onUpdate(newContent, metadata);
   };
 
-  const handleContentChange = (newContent: string) => {
+  const handleContentChange = (newHtml: string) => {
+    const newContent = JSON.stringify({ html: newHtml, calloutType, title });
     onUpdate(newContent, metadata);
   };
 
@@ -141,7 +196,7 @@ export function CalloutBlock({
             <span className="text-red-500">*</span>
           </Label>
           <RichTextEditor
-            content={content}
+            content={htmlContent}
             onUpdate={handleContentChange}
             placeholder="Enter callout content..."
             editable={editable}
@@ -168,7 +223,7 @@ export function CalloutBlock({
               {title && <h4 className="text-lg font-semibold mb-2">{title}</h4>}
               <div
                 className="prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: content }}
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
               />
             </div>
           </div>
@@ -176,7 +231,7 @@ export function CalloutBlock({
       )}
 
       {/* Preview in Edit Mode */}
-      {editable && content && (
+      {editable && htmlContent && (
         <div className="space-y-2">
           <Label>Preview</Label>
           <div
@@ -193,7 +248,7 @@ export function CalloutBlock({
                 {title && <h4 className="text-lg font-semibold mb-2">{title}</h4>}
                 <div
                   className="prose prose-sm dark:prose-invert max-w-none"
-                  dangerouslySetInnerHTML={{ __html: content }}
+                  dangerouslySetInnerHTML={{ __html: htmlContent }}
                 />
               </div>
             </div>

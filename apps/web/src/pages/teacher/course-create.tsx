@@ -1,4 +1,4 @@
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,25 +22,43 @@ import {
 } from '../../components/ui/select';
 import { Textarea } from '../../components/ui/textarea';
 import { coursesApi } from '../../lib/api';
-import { CourseLevel, type CreateCourseRequest } from '../../types/course';
+import type { CreateCourseRequest } from '../../types/course';
 
 export function CourseCreatePage() {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateCourseRequest>({
+    slug: '',
     title_en: '',
     title_fr: '',
     description_en: '',
     description_fr: '',
-    level: CourseLevel.BEGINNER,
+    difficulty: 'Beginner',
     category: '',
     thumbnail_url: '',
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof CreateCourseRequest, string>>>({});
 
+  // Generate slug from title
+  const generateSlug = (title: string): string => {
+    return title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+      .replace(/\s+/g, '-') // Replace spaces with hyphens
+      .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+      .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+  };
+
   const validateForm = (): boolean => {
     const newErrors: Partial<Record<keyof CreateCourseRequest, string>> = {};
+
+    if (!formData.slug.trim()) {
+      newErrors.slug = 'Slug is required';
+    } else if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(formData.slug)) {
+      newErrors.slug = 'Slug must be lowercase alphanumeric with hyphens only';
+    }
 
     if (!formData.title_en.trim()) {
       newErrors.title_en = 'English title is required';
@@ -48,10 +66,6 @@ export function CourseCreatePage() {
 
     if (!formData.description_en.trim()) {
       newErrors.description_en = 'English description is required';
-    }
-
-    if (!formData.category.trim()) {
-      newErrors.category = 'Category is required';
     }
 
     setErrors(newErrors);
@@ -69,7 +83,6 @@ export function CourseCreatePage() {
 
     try {
       const course = await coursesApi.create(formData);
-      console.log('Course created successfully:', course);
 
       // Navigate to the created course detail page
       navigate(`/teacher/courses/${course.id}`);
@@ -82,8 +95,15 @@ export function CourseCreatePage() {
     }
   };
 
-  const handleChange = (field: keyof CreateCourseRequest, value: string | CourseLevel) => {
+  const handleChange = (field: keyof CreateCourseRequest, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+
+    // Auto-generate slug when title changes
+    if (field === 'title_en') {
+      const newSlug = generateSlug(value);
+      setFormData((prev) => ({ ...prev, slug: newSlug }));
+    }
+
     // Clear error for this field when user starts typing
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -122,6 +142,41 @@ export function CourseCreatePage() {
               <CardDescription>Provide the basic information about your course</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Slug */}
+              <div className="space-y-2">
+                <Label htmlFor="slug">
+                  Course Slug <span className="text-destructive">*</span>
+                </Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="slug"
+                    value={formData.slug}
+                    onChange={(e) => handleChange('slug', e.target.value)}
+                    placeholder="e.g., introduction-to-biblical-greek"
+                    aria-invalid={!!errors.slug}
+                    aria-describedby={errors.slug ? 'slug-error' : undefined}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleChange('slug', generateSlug(formData.title_en))}
+                    title="Regenerate slug from title"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                  </Button>
+                </div>
+                {errors.slug && (
+                  <p id="slug-error" className="text-sm text-destructive">
+                    {errors.slug}
+                  </p>
+                )}
+                <p className="text-sm text-muted-foreground">
+                  URL-friendly identifier (auto-generated from title, lowercase alphanumeric with
+                  hyphens)
+                </p>
+              </div>
+
               {/* English Title */}
               <div className="space-y-2">
                 <Label htmlFor="title_en">
@@ -186,44 +241,33 @@ export function CourseCreatePage() {
                 />
               </div>
 
-              {/* Course Level */}
+              {/* Course Difficulty */}
               <div className="space-y-2">
-                <Label htmlFor="level">
-                  Course Level <span className="text-destructive">*</span>
-                </Label>
+                <Label htmlFor="difficulty">Course Difficulty</Label>
                 <Select
-                  value={formData.level}
-                  onValueChange={(value) => handleChange('level', value as CourseLevel)}
+                  value={formData.difficulty}
+                  onValueChange={(value) => handleChange('difficulty', value)}
                 >
-                  <SelectTrigger id="level">
-                    <SelectValue placeholder="Select course level" />
+                  <SelectTrigger id="difficulty">
+                    <SelectValue placeholder="Select course difficulty" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={CourseLevel.BEGINNER}>Beginner</SelectItem>
-                    <SelectItem value={CourseLevel.INTERMEDIATE}>Intermediate</SelectItem>
-                    <SelectItem value={CourseLevel.ADVANCED}>Advanced</SelectItem>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Category */}
               <div className="space-y-2">
-                <Label htmlFor="category">
-                  Category <span className="text-destructive">*</span>
-                </Label>
+                <Label htmlFor="category">Category</Label>
                 <Input
                   id="category"
                   value={formData.category}
                   onChange={(e) => handleChange('category', e.target.value)}
                   placeholder="e.g., Biblical Languages, Theology, Church History"
-                  aria-invalid={!!errors.category}
-                  aria-describedby={errors.category ? 'category-error' : undefined}
                 />
-                {errors.category && (
-                  <p id="category-error" className="text-sm text-destructive">
-                    {errors.category}
-                  </p>
-                )}
               </div>
 
               {/* Thumbnail URL */}

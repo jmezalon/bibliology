@@ -405,16 +405,18 @@ export class LessonsService {
             (block: any) => ({
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               id: block.id,
+              // Map block_order to order for API consistency
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              block_order: block.block_order,
+              order: block.block_order,
+              // Map block_type to type for API consistency
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              block_type: block.block_type,
+              type: block.block_type,
+              // Serialize content_en JSON to string for API
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              content_en: block.content_en,
+              content: JSON.stringify(block.content_en),
+              // Map style_config to metadata for API consistency
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              content_fr: block.content_fr,
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-              style_config: block.style_config,
+              metadata: block.style_config,
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
               created_at: block.created_at,
               // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access

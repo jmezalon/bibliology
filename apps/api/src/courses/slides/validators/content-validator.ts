@@ -4,60 +4,50 @@ import { z } from 'zod';
 
 // Heading content schema
 const HeadingContentSchema = z.object({
-  text: z
-    .string()
-    .min(1, 'Heading text is required')
-    .max(200, 'Heading must not exceed 200 characters'),
-  level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
+  text: z.string().max(200, 'Heading must not exceed 200 characters').optional(),
+  level: z.union([z.literal(1), z.literal(2), z.literal(3)]).optional(),
   alignment: z.enum(['left', 'center', 'right']).optional(),
 });
 
 // Text content schema
 const TextContentSchema = z.object({
-  html: z
-    .string()
-    .min(1, 'Text content is required')
-    .max(5000, 'Text must not exceed 5000 characters'),
+  html: z.string().max(5000, 'Text must not exceed 5000 characters').optional(),
 });
 
 // Image content schema
 const ImageContentSchema = z.object({
-  imageUrl: z.string().url('Invalid image URL'),
-  imageAlt: z.string().min(1, 'Alt text is required for accessibility'),
+  imageUrl: z.string().optional(),
+  imageAlt: z.string().optional(),
   caption: z.string().optional(),
 });
 
 // Verse content schema
 const VerseContentSchema = z.object({
-  text: z.string().min(1, 'Verse text is required'),
-  verseReference: z.string().min(1, 'Verse reference is required'),
-  translation: z.enum(['KJV', 'NIV', 'ESV', 'NKJV', 'LSG', 'NBS', 'BDS']),
+  html: z.string().optional(),
+  verseReference: z.string().optional(),
+  translation: z.enum(['KJV', 'NIV', 'ESV', 'NKJV', 'LSG', 'NBS', 'BDS']).optional(),
 });
 
 // Vocabulary content schema
-const VocabularyContentSchema = z
-  .object({
-    term_en: z.string().optional(),
-    term_fr: z.string().optional(),
-    definition: z.string().min(1, 'Definition is required'),
-    partOfSpeech: z
-      .enum([
-        'noun',
-        'verb',
-        'adjective',
-        'adverb',
-        'pronoun',
-        'preposition',
-        'conjunction',
-        'interjection',
-        'other',
-      ])
-      .optional(),
-    pronunciation: z.string().optional(),
-  })
-  .refine((data) => data.term_en || data.term_fr, {
-    message: 'At least one term (English or French) is required',
-  });
+const VocabularyContentSchema = z.object({
+  html: z.string().optional(),
+  term_en: z.string().optional(),
+  term_fr: z.string().optional(),
+  partOfSpeech: z
+    .enum([
+      'noun',
+      'verb',
+      'adjective',
+      'adverb',
+      'pronoun',
+      'preposition',
+      'conjunction',
+      'interjection',
+      'other',
+    ])
+    .optional(),
+  pronunciation: z.string().optional(),
+});
 
 // List content schema
 const ListContentSchema = z.object({
@@ -70,8 +60,8 @@ const ListContentSchema = z.object({
 
 // Callout content schema
 const CalloutContentSchema = z.object({
-  text: z.string().min(1, 'Callout content is required'),
-  calloutType: z.enum(['info', 'warning', 'success', 'error']),
+  html: z.string().optional(),
+  calloutType: z.enum(['info', 'warning', 'success', 'error']).optional(),
   title: z.string().optional(),
 });
 

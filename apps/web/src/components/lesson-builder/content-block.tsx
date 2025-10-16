@@ -26,6 +26,7 @@ interface ContentBlockProps {
   onDelete: () => void;
   onDuplicate: () => void;
   isDragging?: boolean;
+  editable?: boolean;
 }
 
 export const ContentBlock = memo(function ContentBlock({
@@ -36,6 +37,7 @@ export const ContentBlock = memo(function ContentBlock({
   onDelete,
   onDuplicate,
   isDragging = false,
+  editable = true,
 }: ContentBlockProps) {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr'>('en');
@@ -68,10 +70,13 @@ export const ContentBlock = memo(function ContentBlock({
   // Render the appropriate block component
   const renderBlockContent = () => {
     const commonProps = {
-      editable: true,
+      editable,
       language: currentLanguage,
       onLanguageChange: setCurrentLanguage,
     };
+
+    // Ensure metadata is never null - convert null to undefined for all blocks
+    const safeMetadata = block.metadata ?? undefined;
 
     switch (block.type) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
@@ -79,7 +84,7 @@ export const ContentBlock = memo(function ContentBlock({
         return (
           <TextBlock
             content={block.content}
-            onUpdate={(content) => onUpdate(content, block.metadata)}
+            onUpdate={(content) => onUpdate(content, safeMetadata)}
             {...commonProps}
           />
         );
@@ -91,7 +96,7 @@ export const ContentBlock = memo(function ContentBlock({
             content={block.content}
             onUpdate={onUpdate}
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={block.metadata as any}
+            metadata={safeMetadata as any}
             {...commonProps}
           />
         );
@@ -101,7 +106,7 @@ export const ContentBlock = memo(function ContentBlock({
         return (
           <ImageBlock
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={(block.metadata || {}) as any}
+            metadata={(safeMetadata || {}) as any}
             onUpdate={(metadata) => onUpdate(block.content, metadata)}
             {...commonProps}
           />
@@ -114,7 +119,7 @@ export const ContentBlock = memo(function ContentBlock({
             content={block.content}
             onUpdate={onUpdate}
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={block.metadata as any}
+            metadata={safeMetadata as any}
             {...commonProps}
           />
         );
@@ -126,7 +131,7 @@ export const ContentBlock = memo(function ContentBlock({
             content={block.content}
             onUpdate={onUpdate}
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={block.metadata as any}
+            metadata={safeMetadata as any}
             {...commonProps}
           />
         );
@@ -136,7 +141,7 @@ export const ContentBlock = memo(function ContentBlock({
         return (
           <ListBlock
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={(block.metadata || {}) as any}
+            metadata={(safeMetadata || {}) as any}
             onUpdate={(metadata) => onUpdate(block.content, metadata)}
             {...commonProps}
           />
@@ -149,7 +154,7 @@ export const ContentBlock = memo(function ContentBlock({
             content={block.content}
             onUpdate={onUpdate}
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={block.metadata as any}
+            metadata={safeMetadata as any}
             {...commonProps}
           />
         );
@@ -159,9 +164,9 @@ export const ContentBlock = memo(function ContentBlock({
         return (
           <DividerBlock
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            metadata={(block.metadata || {}) as any}
+            metadata={(safeMetadata || {}) as any}
             onUpdate={(metadata) => onUpdate(block.content, metadata)}
-            editable={true}
+            editable={editable}
           />
         );
 
@@ -187,127 +192,133 @@ export const ContentBlock = memo(function ContentBlock({
       )}
       onClick={onSelect}
     >
-      {/* Block Type Badge */}
-      <div
-        className={cn(
-          'absolute -top-2 -left-2 z-10 px-2 py-0.5 text-xs font-medium rounded',
-          'bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600',
-          hasValidationErrors && 'bg-amber-100 dark:bg-amber-900 border-amber-500',
-        )}
-      >
-        <div className="flex items-center gap-1">
-          <span>{block.type}</span>
-          {hasValidationErrors && (
-            <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+      {/* Block Type Badge - Only in edit mode */}
+      {editable && (
+        <div
+          className={cn(
+            'absolute -top-2 -left-2 z-10 px-2 py-0.5 text-xs font-medium rounded',
+            'bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600',
+            hasValidationErrors && 'bg-amber-100 dark:bg-amber-900 border-amber-500',
           )}
+        >
+          <div className="flex items-center gap-1">
+            <span>{block.type}</span>
+            {hasValidationErrors && (
+              <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Action Buttons */}
-      <div
-        className={cn(
-          'absolute -top-2 -right-2 z-10 flex items-center gap-1 transition-opacity',
-          isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
-        )}
-      >
-        {/* Settings */}
-        <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-blue-50 hover:text-blue-600 border border-gray-300 dark:border-gray-600 shadow-sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                setSettingsOpen(true);
-              }}
-              title="Block settings"
-            >
-              <Settings className="h-3 w-3" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-64" align="end">
-            <div className="space-y-3">
-              <div className="space-y-1">
-                <h4 className="font-medium text-sm">Block Settings</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400">{block.type} Block</p>
-              </div>
+      {/* Action Buttons - Only in edit mode */}
+      {editable && (
+        <div
+          className={cn(
+            'absolute -top-2 -right-2 z-10 flex items-center gap-1 transition-opacity',
+            isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+          )}
+        >
+          {/* Settings */}
+          <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-blue-50 hover:text-blue-600 border border-gray-300 dark:border-gray-600 shadow-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSettingsOpen(true);
+                }}
+                title="Block settings"
+              >
+                <Settings className="h-3 w-3" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64" align="end">
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <h4 className="font-medium text-sm">Block Settings</h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">{block.type} Block</p>
+                </div>
 
-              {hasValidationErrors && (
-                <div className="p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
-                  <div className="flex items-start gap-2">
-                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-xs">
-                      <p className="font-medium text-amber-800 dark:text-amber-200 mb-1">
-                        Validation Errors
-                      </p>
-                      <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
-                        {validation.errors.map((error, i) => (
-                          <li key={i}>{error.message}</li>
-                        ))}
-                      </ul>
+                {hasValidationErrors && (
+                  <div className="p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-xs">
+                        <p className="font-medium text-amber-800 dark:text-amber-200 mb-1">
+                          Validation Errors
+                        </p>
+                        <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
+                          {validation.errors.map((error, i) => (
+                            <li key={i}>{error.message}</li>
+                          ))}
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                <div className="flex justify-between">
-                  <span>Block ID:</span>
-                  <span className="font-mono">{block.id.slice(0, 8)}...</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Order:</span>
-                  <span>{block.order + 1}</span>
+                <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                  <div className="flex justify-between">
+                    <span>Block ID:</span>
+                    <span className="font-mono">{block.id.slice(0, 8)}...</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Order:</span>
+                    <span>{block.order + 1}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </PopoverContent>
-        </Popover>
+            </PopoverContent>
+          </Popover>
 
-        {/* Duplicate */}
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-green-50 hover:text-green-600 border border-gray-300 dark:border-gray-600 shadow-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDuplicate();
-          }}
-          title="Duplicate block"
+          {/* Duplicate */}
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-green-50 hover:text-green-600 border border-gray-300 dark:border-gray-600 shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDuplicate();
+            }}
+            title="Duplicate block"
+          >
+            <Copy className="h-3 w-3" />
+          </Button>
+
+          {/* Delete */}
+          <Button
+            size="icon"
+            variant="ghost"
+            className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-red-50 hover:text-red-600 border border-gray-300 dark:border-gray-600 shadow-sm"
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            title="Delete block"
+          >
+            <Trash2 className="h-3 w-3" />
+          </Button>
+        </div>
+      )}
+
+      {/* Drag Handle - Only in edit mode */}
+      {editable && (
+        <div
+          {...attributes}
+          {...listeners}
+          className={cn(
+            'absolute -left-8 top-1/2 -translate-y-1/2 flex h-8 w-6 items-center justify-center rounded-md',
+            'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600',
+            'cursor-grab active:cursor-grabbing transition-opacity',
+            isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
+          )}
+          title="Drag to reorder"
         >
-          <Copy className="h-3 w-3" />
-        </Button>
-
-        {/* Delete */}
-        <Button
-          size="icon"
-          variant="ghost"
-          className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-red-50 hover:text-red-600 border border-gray-300 dark:border-gray-600 shadow-sm"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-          title="Delete block"
-        >
-          <Trash2 className="h-3 w-3" />
-        </Button>
-      </div>
-
-      {/* Drag Handle */}
-      <div
-        {...attributes}
-        {...listeners}
-        className={cn(
-          'absolute -left-8 top-1/2 -translate-y-1/2 flex h-8 w-6 items-center justify-center rounded-md',
-          'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600',
-          'cursor-grab active:cursor-grabbing transition-opacity',
-          isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
-        )}
-        title="Drag to reorder"
-      >
-        <GripVertical className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-      </div>
+          <GripVertical className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        </div>
+      )}
 
       {/* Content */}
       <div className="relative">{renderBlockContent()}</div>

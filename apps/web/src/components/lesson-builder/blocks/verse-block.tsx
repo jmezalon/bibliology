@@ -34,23 +34,82 @@ const TRANSLATIONS: Record<BibleTranslation, { name: string; language: 'en' | 'f
 export function VerseBlock({
   content,
   onUpdate,
-  metadata = {},
+  metadata,
   language = 'en',
   onLanguageChange,
   editable = true,
 }: VerseBlockProps) {
-  const verseReference = metadata.verseReference || '';
-  const translation = metadata.translation || 'NIV';
+  // Ensure metadata is never null
+  const safeMetadata = metadata || {};
+
+  // Parse JSON content from backend
+  const parseContent = (
+    jsonContent: string,
+  ): { html: string; verseReference: string; translation: string } => {
+    // Handle null/undefined content
+    if (!jsonContent) {
+      return {
+        html: '',
+        verseReference: safeMetadata.verseReference || '',
+        translation: safeMetadata.translation || 'NIV',
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(jsonContent) as {
+        html?: string;
+        text?: string;
+        verseReference?: string;
+        translation?: string;
+      } | null;
+      // Handle parsed null
+      if (!parsed || typeof parsed !== 'object') {
+        return {
+          html: '',
+          verseReference: safeMetadata.verseReference || '',
+          translation: safeMetadata.translation || 'NIV',
+        };
+      }
+      return {
+        html: parsed.html || parsed.text || '',
+        verseReference: parsed.verseReference || safeMetadata.verseReference || '',
+        translation: parsed.translation || safeMetadata.translation || 'NIV',
+      };
+    } catch {
+      // Fallback if content is not JSON - assume it's HTML
+      return {
+        html: jsonContent || '',
+        verseReference: safeMetadata.verseReference || '',
+        translation: safeMetadata.translation || 'NIV',
+      };
+    }
+  };
+
+  const parsedContent = parseContent(content);
+  const htmlContent = parsedContent.html;
+  const verseReference = parsedContent.verseReference;
+  const translation = parsedContent.translation as BibleTranslation;
 
   const handleReferenceChange = (reference: string) => {
-    onUpdate(content, { ...metadata, verseReference: reference });
+    const newContent = JSON.stringify({
+      html: htmlContent,
+      verseReference: reference,
+      translation,
+    });
+    onUpdate(newContent, metadata);
   };
 
   const handleTranslationChange = (newTranslation: string) => {
-    onUpdate(content, { ...metadata, translation: newTranslation as BibleTranslation });
+    const newContent = JSON.stringify({
+      html: htmlContent,
+      verseReference,
+      translation: newTranslation,
+    });
+    onUpdate(newContent, metadata);
   };
 
-  const handleContentChange = (newContent: string) => {
+  const handleContentChange = (newHtml: string) => {
+    const newContent = JSON.stringify({ html: newHtml, verseReference, translation });
     onUpdate(newContent, metadata);
   };
 
@@ -108,7 +167,7 @@ export function VerseBlock({
           </Label>
         )}
         <RichTextEditor
-          content={content}
+          content={htmlContent}
           onUpdate={handleContentChange}
           placeholder="Enter or paste the verse text..."
           editable={editable}
@@ -131,11 +190,11 @@ export function VerseBlock({
       )}
 
       {/* Preview Box (non-editable mode) */}
-      {!editable && content && (
+      {!editable && htmlContent && (
         <div className="p-6 bg-blue-50 dark:bg-blue-950 border-l-4 border-blue-500 rounded-r-lg">
           <div
             className="prose prose-sm dark:prose-invert max-w-none mb-4"
-            dangerouslySetInnerHTML={{ __html: content }}
+            dangerouslySetInnerHTML={{ __html: htmlContent }}
           />
           {verseReference && (
             <div className="flex items-center justify-end gap-2 text-blue-700 dark:text-blue-300">

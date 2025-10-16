@@ -1,5 +1,5 @@
 import { AlignCenter, AlignLeft, AlignRight } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { cn } from '../../../lib/utils';
 import { Button } from '../../ui/button';
@@ -27,26 +27,96 @@ export interface HeadingBlockMetadata {
 export function HeadingBlock({
   content,
   onUpdate,
-  metadata = {},
+  metadata,
   language = 'en',
   onLanguageChange,
   editable = true,
 }: HeadingBlockProps) {
-  const [text, setText] = useState(content);
-  const level = metadata.level || 2;
-  const alignment = metadata.alignment || 'left';
+  // Ensure metadata is never null
+  const safeMetadata = metadata || {};
+
+  // Parse JSON content from backend
+  const parseContent = (jsonContent: string) => {
+    // Handle null/undefined content
+    if (!jsonContent) {
+      return {
+        text: '',
+        level: safeMetadata.level || 2,
+        alignment: safeMetadata.alignment || 'left',
+      };
+    }
+
+    try {
+      const parsed = JSON.parse(jsonContent) as {
+        text?: string;
+        level?: HeadingLevel;
+        alignment?: TextAlignment;
+      } | null;
+      // Handle parsed null
+      if (!parsed || typeof parsed !== 'object') {
+        return {
+          text: '',
+          level: safeMetadata.level || 2,
+          alignment: safeMetadata.alignment || 'left',
+        };
+      }
+      return {
+        text: parsed.text || '',
+        level: parsed.level || safeMetadata.level || 2,
+        alignment: parsed.alignment || safeMetadata.alignment || 'left',
+      };
+    } catch {
+      // Fallback if content is not JSON
+      return {
+        text: jsonContent || '',
+        level: safeMetadata.level || 2,
+        alignment: safeMetadata.alignment || 'left',
+      };
+    }
+  };
+
+  const parsedContent = parseContent(content);
+  const [text, setText] = useState(parsedContent.text);
+  const [level, setLevel] = useState(parsedContent.level);
+  const [alignment, setAlignment] = useState(parsedContent.alignment);
+
+  // Sync state when content prop changes
+  useEffect(() => {
+    const parsed = parseContent(content);
+    setText(parsed.text);
+    setLevel(parsed.level);
+    setAlignment(parsed.alignment);
+  }, [content]);
 
   const handleTextChange = (value: string) => {
     setText(value);
-    onUpdate(value, metadata);
+    const newContent = JSON.stringify({
+      text: value,
+      level,
+      alignment,
+    });
+    onUpdate(newContent, metadata);
   };
 
   const handleLevelChange = (newLevel: string) => {
-    onUpdate(content, { ...metadata, level: parseInt(newLevel) as HeadingLevel });
+    const newLevelNum = parseInt(newLevel) as HeadingLevel;
+    setLevel(newLevelNum);
+    const newContent = JSON.stringify({
+      text,
+      level: newLevelNum,
+      alignment,
+    });
+    onUpdate(newContent, metadata);
   };
 
   const handleAlignmentChange = (newAlignment: TextAlignment) => {
-    onUpdate(content, { ...metadata, alignment: newAlignment });
+    setAlignment(newAlignment);
+    const newContent = JSON.stringify({
+      text,
+      level,
+      alignment: newAlignment,
+    });
+    onUpdate(newContent, metadata);
   };
 
   const HeadingTag = `h${level}` as keyof JSX.IntrinsicElements;

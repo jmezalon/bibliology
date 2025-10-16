@@ -181,7 +181,7 @@ export function LessonBuilderPage() {
     await createSlideMutation.mutateAsync({
       lesson_id: lessonId,
       layout,
-      order: lesson?.slides.length || 0,
+      slide_order: lesson?.slides.length || 0,
     });
   };
 
@@ -273,10 +273,40 @@ export function LessonBuilderPage() {
       const currentSlide = lesson?.slides.find((s) => s.id === currentSlideId);
       const blockOrder = currentSlide?.content_blocks.length || 0;
 
+      // Provide default content based on block type
+      /* eslint-disable @typescript-eslint/no-unsafe-enum-comparison */
+      const getDefaultContent = (blockType: ContentBlockType): string => {
+        switch (blockType) {
+          case 'HEADING':
+            return JSON.stringify({ text: 'New Heading', level: 2, alignment: 'left' });
+          case 'TEXT':
+            return JSON.stringify({ html: '<p>Enter your text here</p>' });
+          case 'IMAGE':
+            return JSON.stringify({ imageUrl: '', imageAlt: '', caption: '' });
+          case 'VERSE':
+            return JSON.stringify({ html: '<p></p>', verseReference: '', translation: 'NIV' });
+          case 'VOCABULARY':
+            return JSON.stringify({ html: '<p></p>', term_en: '', term_fr: '' });
+          case 'LIST':
+            return JSON.stringify({ listStyle: 'bullet', items: ['Item 1'] });
+          case 'CALLOUT':
+            return JSON.stringify({
+              html: '<p>Important note</p>',
+              calloutType: 'info',
+              title: '',
+            });
+          case 'DIVIDER':
+            return JSON.stringify({ style: 'solid', width: 'full' });
+          default:
+            return JSON.stringify({});
+        }
+      };
+      /* eslint-enable @typescript-eslint/no-unsafe-enum-comparison */
+
       await createContentBlockMutation.mutateAsync({
         slide_id: currentSlideId,
         type,
-        content: JSON.stringify({}), // Empty content, user will fill it in
+        content: getDefaultContent(type),
         order: blockOrder,
       });
     },
@@ -441,6 +471,7 @@ export function LessonBuilderPage() {
             onContentBlockAdd={(type) => void handleContentBlockAdd(type)}
             onContentBlockDuplicate={(blockId) => void handleContentBlockDuplicate(blockId)}
             onContentBlockReorder={(blockOrders) => void handleContentBlockReorder(blockOrders)}
+            previewMode={isPreviewMode}
           />
         </div>
 

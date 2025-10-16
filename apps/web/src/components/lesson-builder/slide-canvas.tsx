@@ -33,6 +33,7 @@ interface SlideCanvasProps {
   onContentBlockAdd: (type: ContentBlockType) => void;
   onContentBlockDuplicate?: (blockId: string) => void;
   onContentBlockReorder?: (blockOrders: { block_id: string; order: number }[]) => void;
+  previewMode?: boolean;
 }
 
 export function SlideCanvas({
@@ -42,6 +43,7 @@ export function SlideCanvas({
   onContentBlockAdd,
   onContentBlockDuplicate,
   onContentBlockReorder,
+  previewMode = false,
 }: SlideCanvasProps) {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [showPalette, setShowPalette] = useState(false);
@@ -132,37 +134,57 @@ export function SlideCanvas({
 
             {/* Content Blocks with Drag and Drop */}
             {sortedBlocks.length > 0 ? (
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={sortedBlocks.map((block) => block.id)}
-                  strategy={verticalListSortingStrategy}
+              previewMode ? (
+                /* Preview Mode - No drag and drop, read-only blocks */
+                <div className="space-y-6">
+                  {sortedBlocks.map((block) => (
+                    <ContentBlock
+                      key={block.id}
+                      block={block}
+                      isSelected={false}
+                      onSelect={() => {}}
+                      onUpdate={() => {}}
+                      onDelete={() => {}}
+                      onDuplicate={() => {}}
+                      editable={false}
+                    />
+                  ))}
+                </div>
+              ) : (
+                /* Edit Mode - With drag and drop */
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
                 >
-                  <div className="space-y-6 pl-10">
-                    {sortedBlocks.map((block) => (
-                      <ContentBlock
-                        key={block.id}
-                        block={block}
-                        isSelected={block.id === selectedBlockId}
-                        onSelect={() => setSelectedBlockId(block.id)}
-                        onUpdate={(
-                          content: string,
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                          metadata?: any,
-                        ) =>
-                          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-                          onContentBlockUpdate(block.id, content, metadata)
-                        }
-                        onDelete={() => onContentBlockDelete(block.id)}
-                        onDuplicate={() => handleDuplicate(block.id)}
-                      />
-                    ))}
-                  </div>
-                </SortableContext>
-              </DndContext>
+                  <SortableContext
+                    items={sortedBlocks.map((block) => block.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-6 pl-10">
+                      {sortedBlocks.map((block) => (
+                        <ContentBlock
+                          key={block.id}
+                          block={block}
+                          isSelected={block.id === selectedBlockId}
+                          onSelect={() => setSelectedBlockId(block.id)}
+                          onUpdate={(
+                            content: string,
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            metadata?: any,
+                          ) =>
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+                            onContentBlockUpdate(block.id, content, metadata)
+                          }
+                          onDelete={() => onContentBlockDelete(block.id)}
+                          onDuplicate={() => handleDuplicate(block.id)}
+                          editable={true}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                </DndContext>
+              )
             ) : (
               /* Empty State */
               <div className="flex h-full items-center justify-center">
@@ -185,8 +207,8 @@ export function SlideCanvas({
         </div>
       </div>
 
-      {/* Floating Block Palette */}
-      {sortedBlocks.length > 0 && (
+      {/* Floating Block Palette - Hidden in preview mode */}
+      {!previewMode && (
         <BlockPalette
           open={showPalette}
           onOpenChange={setShowPalette}
