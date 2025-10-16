@@ -3,7 +3,14 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
 import { useAuthStore } from '../store/auth.store';
@@ -21,7 +28,8 @@ export function LoginPage() {
     formState: { errors },
   } = useForm<LoginRequest>();
 
-  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname || '/dashboard';
+  const from =
+    (location.state as { from?: { pathname: string } } | null)?.from?.pathname || '/dashboard';
 
   const onSubmit = async (data: LoginRequest) => {
     try {
@@ -35,9 +43,11 @@ export function LoginPage() {
 
       navigate(from, { replace: true });
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error && 'response' in error
-        ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Invalid email or password.')
-        : 'Invalid email or password.';
+      const errorMessage =
+        error instanceof Error && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Invalid email or password.'
+          : 'Invalid email or password.';
 
       toast({
         title: 'Login failed',
@@ -91,10 +101,7 @@ export function LoginPage() {
             />
 
             <div className="flex items-center justify-between">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-primary hover:underline"
-              >
+              <Link to="/forgot-password" className="text-sm text-primary hover:underline">
                 Forgot password?
               </Link>
             </div>

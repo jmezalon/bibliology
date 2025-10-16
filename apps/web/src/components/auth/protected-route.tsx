@@ -47,9 +47,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center max-w-md">
           <h1 className="text-4xl font-bold mb-4">Access Denied</h1>
-          <p className="text-muted-foreground">
-            You don't have permission to access this page.
-          </p>
+          <p className="text-muted-foreground">You don't have permission to access this page.</p>
         </div>
       </div>
     );

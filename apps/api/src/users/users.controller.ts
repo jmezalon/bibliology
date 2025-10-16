@@ -18,8 +18,6 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UsersService } from './users.service';
 
-
-
 @Controller('users')
 @UseGuards(RolesGuard)
 export class UsersController {

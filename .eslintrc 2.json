@@ -9,11 +9,7 @@
   "overrides": [
     {
       "files": ["**/*.spec.ts", "**/*.test.ts", "**/test/**/*.ts"],
-      "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        "prettier"
-      ],
+      "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
       "parserOptions": {
         "project": null
       },
@@ -53,14 +49,7 @@
     "import/order": [
       "error",
       {
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index"
-        ],
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
         "newlines-between": "always",
         "alphabetize": {
           "order": "asc",
@@ -69,12 +58,5 @@
       }
     ]
   },
-  "ignorePatterns": [
-    "node_modules",
-    "dist",
-    "build",
-    ".turbo",
-    "*.config.js",
-    "*.config.ts"
-  ]
+  "ignorePatterns": ["node_modules", "dist", "build", ".turbo", "*.config.js", "*.config.ts"]
 }

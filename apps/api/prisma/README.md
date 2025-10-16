@@ -124,6 +124,7 @@ model Course {
 ```
 
 **Why not JSONB?**
+
 - Better type safety
 - Simpler queries
 - Easier to index
@@ -159,12 +160,14 @@ Content blocks use JSONB for maximum flexibility:
 After running `db:seed`, you'll have:
 
 ### Users (password: `password123`)
+
 - `admin@bibliology.com` (Admin)
 - `teacher@bibliology.com` (Teacher)
 - `student.en@example.com` (Student - English)
 - `student.fr@example.com` (Student - French)
 
 ### Content
+
 - 1 course: "Introduction to Pneumatology"
 - 3 lessons (2 published, 1 draft)
 - Multiple slides with content blocks
@@ -174,6 +177,7 @@ After running `db:seed`, you'll have:
 ## Migration Strategy
 
 ### Development
+
 ```bash
 # 1. Modify schema.prisma
 # 2. Create migration
@@ -183,6 +187,7 @@ pnpm --filter @bibliology/api db:migrate:dev --name add_field_name
 ```
 
 ### Production
+
 ```bash
 # 1. Migrations are committed to git
 # 2. Deploy runs: pnpm db:migrate
@@ -192,6 +197,7 @@ pnpm --filter @bibliology/api db:migrate:dev --name add_field_name
 ## Troubleshooting
 
 ### Connection Refused
+
 ```bash
 # Check PostgreSQL is running
 docker-compose ps
@@ -201,6 +207,7 @@ echo $DATABASE_URL
 ```
 
 ### Migration Conflicts
+
 ```bash
 # Reset database (⚠️ DESTRUCTIVE)
 pnpm --filter @bibliology/api db:reset
@@ -209,6 +216,7 @@ pnpm --filter @bibliology/api db:reset
 ```
 
 ### Prisma Client Out of Sync
+
 ```bash
 # Regenerate client
 pnpm db:generate

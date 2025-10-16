@@ -34,6 +34,7 @@
 ### Design Decisions
 
 **Separate EN/FR columns vs JSONB language object:**
+
 - ✅ **Decision:** Separate columns (`title_en`, `title_fr`)
 - **Rationale:**
   - Simpler queries: `WHERE title_en ILIKE '%search%'`
@@ -43,6 +44,7 @@
 - **Trade-off:** More columns, but worth it for simplicity
 
 **JSONB for content blocks:**
+
 - ✅ **Decision:** Use JSONB for `content_en` and `content_fr` in content_blocks
 - **Rationale:**
   - Content structure varies by block type (text vs image vs verse)
@@ -51,6 +53,7 @@
 - **Trade-off:** Less type safety, but Zod validation handles that
 
 **Denormalized progress fields:**
+
 - ✅ **Decision:** Store `progress_percentage`, `lessons_completed` in enrollments table
 - **Rationale:**
   - Dashboard queries are very frequent
@@ -65,6 +68,7 @@
 ### Entity-Level Bilingualism
 
 Fields that have translations:
+
 - `title_en` / `title_fr`
 - `description_en` / `description_fr`
 - `content_en` / `content_fr`
@@ -610,6 +614,7 @@ model ActivityLog {
 ### Primary Indexes
 
 **Automatically created by Prisma:**
+
 - Primary keys (`@id`)
 - Unique constraints (`@unique`)
 - Foreign keys (implicit)
@@ -709,6 +714,7 @@ pnpm prisma migrate dev --name descriptive_name
 ### Migration Best Practices
 
 1. **Descriptive names:**
+
    ```bash
    pnpm prisma migrate dev --name add_user_avatar
    pnpm prisma migrate dev --name add_quiz_time_limit
@@ -720,6 +726,7 @@ pnpm prisma migrate dev --name descriptive_name
    - Easier to debug and rollback
 
 3. **Test before committing:**
+
    ```bash
    # Reset database
    pnpm prisma migrate reset
@@ -746,6 +753,7 @@ pnpm prisma migrate dev --name descriptive_name
    ```
 
 5. **Document breaking changes:**
+
    ```sql
    -- WARNING: This migration will delete all existing quiz submissions
    -- Backup data before applying
@@ -772,6 +780,7 @@ pnpm prisma migrate deploy
 ### Common Queries (with Prisma)
 
 **1. Get course with all lessons for student:**
+
 ```typescript
 const course = await prisma.course.findUnique({
   where: { id: courseId },
@@ -783,20 +792,21 @@ const course = await prisma.course.findUnique({
         lesson_progress: {
           where: {
             enrollment: {
-              student_id: studentId
-            }
-          }
-        }
-      }
+              student_id: studentId,
+            },
+          },
+        },
+      },
     },
     enrollments: {
-      where: { student_id: studentId }
-    }
-  }
+      where: { student_id: studentId },
+    },
+  },
 });
 ```
 
 **2. Get lesson with all slides and content blocks:**
+
 ```typescript
 const lesson = await prisma.lesson.findUnique({
   where: { id: lessonId },
@@ -805,22 +815,23 @@ const lesson = await prisma.lesson.findUnique({
       orderBy: { slide_order: 'asc' },
       include: {
         content_blocks: {
-          orderBy: { block_order: 'asc' }
+          orderBy: { block_order: 'asc' },
         },
         quizzes: {
           include: {
             questions: {
-              orderBy: { question_order: 'asc' }
-            }
-          }
-        }
-      }
-    }
-  }
+              orderBy: { question_order: 'asc' },
+            },
+          },
+        },
+      },
+    },
+  },
 });
 ```
 
 **3. Get student dashboard data:**
+
 ```typescript
 const dashboard = await prisma.user.findUnique({
   where: { id: studentId },
@@ -832,53 +843,55 @@ const dashboard = await prisma.user.findUnique({
           select: {
             id: true,
             title_en: true,
-            thumbnail_url: true
-          }
+            thumbnail_url: true,
+          },
         },
         lesson_progress: {
-          where: { status: 'COMPLETED' }
-        }
+          where: { status: 'COMPLETED' },
+        },
       },
-      orderBy: { last_accessed_at: 'desc' }
+      orderBy: { last_accessed_at: 'desc' },
     },
     certificates: {
       take: 5,
-      orderBy: { issued_at: 'desc' }
-    }
-  }
+      orderBy: { issued_at: 'desc' },
+    },
+  },
 });
 ```
 
 **4. Get quiz results with statistics:**
+
 ```typescript
 const results = await prisma.quizSubmission.findMany({
   where: {
     student_id: studentId,
-    submitted_at: { not: null }
+    submitted_at: { not: null },
   },
   include: {
     quiz: {
       select: {
         title_en: true,
-        passing_score_percentage: true
-      }
+        passing_score_percentage: true,
+      },
     },
     answers: {
       include: {
         question: {
           select: {
             question_text_en: true,
-            points: true
-          }
-        }
-      }
-    }
+            points: true,
+          },
+        },
+      },
+    },
   },
-  orderBy: { submitted_at: 'desc' }
+  orderBy: { submitted_at: 'desc' },
 });
 ```
 
 **5. Search lessons (with JSONB query):**
+
 ```typescript
 const lessons = await prisma.$queryRaw`
   SELECT l.*, c.title_en as course_title
@@ -901,6 +914,7 @@ const lessons = await prisma.$queryRaw`
 ### Performance Optimizations
 
 **1. Select only needed fields:**
+
 ```typescript
 // Bad: Fetches all fields
 const courses = await prisma.course.findMany();
@@ -912,33 +926,35 @@ const courses = await prisma.course.findMany({
     title_en: true,
     thumbnail_url: true,
     _count: {
-      select: { lessons: true }
-    }
-  }
+      select: { lessons: true },
+    },
+  },
 });
 ```
 
 **2. Use pagination:**
+
 ```typescript
 const lessons = await prisma.lesson.findMany({
   where: { course_id: courseId },
   skip: (page - 1) * pageSize,
   take: pageSize,
-  orderBy: { lesson_order: 'asc' }
+  orderBy: { lesson_order: 'asc' },
 });
 ```
 
 **3. Batch queries with dataloader (if needed):**
+
 ```typescript
 import DataLoader from 'dataloader';
 
 const lessonLoader = new DataLoader(async (lessonIds: string[]) => {
   const lessons = await prisma.lesson.findMany({
-    where: { id: { in: lessonIds } }
+    where: { id: { in: lessonIds } },
   });
 
-  const lessonMap = new Map(lessons.map(l => [l.id, l]));
-  return lessonIds.map(id => lessonMap.get(id));
+  const lessonMap = new Map(lessons.map((l) => [l.id, l]));
+  return lessonIds.map((id) => lessonMap.get(id));
 });
 ```
 
@@ -949,6 +965,7 @@ const lessonLoader = new DataLoader(async (lessonIds: string[]) => {
 ### Connection Pooling
 
 **Prisma Client (built-in):**
+
 ```typescript
 // prisma/client.ts
 import { PrismaClient } from '@prisma/client';
@@ -957,15 +974,16 @@ const prisma = new PrismaClient({
   log: ['query', 'error', 'warn'],
   datasources: {
     db: {
-      url: process.env.DATABASE_URL
-    }
-  }
+      url: process.env.DATABASE_URL,
+    },
+  },
 });
 
 export default prisma;
 ```
 
 **Recommended connection pool settings for Render:**
+
 ```bash
 DATABASE_URL="postgresql://user:pass@host:5432/db?connection_limit=10&pool_timeout=20"
 ```
@@ -973,6 +991,7 @@ DATABASE_URL="postgresql://user:pass@host:5432/db?connection_limit=10&pool_timeo
 ### Query Optimization
 
 **1. Use `include` wisely:**
+
 ```typescript
 // Don't over-fetch
 const lesson = await prisma.lesson.findUnique({
@@ -983,13 +1002,14 @@ const lesson = await prisma.lesson.findUnique({
         content_blocks: true,
         // Don't include everything
         // quizzes: { include: { questions: true } }
-      }
-    }
-  }
+      },
+    },
+  },
 });
 ```
 
 **2. Leverage database-level aggregations:**
+
 ```typescript
 const stats = await prisma.course.findUnique({
   where: { id: courseId },
@@ -997,14 +1017,15 @@ const stats = await prisma.course.findUnique({
     _count: {
       select: {
         lessons: true,
-        enrollments: true
-      }
-    }
-  }
+        enrollments: true,
+      },
+    },
+  },
 });
 ```
 
 **3. Use transactions for data integrity:**
+
 ```typescript
 await prisma.$transaction(async (tx) => {
   // Update enrollment
@@ -1012,8 +1033,8 @@ await prisma.$transaction(async (tx) => {
     where: { id: enrollmentId },
     data: {
       lessons_completed: { increment: 1 },
-      progress_percentage: newPercentage
-    }
+      progress_percentage: newPercentage,
+    },
   });
 
   // Mark lesson complete
@@ -1021,8 +1042,8 @@ await prisma.$transaction(async (tx) => {
     where: { id: progressId },
     data: {
       status: 'COMPLETED',
-      completed_at: new Date()
-    }
+      completed_at: new Date(),
+    },
   });
 });
 ```
@@ -1043,7 +1064,7 @@ async function getCourseWithLessons(courseId: string) {
   // Query database
   const course = await prisma.course.findUnique({
     where: { id: courseId },
-    include: { lessons: true }
+    include: { lessons: true },
   });
 
   // Cache for 15 minutes
@@ -1056,7 +1077,7 @@ async function getCourseWithLessons(courseId: string) {
 async function updateLesson(lessonId: string, data: any) {
   const lesson = await prisma.lesson.update({
     where: { id: lessonId },
-    data
+    data,
   });
 
   // Invalidate course cache
@@ -1073,10 +1094,12 @@ async function updateLesson(lessonId: string, data: any) {
 ### Backup Strategy
 
 **1. Automated daily backups (Render provides this):**
+
 - Enabled in Render dashboard
 - Retention: 7 days (free tier) or 30+ days (paid)
 
 **2. Manual backups before major changes:**
+
 ```bash
 # Export database
 pg_dump $DATABASE_URL > backup-$(date +%Y%m%d).sql
@@ -1089,6 +1112,7 @@ aws s3 cp backup-$(date +%Y%m%d).sql.gz s3://bibliology-backups/
 ```
 
 **3. Migration backups:**
+
 ```bash
 # Before running migration in production
 pg_dump $DATABASE_URL > pre-migration-backup.sql
@@ -1097,6 +1121,7 @@ pg_dump $DATABASE_URL > pre-migration-backup.sql
 ### Recovery
 
 **Restore from backup:**
+
 ```bash
 # Download backup
 aws s3 cp s3://bibliology-backups/backup-20250115.sql.gz .
@@ -1109,6 +1134,7 @@ psql $DATABASE_URL < backup-20250115.sql
 ```
 
 **Point-in-time recovery (if supported by hosting):**
+
 - Use Render's dashboard to restore to specific timestamp
 - Or use PostgreSQL WAL archives (advanced)
 

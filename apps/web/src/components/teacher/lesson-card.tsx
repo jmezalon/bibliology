@@ -1,4 +1,13 @@
-import { GripVertical, Edit, Trash2, Eye, FileText, Clock, ToggleLeft, ToggleRight } from 'lucide-react';
+import {
+  GripVertical,
+  Edit,
+  Trash2,
+  Eye,
+  FileText,
+  Clock,
+  ToggleLeft,
+  ToggleRight,
+} from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 import type { Lesson } from '../../types/course';
@@ -28,10 +37,7 @@ export function LessonCard({
 
   return (
     <Card
-      className={cn(
-        'lesson-card group transition-all',
-        isDragging && 'opacity-50 shadow-lg'
-      )}
+      className={cn('lesson-card group transition-all', isDragging && 'opacity-50 shadow-lg')}
       role="article"
       aria-label={`Lesson: ${lesson.title_en}`}
     >
@@ -56,9 +62,7 @@ export function LessonCard({
           {/* Lesson Info */}
           <div className="flex-1 min-w-0">
             <h4 className="font-semibold truncate">{lesson.title_en}</h4>
-            <p className="text-sm text-muted-foreground truncate">
-              {lesson.description_en}
-            </p>
+            <p className="text-sm text-muted-foreground truncate">{lesson.description_en}</p>
           </div>
 
           {/* Status Badge */}
@@ -68,7 +72,7 @@ export function LessonCard({
                 'px-2 py-1 text-xs font-medium rounded-full',
                 lesson.is_published
                   ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                  : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100'
+                  : 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100',
               )}
               role="status"
             >

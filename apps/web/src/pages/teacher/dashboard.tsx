@@ -5,7 +5,13 @@ import { Container } from '../../components/layout/container';
 import { EmptyState } from '../../components/teacher/empty-state';
 import { StatCard } from '../../components/teacher/stat-card';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../../components/ui/card';
 import { useAuthStore } from '../../store/auth.store';
 
 export function TeacherDashboardPage() {

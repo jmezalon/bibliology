@@ -12,9 +12,7 @@ export function HomePage() {
       <section className="bg-gradient-to-b from-primary/10 to-background py-20 md:py-32">
         <Container>
           <div className="text-center space-y-6 max-w-3xl mx-auto">
-            <h1 className="heading-xl">
-              Master Biblical Studies with Bilingual Learning
-            </h1>
+            <h1 className="heading-xl">Master Biblical Studies with Bilingual Learning</h1>
             <p className="text-xl text-muted-foreground">
               Study theology, biblical languages, and church history in both English and French
             </p>

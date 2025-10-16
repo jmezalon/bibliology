@@ -40,6 +40,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 1-2: Project Setup
 
 **Tasks:**
+
 - [ ] Initialize Turborepo monorepo
 - [ ] Set up GitHub repository
 - [ ] Configure ESLint, Prettier, TypeScript configs
@@ -48,12 +49,14 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Set up GitHub Actions CI pipeline (lint, typecheck, test)
 
 **Deliverables:**
+
 - Working monorepo with `pnpm dev` running all apps
 - CI pipeline passing on all commits
 
 ### Days 3-4: Database & Prisma Setup
 
 **Tasks:**
+
 - [ ] Create complete Prisma schema (see database-strategy.md)
 - [ ] Set up initial migration
 - [ ] Create seed data for development
@@ -64,6 +67,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Set up Prisma Studio
 
 **Deliverables:**
+
 - Database schema fully migrated
 - Seed script populates dev data
 - All tables and relationships verified
@@ -71,6 +75,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 5-7: Authentication Module
 
 **Tasks:**
+
 - [ ] Create shared types package (@bibliology/types)
 - [ ] Create shared validation package (@bibliology/validation)
 - [ ] Implement auth module in NestJS:
@@ -90,6 +95,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Set up HttpOnly cookies for tokens
 
 **Deliverables:**
+
 - User can register, login, logout
 - JWT authentication working end-to-end
 - Role-based access control (student vs teacher)
@@ -104,6 +110,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 8-10: Lesson CRUD API
 
 **Tasks:**
+
 - [ ] Implement courses module:
   - Create/read/update/delete courses
   - Publish/unpublish course
@@ -123,6 +130,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Write integration tests for lesson creation flow
 
 **Deliverables:**
+
 - Complete lesson CRUD API working
 - Postman/Thunder Client collection for testing
 - API documentation (OpenAPI spec)
@@ -131,6 +139,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 11-14: Lesson Builder UI
 
 **Tasks:**
+
 - [ ] Create lesson builder page layout:
   - Slide navigator (left sidebar)
   - Canvas (center)
@@ -156,6 +165,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Style with Tailwind + shadcn/ui
 
 **Deliverables:**
+
 - Working lesson builder UI
 - Teacher can create 10-slide lesson with various content types
 - Auto-save works reliably
@@ -171,6 +181,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 15-17: Lesson Viewer (Student)
 
 **Tasks:**
+
 - [ ] Create lesson viewer page:
   - Full-screen slide display
   - Navigation controls (prev/next)
@@ -196,6 +207,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Mobile-responsive design
 
 **Deliverables:**
+
 - Student can view published lessons
 - Smooth navigation between slides
 - Progress saves automatically
@@ -205,6 +217,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 18-21: PowerPoint Import (Simplified)
 
 **Tasks:**
+
 - [ ] Set up BullMQ for background jobs
 - [ ] Create worker app (separate from API)
 - [ ] Implement PowerPoint parser:
@@ -230,6 +243,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
   - Store URLs in content blocks
 
 **Deliverables:**
+
 - Teacher can upload .pptx file
 - System parses and extracts content
 - Teacher sees preview of parsed slides
@@ -246,6 +260,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 22-24: Quiz System
 
 **Tasks:**
+
 - [ ] Implement quizzes API:
   - Create/update/delete quiz
   - Create/update/delete questions
@@ -269,6 +284,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Update progress tracking to include quiz completion
 
 **Deliverables:**
+
 - Teacher can add quizzes to lessons
 - Student can take quizzes
 - Scores calculated automatically
@@ -278,6 +294,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 25-26: Polish & Bug Fixes
 
 **Tasks:**
+
 - [ ] Fix all known bugs from testing
 - [ ] Improve error handling:
   - User-friendly error messages
@@ -301,6 +318,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 - [ ] Add toast notifications for user feedback
 
 **Deliverables:**
+
 - All critical bugs fixed
 - Error handling improved
 - Loading states polished
@@ -310,6 +328,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Days 27-28: Deployment & Testing
 
 **Tasks:**
+
 - [ ] Set up production environments:
   - Create Render account and projects
   - Create Vercel project
@@ -341,6 +360,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
   - FAQ
 
 **Deliverables:**
+
 - Application deployed to production
 - All features working in production
 - CI/CD pipeline auto-deploys on merge
@@ -354,21 +374,25 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### High-Risk Items
 
 **1. PowerPoint Parsing Complexity**
+
 - **Risk:** PPTX files have complex structure, parsing may fail
 - **Mitigation:** Start with simple PPTX files, allow manual fixes
 - **Backup Plan:** Manual lesson creation only (skip import for MVP)
 
 **2. Background Job Processing**
+
 - **Risk:** BullMQ/Redis setup might be complex
 - **Mitigation:** Test thoroughly in development
 - **Backup Plan:** Synchronous parsing (slower but simpler)
 
 **3. Performance with Large Lessons**
+
 - **Risk:** 50+ slide lessons might load slowly
 - **Mitigation:** Implement pagination, lazy loading
 - **Backup Plan:** Limit lesson size to 20 slides for MVP
 
 **4. Cross-Browser Compatibility**
+
 - **Risk:** Rich text editor might not work in all browsers
 - **Mitigation:** Test in Chrome, Firefox, Safari
 - **Backup Plan:** Support Chrome/Firefox only for MVP
@@ -376,11 +400,13 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ### Medium-Risk Items
 
 **5. Authentication Cookie Issues**
+
 - **Risk:** SameSite cookie issues with Vercel/Render
 - **Mitigation:** Test early, configure CORS properly
 - **Backup Plan:** Use Authorization header (less secure)
 
 **6. Time Estimation**
+
 - **Risk:** Tasks may take longer than estimated
 - **Mitigation:** Daily standups, adjust scope if needed
 - **Backup Plan:** Cut less critical features (e.g., vocab blocks)
@@ -390,26 +416,31 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ## Testing Strategy
 
 ### Week 1
+
 - Unit tests for auth service
 - Integration tests for auth flow
 
 ### Week 2
+
 - Unit tests for lesson service
 - Integration tests for lesson CRUD
 - E2E tests for lesson builder
 
 ### Week 3
+
 - Unit tests for progress tracking
 - Integration tests for PowerPoint import
 - E2E tests for lesson viewer
 
 ### Week 4
+
 - Unit tests for quiz grading
 - Integration tests for quiz submission
 - E2E tests for complete user flows
 - Production smoke tests
 
 **Coverage Goals:**
+
 - Backend: 80%+ unit test coverage
 - Frontend: 60%+ component test coverage
 - E2E: All critical user flows
@@ -419,22 +450,26 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 ## Daily Workflow
 
 **Morning (9 AM - 12 PM):**
+
 - Review previous day's work
 - Daily standup (if team > 1)
 - Focus on coding new features
 
 **Afternoon (1 PM - 5 PM):**
+
 - Continue feature development
 - Code review (if team > 1)
 - Write tests
 - Fix bugs
 
 **End of Day:**
+
 - Commit and push code
 - Update project board
 - Document blockers
 
 **End of Week:**
+
 - Demo completed features
 - Review progress against timeline
 - Adjust scope if needed
@@ -446,6 +481,7 @@ This Phase 1 MVP focuses on **core functionality** that allows teachers to creat
 At the end of Week 4, we should have:
 
 ### Functional Requirements
+
 - ✅ Teachers can create lessons (10+ slides)
 - ✅ Teachers can import PowerPoint (simple files)
 - ✅ Students can view lessons
@@ -454,6 +490,7 @@ At the end of Week 4, we should have:
 - ✅ Bilingual content works (EN/FR)
 
 ### Technical Requirements
+
 - ✅ Deployed to production
 - ✅ CI/CD pipeline working
 - ✅ 80%+ backend test coverage
@@ -461,11 +498,13 @@ At the end of Week 4, we should have:
 - ✅ No high-severity bugs
 
 ### Performance Requirements
+
 - ✅ Page load < 3 seconds
 - ✅ API response < 500ms
 - ✅ PPTX import < 60 seconds (10-slide deck)
 
 ### User Experience
+
 - ✅ Teacher can create lesson in < 30 min
 - ✅ Student can complete lesson smoothly
 - ✅ Mobile experience is usable

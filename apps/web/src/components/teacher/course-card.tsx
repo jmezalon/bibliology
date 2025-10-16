@@ -41,7 +41,7 @@ export function CourseCard({ course, onEdit, onDelete, onView }: CourseCardProps
               'px-2 py-1 text-xs font-medium rounded-full',
               course.is_published
                 ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100',
             )}
             role="status"
             aria-label={course.is_published ? 'Published' : 'Draft'}
@@ -122,9 +122,12 @@ export function CourseCard({ course, onEdit, onDelete, onView }: CourseCardProps
             <span
               className={cn(
                 'px-2 py-0.5 text-xs rounded-full',
-                course.level === CourseLevel.BEGINNER && 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
-                course.level === CourseLevel.INTERMEDIATE && 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',
-                course.level === CourseLevel.ADVANCED && 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100'
+                course.level === CourseLevel.BEGINNER &&
+                  'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100',
+                course.level === CourseLevel.INTERMEDIATE &&
+                  'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100',
+                course.level === CourseLevel.ADVANCED &&
+                  'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100',
               )}
             >
               {course.level}

@@ -26,6 +26,7 @@ Before Launch:
 ## Phase 3: Ongoing (After Launch)
 
 As Needed:
+
 - Performance issues → use CI/CD agent
 - Adding new services → use CI/CD agent
 - Security updates → use CI/CD agent

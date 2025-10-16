@@ -17,7 +17,7 @@ export function Container({ size = 'default', className, children, ...props }: C
           'max-w-7xl': size === 'wide',
           'max-w-full': size === 'full',
         },
-        className
+        className,
       )}
       {...props}
     >

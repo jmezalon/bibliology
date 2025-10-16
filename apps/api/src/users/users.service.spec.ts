@@ -104,18 +104,20 @@ describe('UsersService', () => {
 
       const result = await service.findOne('1', '1', UserRole.STUDENT);
 
-      expect(result).toEqual(expect.objectContaining({
-        id: '1',
-        email: 'user@example.com',
-      }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: '1',
+          email: 'user@example.com',
+        }),
+      );
     });
 
     it('should throw NotFoundException when user not found', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(
-        service.findOne('999', '1', UserRole.STUDENT),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.findOne('999', '1', UserRole.STUDENT)).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ForbiddenException when non-admin tries to view other user', async () => {
@@ -127,9 +129,7 @@ describe('UsersService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(
-        service.findOne('2', '1', UserRole.STUDENT),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.findOne('2', '1', UserRole.STUDENT)).rejects.toThrow(ForbiddenException);
     });
 
     it('should allow admin to view any user', async () => {
@@ -149,10 +149,12 @@ describe('UsersService', () => {
 
       const result = await service.findOne('2', '1', UserRole.ADMIN);
 
-      expect(result).toEqual(expect.objectContaining({
-        id: '2',
-        email: 'other@example.com',
-      }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: '2',
+          email: 'other@example.com',
+        }),
+      );
     });
   });
 
@@ -187,9 +189,9 @@ describe('UsersService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(
-        service.update('1', updateDto, '1', UserRole.STUDENT),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.update('1', updateDto, '1', UserRole.STUDENT)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 

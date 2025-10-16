@@ -101,9 +101,7 @@ describe('AuthService', () => {
         email: registerDto.email,
       });
 
-      await expect(service.register(registerDto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(service.register(registerDto)).rejects.toThrow(ConflictException);
     });
   });
 
@@ -147,9 +145,7 @@ describe('AuthService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException with invalid password', async () => {
@@ -168,9 +164,7 @@ describe('AuthService', () => {
 
       mockPrismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(service.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.login(loginDto)).rejects.toThrow(UnauthorizedException);
     });
   });
 
@@ -193,19 +187,19 @@ describe('AuthService', () => {
 
       const result = await service.validateUser(userId);
 
-      expect(result).toEqual(expect.objectContaining({
-        id: userId,
-        email: mockUser.email,
-        name: mockUser.name,
-      }));
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: userId,
+          email: mockUser.email,
+          name: mockUser.name,
+        }),
+      );
     });
 
     it('should throw UnauthorizedException when user not found', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.validateUser('999')).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(service.validateUser('999')).rejects.toThrow(UnauthorizedException);
     });
   });
 });

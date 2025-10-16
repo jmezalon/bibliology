@@ -11,7 +11,6 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
-
 @Module({
   imports: [
     PrismaModule,
@@ -19,7 +18,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || 'your-super-secret-jwt-key-change-this-in-production',
+        secret:
+          configService.get<string>('JWT_SECRET') ||
+          'your-super-secret-jwt-key-change-this-in-production',
         signOptions: {
           expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '7d',
         },

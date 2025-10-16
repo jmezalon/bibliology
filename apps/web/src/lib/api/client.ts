@@ -31,7 +31,7 @@ apiClient.interceptors.request.use(
   (error: AxiosError) => {
     console.error('[API Request Error]', error);
     return Promise.reject(error);
-  }
+  },
 );
 
 /**
@@ -109,7 +109,7 @@ apiClient.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default apiClient;

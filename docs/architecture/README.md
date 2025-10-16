@@ -13,6 +13,7 @@
 ### Core Features (Phase 1 MVP)
 
 **For Teachers:**
+
 - Create lessons from scratch with rich content blocks
 - Import existing PowerPoint presentations
 - Add quizzes with multiple choice and true/false questions
@@ -20,6 +21,7 @@
 - View basic analytics
 
 **For Students:**
+
 - Browse and enroll in courses
 - View lessons with smooth navigation
 - Take inline quizzes with instant feedback
@@ -30,6 +32,7 @@
 ### Technology Stack
 
 **Frontend:**
+
 - React 18+ with TypeScript
 - Vite for fast development
 - TailwindCSS + shadcn/ui for UI components
@@ -39,6 +42,7 @@
 - dnd-kit for drag-and-drop
 
 **Backend:**
+
 - NestJS (Node.js + TypeScript)
 - Prisma ORM
 - PostgreSQL 15+ database
@@ -47,6 +51,7 @@
 - JWT authentication (cookie-based)
 
 **Infrastructure:**
+
 - Turborepo monorepo
 - Docker Compose for local development
 - Render for backend deployment
@@ -61,9 +66,11 @@
 This architecture documentation is organized into the following files:
 
 ### 1. [ADR-001: Technology Stack Selection](./adr-001-tech-stack.md)
+
 **Purpose:** Detailed rationale for every technology decision
 
 **What you'll find:**
+
 - Complete justification for each technology choice
 - Alternatives considered with pros/cons
 - Trade-off analysis
@@ -71,6 +78,7 @@ This architecture documentation is organized into the following files:
 - Future considerations
 
 **Key decisions:**
+
 - Why Turborepo over Nx
 - Why NestJS over Express
 - Why Prisma over TypeORM
@@ -79,9 +87,11 @@ This architecture documentation is organized into the following files:
 - And 15+ more architectural decisions
 
 ### 2. [Project Structure](./project-structure.md)
+
 **Purpose:** Complete folder hierarchy and file organization
 
 **What you'll find:**
+
 - Monorepo structure (apps/ and packages/)
 - Backend API structure with all modules
 - Frontend app structure with all pages/components
@@ -93,15 +103,18 @@ This architecture documentation is organized into the following files:
 - Environment variables
 
 **Highlights:**
+
 - 3 apps: API, Web, Worker
 - 4 shared packages: types, validation, utils, ui
 - Clear separation of concerns
 - Scalable from MVP to production
 
 ### 3. [System Diagrams](./system-diagrams.mmd)
+
 **Purpose:** Visual representation of architecture
 
 **What you'll find:**
+
 - High-level system architecture
 - Authentication flow (sequence diagram)
 - PowerPoint import flow (sequence diagram)
@@ -118,9 +131,11 @@ This architecture documentation is organized into the following files:
 **Total diagrams:** 12 comprehensive Mermaid diagrams
 
 ### 4. [Development Workflow](./dev-workflow.md)
+
 **Purpose:** How to develop, test, and deploy
 
 **What you'll find:**
+
 - Local development setup (step-by-step)
 - Environment configuration
 - Development commands (monorepo)
@@ -134,6 +149,7 @@ This architecture documentation is organized into the following files:
 - Troubleshooting guide
 
 **Key sections:**
+
 - Docker Compose setup for local services
 - GitHub Flow branching strategy
 - Conventional Commits specification
@@ -141,9 +157,11 @@ This architecture documentation is organized into the following files:
 - Prisma migration workflow
 
 ### 5. [Database Strategy](./database-strategy.md)
+
 **Purpose:** Database design philosophy and implementation
 
 **What you'll find:**
+
 - Schema design principles
 - Bilingual content strategy (EN/FR columns)
 - Complete Prisma schema (600+ lines)
@@ -156,6 +174,7 @@ This architecture documentation is organized into the following files:
 - Backup and recovery procedures
 
 **Key tables:**
+
 - Users, Courses, Lessons, Slides
 - ContentBlocks (JSONB for flexibility)
 - Quizzes, Questions, QuizSubmissions
@@ -163,9 +182,11 @@ This architecture documentation is organized into the following files:
 - Certificates, ActivityLogs
 
 ### 6. [OpenAPI Specification](../api/openapi.yml)
+
 **Purpose:** Complete REST API contract
 
 **What you'll find:**
+
 - 50+ API endpoints documented
 - Request/response schemas
 - Authentication requirements
@@ -174,6 +195,7 @@ This architecture documentation is organized into the following files:
 - Rate limiting information
 
 **Endpoint categories:**
+
 - Authentication (register, login, logout, refresh)
 - Courses (CRUD + publish)
 - Lessons (CRUD + publish + reorder)
@@ -189,9 +211,11 @@ This architecture documentation is organized into the following files:
 - Health (system status)
 
 ### 7. [Phase 1 MVP Timeline](./phase-1-mvp-timeline.md)
+
 **Purpose:** 4-week implementation plan
 
 **What you'll find:**
+
 - Week-by-week breakdown
 - Day-by-day tasks with checkboxes
 - Deliverables for each week
@@ -202,6 +226,7 @@ This architecture documentation is organized into the following files:
 - Post-MVP priorities
 
 **Timeline:**
+
 - **Week 1:** Foundation & Authentication
 - **Week 2:** Lesson Management (Teacher)
 - **Week 3:** Student Experience & PowerPoint Import
@@ -244,6 +269,7 @@ pnpm dev
 ```
 
 **Access points:**
+
 - Frontend: http://localhost:5173
 - Backend API: http://localhost:3000
 - Prisma Studio: http://localhost:5555 (`pnpm db:studio`)
@@ -254,27 +280,32 @@ pnpm dev
 ## Architecture Principles
 
 ### 1. TypeScript Everywhere
+
 - Strict mode enabled
 - No `any` types
 - Shared types between frontend and backend
 
 ### 2. Separation of Concerns
+
 - Clear module boundaries
 - Feature-based folder structure
 - Repository pattern for data access
 
 ### 3. Bilingual from Day One
+
 - Separate EN/FR columns in database
 - Fallback to English if French missing
 - Language toggle throughout UI
 
 ### 4. Developer Experience
+
 - Fast hot reload with Vite/Turbo
 - Type-safe API calls
 - Comprehensive error messages
 - Automated testing
 
 ### 5. Security First
+
 - HttpOnly cookies for JWT
 - CSRF protection (SameSite cookies)
 - Role-based access control
@@ -283,6 +314,7 @@ pnpm dev
 - XSS prevention (sanitization)
 
 ### 6. Performance Optimized
+
 - Database indexing strategy
 - Redis caching layer
 - Code splitting
@@ -290,6 +322,7 @@ pnpm dev
 - Query optimization
 
 ### 7. Scalable Architecture
+
 - Horizontal scaling ready
 - Background job processing
 - Stateless API servers
@@ -300,45 +333,55 @@ pnpm dev
 ## Key Architectural Decisions
 
 ### Monorepo Strategy
+
 **Decision:** Use Turborepo for monorepo management
 
 **Rationale:**
+
 - Share code between apps easily
 - Atomic commits across frontend/backend
 - Fast builds with caching
 - Simple configuration
 
 ### Database Schema
+
 **Decision:** Separate EN/FR columns instead of JSONB language object
 
 **Rationale:**
+
 - Simpler queries: `WHERE title_en ILIKE '%search%'`
 - Better indexing for each language
 - Type-safe with Prisma
 - Easy to make English required, French optional
 
 ### Content Block Storage
+
 **Decision:** Use JSONB for content blocks instead of separate tables
 
 **Rationale:**
+
 - Content structure varies by block type
 - Flexibility to add new types without migrations
 - Can still query inside JSONB with Postgres operators
 - Zod validation provides type safety
 
 ### Authentication
+
 **Decision:** Cookie-based JWT instead of localStorage
 
 **Rationale:**
+
 - More secure (HttpOnly prevents XSS)
 - CSRF protection with SameSite
 - Automatic token refresh
 - Works with SSR (future)
 
 ### State Management
+
 **Decision:** React Query for server state, Zustand for client state
 
 **Rationale:**
+
 - React Query handles caching, refetching, optimistic updates
 - Zustand is lightweight (1KB) and simple
 - Clear separation between server and client state
@@ -349,18 +392,21 @@ pnpm dev
 ## Scaling Roadmap
 
 ### Current (MVP)
+
 - Single API server
 - Single database
 - Single Redis instance
 - Local file storage (dev)
 
 ### Phase 2 (100 users)
+
 - Add worker process for background jobs
 - Move to Cloudflare R2 for storage
 - Enable database connection pooling
 - Add Redis caching layer
 
 ### Phase 3 (1000 users)
+
 - Horizontal API scaling (multiple instances)
 - Read replicas for database
 - CDN for static assets
@@ -368,6 +414,7 @@ pnpm dev
 - Advanced caching strategy
 
 ### Phase 4 (10000+ users)
+
 - Microservices extraction (imports service)
 - Multi-region deployment
 - Dedicated search service (Meilisearch/Algolia)
@@ -379,18 +426,21 @@ pnpm dev
 ## Testing Strategy
 
 ### Unit Tests (Vitest)
+
 - All service layer functions
 - Utility functions
 - Complex business logic
 - **Goal:** 80%+ coverage
 
 ### Integration Tests
+
 - API endpoints with database
 - Authentication flows
 - Payment processing
 - **Goal:** All critical paths covered
 
 ### E2E Tests (Playwright)
+
 - Complete user journeys
 - Teacher creates lesson
 - Student takes lesson
@@ -398,6 +448,7 @@ pnpm dev
 - **Goal:** All main workflows tested
 
 ### Manual Testing
+
 - Cross-browser testing (Chrome, Firefox, Safari)
 - Mobile responsive testing
 - Accessibility testing
@@ -448,6 +499,7 @@ On Merge to Main:
 ## Security Measures
 
 ### Application Security
+
 - [ ] HTTPS everywhere
 - [ ] HttpOnly cookies for JWT
 - [ ] CSRF protection (SameSite cookies)
@@ -460,6 +512,7 @@ On Merge to Main:
 - [ ] Role-based access control
 
 ### Infrastructure Security
+
 - [ ] Regular security updates
 - [ ] Database backups
 - [ ] Access logs
@@ -472,18 +525,21 @@ On Merge to Main:
 ## Performance Targets
 
 ### Backend API
+
 - Response time: < 200ms (p95)
 - Throughput: 100+ req/sec
 - Database connections: Pooled (max 10)
 - Cache hit rate: > 80%
 
 ### Frontend
+
 - First Contentful Paint: < 1.5s
 - Time to Interactive: < 3s
 - Bundle size: < 500KB (gzipped)
 - Lighthouse score: > 90
 
 ### Background Jobs
+
 - PowerPoint import: < 60s (10-slide deck)
 - Image optimization: < 5s per image
 - Certificate generation: < 10s
@@ -493,6 +549,7 @@ On Merge to Main:
 ## Monitoring & Observability
 
 ### Metrics (Phase 2)
+
 - API response times
 - Error rates
 - Database query performance
@@ -501,6 +558,7 @@ On Merge to Main:
 - User engagement metrics
 
 ### Logging
+
 - Structured JSON logs
 - Log levels (error, warn, info, debug)
 - Request/response logging
@@ -508,6 +566,7 @@ On Merge to Main:
 - User action tracking
 
 ### Alerting (Phase 2)
+
 - API downtime
 - High error rates
 - Database connection issues
@@ -519,18 +578,21 @@ On Merge to Main:
 ## Documentation Standards
 
 ### Code Documentation
+
 - JSDoc comments for public APIs
 - README in each package
 - Architecture Decision Records (ADRs)
 - Inline comments for complex logic
 
 ### API Documentation
+
 - OpenAPI specification (openapi.yml)
 - Generated API docs (Swagger UI)
 - Postman collection
 - Example requests/responses
 
 ### User Documentation (Phase 2)
+
 - Teacher guide
 - Student guide
 - FAQ
@@ -541,6 +603,7 @@ On Merge to Main:
 ## Team Workflow
 
 ### Daily Routine
+
 1. Pull latest code (`git pull origin main`)
 2. Check project board for assigned tasks
 3. Create feature branch (`feature/task-name`)
@@ -551,6 +614,7 @@ On Merge to Main:
 8. Merge after approval
 
 ### Weekly Routine
+
 1. Sprint planning (Monday)
 2. Daily standups (async or sync)
 3. Code reviews throughout week
@@ -558,6 +622,7 @@ On Merge to Main:
 5. Retrospective (Friday)
 
 ### Code Review Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Tests pass locally
 - [ ] New tests added for new features
@@ -574,17 +639,20 @@ On Merge to Main:
 ### Common Issues
 
 **Docker services won't start:**
+
 ```bash
 docker-compose down -v
 docker-compose up -d
 ```
 
 **Database out of sync:**
+
 ```bash
 pnpm db:reset
 ```
 
 **Build errors:**
+
 ```bash
 pnpm clean
 rm -rf node_modules
@@ -593,6 +661,7 @@ pnpm build
 ```
 
 **Port already in use:**
+
 ```bash
 lsof -i :3000
 kill -9 <PID>
@@ -605,12 +674,14 @@ For more troubleshooting, see [Development Workflow](./dev-workflow.md#troublesh
 ## Contributing
 
 ### Before You Start
+
 1. Read all architecture docs
 2. Set up local development environment
 3. Run tests to ensure everything works
 4. Pick a task from the project board
 
 ### Code Standards
+
 - TypeScript strict mode
 - ESLint + Prettier configured
 - Conventional Commits
@@ -618,6 +689,7 @@ For more troubleshooting, see [Development Workflow](./dev-workflow.md#troublesh
 - Accessibility (WCAG AA)
 
 ### Pull Request Process
+
 1. Create branch from `main`
 2. Make changes with tests
 3. Push and create PR

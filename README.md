@@ -7,6 +7,7 @@ A platform for teachers to create rich, PowerPoint-style Bible study lessons and
 ## Features
 
 ### For Teachers
+
 - Create lessons from scratch with rich content blocks
 - Import existing PowerPoint presentations
 - Add quizzes with multiple question types
@@ -14,6 +15,7 @@ A platform for teachers to create rich, PowerPoint-style Bible study lessons and
 - View analytics and insights
 
 ### For Students
+
 - Browse and enroll in courses
 - View lessons with smooth navigation
 - Take inline quizzes with instant feedback

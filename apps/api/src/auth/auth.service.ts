@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  UnauthorizedException,
-  ConflictException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
@@ -80,7 +75,8 @@ export class AuthService {
     });
 
     // Always run bcrypt comparison even if user not found (prevent timing attacks)
-    const passwordToCompare = user?.password_hash || '$2b$10$invalidhashtopreventtimingattacks1234567890123456';
+    const passwordToCompare =
+      user?.password_hash || '$2b$10$invalidhashtopreventtimingattacks1234567890123456';
     const isPasswordValid = await bcrypt.compare(password, passwordToCompare);
 
     if (!user || !isPasswordValid) {

@@ -1,7 +1,13 @@
 import { z } from 'zod';
 
 // Enums
-export const QuestionTypeSchema = z.enum(['MULTIPLE_CHOICE', 'TRUE_FALSE', 'SHORT_ANSWER', 'FILL_BLANK', 'MATCHING']);
+export const QuestionTypeSchema = z.enum([
+  'MULTIPLE_CHOICE',
+  'TRUE_FALSE',
+  'SHORT_ANSWER',
+  'FILL_BLANK',
+  'MATCHING',
+]);
 
 // Quiz configuration schema
 export const quizConfigSchema = z.object({
@@ -99,25 +105,30 @@ export const createQuestionSchema = z.discriminatedUnion('question_type', [
     question_type: z.literal('MATCHING'),
     question_text_en: z.record(z.any()),
     question_text_fr: z.record(z.any()).optional().nullable(),
-    options_en: z.array(
-      z.object({
-        id: z.string(),
-        left: z.string(),
-        right: z.string(),
-      })
-    ).min(2, 'At least 2 pairs are required'),
-    options_fr: z.array(
-      z.object({
-        id: z.string(),
-        left: z.string(),
-        right: z.string(),
-      })
-    ).optional().nullable(),
+    options_en: z
+      .array(
+        z.object({
+          id: z.string(),
+          left: z.string(),
+          right: z.string(),
+        }),
+      )
+      .min(2, 'At least 2 pairs are required'),
+    options_fr: z
+      .array(
+        z.object({
+          id: z.string(),
+          left: z.string(),
+          right: z.string(),
+        }),
+      )
+      .optional()
+      .nullable(),
     correct_answers: z.array(
       z.object({
         left_id: z.string(),
         right_id: z.string(),
-      })
+      }),
     ),
     explanation_en: z.record(z.any()).optional().nullable(),
     explanation_fr: z.record(z.any()).optional().nullable(),

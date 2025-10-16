@@ -13,7 +13,11 @@ export class UsersService {
   /**
    * Get all users (Admin only)
    */
-  async findAll(page: number = 1, limit: number = 10, role?: UserRole): Promise<{ users: UserDto[]; total: number }> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+    role?: UserRole,
+  ): Promise<{ users: UserDto[]; total: number }> {
     // Validate and sanitize pagination parameters
     if (page < 1) page = 1;
     if (limit < 1) limit = 10;
@@ -42,7 +46,11 @@ export class UsersService {
   /**
    * Get user by ID
    */
-  async findOne(id: string, requestingUserId: string, requestingUserRole: UserRole): Promise<UserDto> {
+  async findOne(
+    id: string,
+    requestingUserId: string,
+    requestingUserRole: UserRole,
+  ): Promise<UserDto> {
     const user: User | null = await this.prisma.user.findUnique({
       where: { id },
     });

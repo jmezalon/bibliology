@@ -94,12 +94,14 @@ Once `pnpm dev` is running, verify these URLs:
 ### Development (.env files)
 
 **Root `.env`**
+
 ```bash
 # Not typically needed at root, but can store shared vars
 NODE_ENV=development
 ```
 
 **apps/api/.env**
+
 ```bash
 # App
 NODE_ENV=development
@@ -137,6 +139,7 @@ MAX_FILE_SIZE_MB=50
 ```
 
 **apps/web/.env**
+
 ```bash
 VITE_API_URL=http://localhost:3000
 VITE_APP_NAME=Bibliology
@@ -280,6 +283,7 @@ main (production-ready code)
 ```
 
 **Branch Naming:**
+
 - `feature/` - New features
 - `fix/` - Bug fixes
 - `chore/` - Maintenance tasks
@@ -288,6 +292,7 @@ main (production-ready code)
 - `test/` - Adding tests
 
 **Examples:**
+
 ```bash
 feature/lesson-builder
 feature/pptx-import
@@ -304,6 +309,7 @@ test/lesson-service-unit-tests
 We follow **Conventional Commits** specification:
 
 **Format:**
+
 ```
 <type>(<scope>): <subject>
 
@@ -313,6 +319,7 @@ We follow **Conventional Commits** specification:
 ```
 
 **Types:**
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -324,6 +331,7 @@ We follow **Conventional Commits** specification:
 - `ci`: CI/CD changes
 
 **Examples:**
+
 ```bash
 feat(lessons): add PowerPoint import functionality
 
@@ -350,6 +358,7 @@ chore(deps): update NestJS to v10.2.0
 ### Development Workflow
 
 1. **Create a branch**
+
    ```bash
    git checkout main
    git pull origin main
@@ -357,12 +366,14 @@ chore(deps): update NestJS to v10.2.0
    ```
 
 2. **Make changes and commit frequently**
+
    ```bash
    git add .
    git commit -m "feat(lessons): add slide editor component"
    ```
 
 3. **Keep your branch up to date**
+
    ```bash
    git fetch origin
    git rebase origin/main
@@ -371,6 +382,7 @@ chore(deps): update NestJS to v10.2.0
    ```
 
 4. **Push your branch**
+
    ```bash
    git push origin feature/lesson-builder
    ```
@@ -382,6 +394,7 @@ chore(deps): update NestJS to v10.2.0
    - Wait for CI checks to pass
 
 6. **Address review feedback**
+
    ```bash
    # Make changes
    git add .
@@ -403,6 +416,7 @@ chore(deps): update NestJS to v10.2.0
 ### Pull Request Guidelines
 
 **PR Title Format:**
+
 ```
 feat(lessons): add PowerPoint import functionality
 fix(auth): resolve token refresh issues
@@ -410,29 +424,36 @@ docs(api): update endpoint documentation
 ```
 
 **PR Description Template:**
+
 ```markdown
 ## Description
+
 Brief description of what this PR does.
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change which fixes an issue)
 - [ ] New feature (non-breaking change which adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] Unit tests added/updated
 - [ ] Integration tests added/updated
 - [ ] Manual testing completed
 
 ## Screenshots (if applicable)
+
 Add screenshots here
 
 ## Related Issues
+
 Closes #123
 Related to #456
 
 ## Checklist
+
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
 - [ ] Comments added for complex logic
@@ -462,6 +483,7 @@ pnpm lint --filter=@bibliology/api
 ```
 
 **Key Rules:**
+
 - TypeScript strict mode
 - No unused variables
 - No console.log (use logger)
@@ -480,6 +502,7 @@ pnpm format:check
 ```
 
 **Settings:**
+
 ```json
 {
   "semi": true,
@@ -494,6 +517,7 @@ pnpm format:check
 ### TypeScript
 
 **Strict Mode Enabled:**
+
 - `strict: true`
 - `noImplicitAny: true`
 - `strictNullChecks: true`
@@ -519,6 +543,7 @@ pnpm typecheck
 ```
 
 **lint-staged** configuration in `package.json`:
+
 ```json
 {
   "lint-staged": {
@@ -549,6 +574,7 @@ apps/api/
 ### Unit Tests (Vitest)
 
 **Example:**
+
 ```typescript
 // lessons.service.spec.ts
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -580,6 +606,7 @@ describe('LessonsService', () => {
 ```
 
 **Run tests:**
+
 ```bash
 # All unit tests
 pnpm test
@@ -597,6 +624,7 @@ pnpm test lessons.service.spec.ts
 ### Integration Tests (E2E)
 
 **Example:**
+
 ```typescript
 // lessons.e2e-spec.ts
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
@@ -633,6 +661,7 @@ describe('Lessons API (E2E)', () => {
 ### Frontend Testing (Vitest + React Testing Library)
 
 **Example:**
+
 ```typescript
 // LessonCard.spec.tsx
 import { describe, it, expect } from 'vitest';
@@ -659,6 +688,7 @@ describe('LessonCard', () => {
 ### E2E Testing (Playwright)
 
 **Example:**
+
 ```typescript
 // lesson-viewer.spec.ts
 import { test, expect } from '@playwright/test';
@@ -680,6 +710,7 @@ test.describe('Lesson Viewer', () => {
 ```
 
 **Run E2E tests:**
+
 ```bash
 # Run all E2E tests
 pnpm test:e2e
@@ -731,6 +762,7 @@ git commit -m "feat(db): add user avatar field"
 ### Seeding Data
 
 **Development Seeds:**
+
 ```typescript
 // prisma/seeds/dev.seed.ts
 import { PrismaClient } from '@prisma/client';
@@ -773,6 +805,7 @@ main()
 ```
 
 **Run seeds:**
+
 ```bash
 # Run all seeds
 pnpm db:seed
@@ -807,6 +840,7 @@ SELECT * FROM users;
 ### CI/CD Pipeline
 
 **GitHub Actions:**
+
 - Runs on every push
 - Checks: Lint, TypeScript, Tests, Build
 - Auto-deploys on merge to `main`
@@ -814,6 +848,7 @@ SELECT * FROM users;
 ### Manual Deployment
 
 **Backend (Render):**
+
 ```bash
 # 1. Ensure all tests pass
 pnpm test
@@ -835,6 +870,7 @@ curl https://api.bibliology.com/health
 ```
 
 **Frontend (Vercel):**
+
 ```bash
 # 1. Build frontend
 pnpm build --filter=@bibliology/web
@@ -867,6 +903,7 @@ Development → Staging → Production
 ### Common Issues
 
 **Issue: Docker services won't start**
+
 ```bash
 # Check if ports are in use
 lsof -i :5432  # PostgreSQL
@@ -881,6 +918,7 @@ docker-compose up -d
 ```
 
 **Issue: Prisma client out of sync**
+
 ```bash
 # Regenerate Prisma client
 pnpm db:generate
@@ -891,6 +929,7 @@ pnpm db:generate
 ```
 
 **Issue: Database connection errors**
+
 ```bash
 # Check if PostgreSQL is running
 docker-compose ps postgres
@@ -906,6 +945,7 @@ echo $DATABASE_URL
 ```
 
 **Issue: Migration conflicts**
+
 ```bash
 # Reset database (WARNING: destroys data)
 pnpm db:reset
@@ -915,6 +955,7 @@ pnpm db:migrate:resolve --applied <migration-name>
 ```
 
 **Issue: Build errors**
+
 ```bash
 # Clean everything and rebuild
 pnpm clean
@@ -924,6 +965,7 @@ pnpm build
 ```
 
 **Issue: Port already in use**
+
 ```bash
 # Find process using port
 lsof -i :3000
@@ -951,6 +993,7 @@ PORT=3001
 ## Best Practices Summary
 
 ### Code
+
 - Write self-documenting code
 - Add comments for complex logic
 - Follow TypeScript strict mode
@@ -958,6 +1001,7 @@ PORT=3001
 - Keep functions small and focused
 
 ### Git
+
 - Commit frequently
 - Write descriptive commit messages
 - Keep branches short-lived (< 1 week)
@@ -965,6 +1009,7 @@ PORT=3001
 - Review your own code before PR
 
 ### Testing
+
 - Write tests for new features
 - Test edge cases
 - Mock external services
@@ -972,6 +1017,7 @@ PORT=3001
 - Maintain test data fixtures
 
 ### Database
+
 - Review migrations before applying
 - Never edit committed migrations
 - Seed data after schema changes
@@ -979,6 +1025,7 @@ PORT=3001
 - Index frequently queried columns
 
 ### Documentation
+
 - Update docs with code changes
 - Document breaking changes
 - Add JSDoc comments for public APIs

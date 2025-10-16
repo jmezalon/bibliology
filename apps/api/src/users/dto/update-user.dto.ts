@@ -20,5 +20,5 @@ export class UpdateUserDto {
 
   @IsEnum(UserRole)
   @IsOptional()
-  role?: typeof UserRole[keyof typeof UserRole];
+  role?: (typeof UserRole)[keyof typeof UserRole];
 }

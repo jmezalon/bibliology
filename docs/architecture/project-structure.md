@@ -10,6 +10,7 @@
 ## Overview
 
 This document defines the complete folder structure for the Bibliology monorepo. The structure is designed for:
+
 - Clear separation of concerns
 - Easy navigation for developers
 - Scalability from MVP to production
@@ -479,6 +480,7 @@ packages/types/
 ```
 
 **Usage:**
+
 ```typescript
 import { User, Course, LessonStatus } from '@bibliology/types';
 ```
@@ -516,6 +518,7 @@ packages/validation/
 ```
 
 **Usage:**
+
 ```typescript
 import { createLessonSchema, CreateLessonDto } from '@bibliology/validation';
 
@@ -648,10 +651,7 @@ scripts/
   "name": "bibliology",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -803,6 +803,7 @@ Configure path aliases in `tsconfig.json`:
 ```
 
 **Usage:**
+
 ```typescript
 // Instead of: import { Button } from '../../../components/ui/button'
 import { Button } from '@components/ui/button';
@@ -925,16 +926,19 @@ pnpm clean
 ### Future Growth (Post-MVP)
 
 **Phase 2:**
+
 - Add mobile app (React Native) to `apps/mobile/`
 - Add admin dashboard to `apps/admin/`
 - Extract UI library to `packages/ui/`
 
 **Phase 3:**
+
 - Microservices: Extract imports service to separate repo
 - Multiple databases: Read replicas for lessons
 - Caching layer: Add CDN for static content
 
 **Phase 4:**
+
 - Multi-region deployment
 - Separate storage per region
 - GraphQL API alongside REST
@@ -956,6 +960,7 @@ This project structure is designed to:
 7. **Enable independent deployment** of apps
 
 **Next Steps:**
+
 1. Review and approve this structure
 2. Initialize the monorepo with this structure
 3. Set up base configuration files

@@ -16,7 +16,13 @@ import { EmptyState } from '../../components/teacher/empty-state';
 import { LessonCard } from '../../components/teacher/lesson-card';
 import { StatCard } from '../../components/teacher/stat-card';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../../components/ui/card';
 import type { Course, Lesson } from '../../types/course';
 
 export function TeacherCourseDetailPage() {
@@ -29,11 +35,13 @@ export function TeacherCourseDetailPage() {
   const lessons: Lesson[] = [];
 
   // Mock course data for display when courseId exists but no real data
-  const displayCourse = course || {
-    title_en: 'Course Title',
-    description_en: 'Course description',
-    is_published: false,
-  } as Course;
+  const displayCourse =
+    course ||
+    ({
+      title_en: 'Course Title',
+      description_en: 'Course description',
+      is_published: false,
+    } as Course);
 
   const stats = {
     totalStudents: 0,
@@ -113,9 +121,7 @@ export function TeacherCourseDetailPage() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <h1 className="heading-lg truncate">
-                    {displayCourse.title_en}
-                  </h1>
+                  <h1 className="heading-lg truncate">{displayCourse.title_en}</h1>
                   <span
                     className={`px-2 py-1 text-xs font-medium rounded-full ${
                       displayCourse.is_published
@@ -126,14 +132,15 @@ export function TeacherCourseDetailPage() {
                     {displayCourse.is_published ? 'Published' : 'Draft'}
                   </span>
                 </div>
-                <p className="text-muted-foreground">
-                  {displayCourse.description_en}
-                </p>
+                <p className="text-muted-foreground">{displayCourse.description_en}</p>
               </div>
             </div>
 
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate(`/teacher/courses/${courseId}/edit`)}>
+              <Button
+                variant="outline"
+                onClick={() => navigate(`/teacher/courses/${courseId}/edit`)}
+              >
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
@@ -181,9 +188,7 @@ export function TeacherCourseDetailPage() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Course Lessons</CardTitle>
-                <CardDescription>
-                  Drag and drop to reorder lessons
-                </CardDescription>
+                <CardDescription>Drag and drop to reorder lessons</CardDescription>
               </div>
               <Button onClick={handleAddLesson}>
                 <Plus className="h-4 w-4 mr-2" />

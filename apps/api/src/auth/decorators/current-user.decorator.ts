@@ -7,7 +7,10 @@ interface RequestWithUser extends Express.Request {
 }
 
 export const CurrentUser = createParamDecorator(
-  (data: keyof UserDto | undefined, ctx: ExecutionContext): UserDto | UserDto[keyof UserDto] | undefined => {
+  (
+    data: keyof UserDto | undefined,
+    ctx: ExecutionContext,
+  ): UserDto | UserDto[keyof UserDto] | undefined => {
     const request = ctx.switchToHttp().getRequest<RequestWithUser>();
     const user = request.user;
 

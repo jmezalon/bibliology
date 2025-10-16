@@ -11,9 +11,12 @@ export const userRegistrationSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number',
     ),
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must not exceed 100 characters'),
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must not exceed 100 characters'),
   role: UserRoleSchema.default('STUDENT'),
   language_pref: z.enum(['en', 'fr']).default('en'),
 });
@@ -26,7 +29,11 @@ export const userLoginSchema = z.object({
 
 // Update user profile schema
 export const userUpdateProfileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name must not exceed 100 characters').optional(),
+  name: z
+    .string()
+    .min(2, 'Name must be at least 2 characters')
+    .max(100, 'Name must not exceed 100 characters')
+    .optional(),
   avatar_url: z.string().url('Invalid avatar URL').nullable().optional(),
   language_pref: z.enum(['en', 'fr']).optional(),
 });
@@ -39,7 +46,7 @@ export const userUpdatePasswordSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-      'Password must contain at least one uppercase letter, one lowercase letter, and one number'
+      'Password must contain at least one uppercase letter, one lowercase letter, and one number',
     ),
 });
 

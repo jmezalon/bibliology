@@ -17,7 +17,6 @@ Bulk import from existing PowerPoint files (we'll parse and convert them)
 Preview mode that shows exactly what students will see
 Bilingual content support (toggle between EN/FR on same lesson)
 
-
 Quiz & Assessment Builder
 
 Multiple question types: multiple choice, true/false, fill-in-blank, matching, short answer
@@ -27,7 +26,6 @@ Automatic grading for objective questions
 Manual review interface for subjective answers
 Progress tracking and analytics
 
-
 Course Organization
 
 Organize lessons into courses/series
@@ -35,15 +33,12 @@ Set prerequisites and learning paths
 Schedule lesson releases or make all available immediately
 Draft/Published status management
 
-
 Analytics Dashboard
 
 Student enrollment and completion rates
 Quiz performance metrics
 Time spent on each lesson
 Most challenging questions/topics
-
-
 
 For Students
 
@@ -55,7 +50,6 @@ Bookmarking and note-taking
 Responsive design for mobile, tablet, desktop
 Smooth slide navigation with keyboard shortcuts
 
-
 Interactive Features
 
 Take quizzes directly in the lesson flow
@@ -64,16 +58,12 @@ Certificate of completion
 Personal dashboard showing all enrolled courses
 Review mode to revisit lessons and retake quizzes
 
-
 Study Tools
 
 Vocabulary glossary auto-generated from lessons
 Verse reference lookup
 Print/download lesson summaries
 Discussion forum per lesson (optional)
-
-
-
 
 Technical Architecture
 Tech Stack Recommendation
@@ -102,7 +92,6 @@ Docker containers
 CI/CD with GitHub Actions
 Vercel/Netlify (frontend) + Railway/Render (backend)
 
-
 PowerPoint Import Strategy
 Since your teacher has years of existing PowerPoints, we should:
 
@@ -113,16 +102,13 @@ Images and their positions
 Slide layouts
 Notes/comments
 
-
 Create an import wizard that:
 
 Shows preview of converted slides
 Allows adjustments before final import
 Maps PowerPoint elements to our content blocks
 
-
 Support iterative improvements (he can refine imported lessons)
-
 
 Development Phases
 Phase 1: MVP (Core Platform)
@@ -152,16 +138,16 @@ Advanced bilingual features
 Offline mode
 Mobile apps (React Native)
 
-
 Sub-Agent Prompts Structure
 I'll create specialized prompts for each agent role to manage different aspects of development through Claude CLI:
+
 1. Architect Agent
-Focuses on: System design, database schema, API structure, technology decisions, scalability planning
+   Focuses on: System design, database schema, API structure, technology decisions, scalability planning
 2. Design Agent
-Focuses on: UI/UX design, component library, design system, accessibility, responsive layouts
+   Focuses on: UI/UX design, component library, design system, accessibility, responsive layouts
 3. Code Review Agent
-Focuses on: Code quality, best practices, security vulnerabilities, performance issues, type safety
+   Focuses on: Code quality, best practices, security vulnerabilities, performance issues, type safety
 4. Testing Agent
-Focuses on: Test coverage, unit tests, integration tests, E2E tests, test data generation
+   Focuses on: Test coverage, unit tests, integration tests, E2E tests, test data generation
 5. CI/CD Agent
-Focuses on: Build pipeline, deployment automation, environment configuration, monitoring setup
+   Focuses on: Build pipeline, deployment automation, environment configuration, monitoring setup

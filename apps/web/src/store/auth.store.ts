@@ -47,9 +47,11 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error && 'response' in error
-            ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Login failed. Please try again.')
-            : 'Login failed. Please try again.';
+          const errorMessage =
+            error instanceof Error && 'response' in error
+              ? (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+                'Login failed. Please try again.'
+              : 'Login failed. Please try again.';
 
           set({
             user: null,
@@ -78,9 +80,11 @@ export const useAuthStore = create<AuthState>()(
             error: null,
           });
         } catch (error: unknown) {
-          const errorMessage = error instanceof Error && 'response' in error
-            ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Registration failed. Please try again.')
-            : 'Registration failed. Please try again.';
+          const errorMessage =
+            error instanceof Error && 'response' in error
+              ? (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+                'Registration failed. Please try again.'
+              : 'Registration failed. Please try again.';
 
           set({
             user: null,
@@ -163,8 +167,8 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 );
 
 export default useAuthStore;

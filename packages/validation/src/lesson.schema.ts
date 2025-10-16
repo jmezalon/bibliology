@@ -2,7 +2,14 @@ import { z } from 'zod';
 
 // Enums
 export const LessonStatusSchema = z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']);
-export const SlideLayoutSchema = z.enum(['TITLE', 'CONTENT', 'TWO_COLUMN', 'IMAGE_FOCUS', 'QUIZ', 'BLANK']);
+export const SlideLayoutSchema = z.enum([
+  'TITLE',
+  'CONTENT',
+  'TWO_COLUMN',
+  'IMAGE_FOCUS',
+  'QUIZ',
+  'BLANK',
+]);
 export const ContentBlockTypeSchema = z.enum([
   'HEADING',
   'TEXT',
@@ -57,7 +64,7 @@ export const reorderLessonsSchema = z.object({
     z.object({
       id: z.string().cuid(),
       lesson_order: z.number().int().min(1),
-    })
+    }),
   ),
 });
 

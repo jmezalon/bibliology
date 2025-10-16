@@ -88,7 +88,7 @@ async function main() {
       description_en:
         'A comprehensive study of the Holy Spirit in Scripture, covering His nature, work, and role in the life of believers.',
       description_fr:
-        "Une étude complète du Saint-Esprit dans les Écritures, couvrant Sa nature, Son œuvre et Son rôle dans la vie des croyants.",
+        'Une étude complète du Saint-Esprit dans les Écritures, couvrant Sa nature, Son œuvre et Son rôle dans la vie des croyants.',
       status: 'PUBLISHED',
       category: 'Theology',
       tags: ['Pneumatology', 'Holy Spirit', 'Trinity', 'Theology'],
@@ -110,10 +110,8 @@ async function main() {
       course_id: pneumatologyCourse.id,
       title_en: 'Who is the Holy Spirit?',
       title_fr: 'Qui est le Saint-Esprit?',
-      description_en:
-        'An introduction to the person and nature of the Holy Spirit.',
-      description_fr:
-        'Une introduction à la personne et à la nature du Saint-Esprit.',
+      description_en: 'An introduction to the person and nature of the Holy Spirit.',
+      description_fr: 'Une introduction à la personne et à la nature du Saint-Esprit.',
       lesson_order: 1,
       status: 'PUBLISHED',
       estimated_minutes: 30,
@@ -128,10 +126,8 @@ async function main() {
       course_id: pneumatologyCourse.id,
       title_en: 'The Work of the Holy Spirit',
       title_fr: "L'Œuvre du Saint-Esprit",
-      description_en:
-        'Exploring the various works and ministries of the Holy Spirit.',
-      description_fr:
-        "Explorer les différentes œuvres et ministères du Saint-Esprit.",
+      description_en: 'Exploring the various works and ministries of the Holy Spirit.',
+      description_fr: 'Explorer les différentes œuvres et ministères du Saint-Esprit.',
       lesson_order: 2,
       status: 'PUBLISHED',
       estimated_minutes: 45,
@@ -146,10 +142,8 @@ async function main() {
       course_id: pneumatologyCourse.id,
       title_en: 'The Gifts of the Spirit',
       title_fr: "Les Dons de l'Esprit",
-      description_en:
-        'Understanding spiritual gifts and their purpose in the Church.',
-      description_fr:
-        "Comprendre les dons spirituels et leur but dans l'Église.",
+      description_en: 'Understanding spiritual gifts and their purpose in the Church.',
+      description_fr: "Comprendre les dons spirituels et leur but dans l'Église.",
       lesson_order: 3,
       status: 'DRAFT',
       estimated_minutes: 60,
@@ -193,8 +187,8 @@ async function main() {
       slide_order: 3,
       layout: 'TWO_COLUMN',
       title_en: 'Old Testament vs New Testament',
-      title_fr: "Ancien Testament vs Nouveau Testament",
-      notes_en: 'Compare the Spirit\'s work in both testaments.',
+      title_fr: 'Ancien Testament vs Nouveau Testament',
+      notes_en: "Compare the Spirit's work in both testaments.",
       notes_fr: "Comparer l'œuvre de l'Esprit dans les deux testaments.",
     },
   });
@@ -216,7 +210,7 @@ async function main() {
         text: 'The Holy Spirit is the third person of the Trinity, co-equal and co-eternal with God the Father and God the Son.',
       },
       content_fr: {
-        text: "Le Saint-Esprit est la troisième personne de la Trinité, coégal et coéternel avec Dieu le Père et Dieu le Fils.",
+        text: 'Le Saint-Esprit est la troisième personne de la Trinité, coégal et coéternel avec Dieu le Père et Dieu le Fils.',
       },
     },
   });
@@ -253,9 +247,9 @@ async function main() {
       },
       content_fr: {
         items: [
-          "Le Saint-Esprit est une Personne, pas simplement une force",
+          'Le Saint-Esprit est une Personne, pas simplement une force',
           "Il a l'intellect, des émotions et une volonté",
-          "Il peut être attristé, menti et blasphémé",
+          'Il peut être attristé, menti et blasphémé',
         ],
       },
     },
@@ -309,7 +303,7 @@ async function main() {
     data: {
       lesson_id: lesson1.id,
       title_en: 'Lesson 1 Quiz: Understanding the Holy Spirit',
-      title_fr: "Quiz Leçon 1: Comprendre le Saint-Esprit",
+      title_fr: 'Quiz Leçon 1: Comprendre le Saint-Esprit',
       passing_score_percentage: 70,
       shuffle_questions: true,
       shuffle_options: true,
@@ -384,7 +378,7 @@ async function main() {
         text: 'Jesus promised to send another ________ to be with believers forever.',
       },
       question_text_fr: {
-        text: 'Jésus a promis d\'envoyer un autre ________ pour être avec les croyants pour toujours.',
+        text: "Jésus a promis d'envoyer un autre ________ pour être avec les croyants pour toujours.",
       },
       correct_answers: {
         accepted: ['advocate', 'Advocate', 'helper', 'Helper', 'comforter', 'Comforter'],
@@ -485,21 +479,27 @@ async function main() {
     data: [
       {
         submission_id: submission.id,
-        question_id: (await prisma.question.findFirst({ where: { quiz_id: quiz.id, question_order: 1 } }))!.id,
+        question_id: (await prisma.question.findFirst({
+          where: { quiz_id: quiz.id, question_order: 1 },
+        }))!.id,
         answer_given: { selectedIndex: 1 },
         is_correct: true,
         points_earned: 1,
       },
       {
         submission_id: submission.id,
-        question_id: (await prisma.question.findFirst({ where: { quiz_id: quiz.id, question_order: 2 } }))!.id,
+        question_id: (await prisma.question.findFirst({
+          where: { quiz_id: quiz.id, question_order: 2 },
+        }))!.id,
         answer_given: { value: false },
         is_correct: true,
         points_earned: 1,
       },
       {
         submission_id: submission.id,
-        question_id: (await prisma.question.findFirst({ where: { quiz_id: quiz.id, question_order: 3 } }))!.id,
+        question_id: (await prisma.question.findFirst({
+          where: { quiz_id: quiz.id, question_order: 3 },
+        }))!.id,
         answer_given: { text: 'Advocate' },
         is_correct: true,
         points_earned: 1,

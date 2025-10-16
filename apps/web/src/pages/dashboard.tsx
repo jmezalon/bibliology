@@ -4,7 +4,6 @@ import { Container } from '../components/layout/container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { useAuthStore } from '../store/auth.store';
 
-
 export function DashboardPage() {
   const { user } = useAuthStore();
 
@@ -13,12 +12,8 @@ export function DashboardPage() {
       <div className="space-y-8">
         {/* Welcome Section */}
         <div>
-          <h1 className="heading-lg mb-2">
-            Welcome back, {user?.name?.split(' ')[0]}! 👋
-          </h1>
-          <p className="text-muted-foreground">
-            Continue your biblical studies journey
-          </p>
+          <h1 className="heading-lg mb-2">Welcome back, {user?.name?.split(' ')[0]}! 👋</h1>
+          <p className="text-muted-foreground">Continue your biblical studies journey</p>
         </div>
 
         {/* Stats Grid */}

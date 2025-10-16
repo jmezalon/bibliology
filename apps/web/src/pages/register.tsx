@@ -3,7 +3,14 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../components/ui/card';
 import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
 import { useAuthStore } from '../store/auth.store';
@@ -37,9 +44,11 @@ export function RegisterPage() {
 
       navigate('/dashboard', { replace: true });
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error && 'response' in error
-        ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create account. Please try again.')
-        : 'Failed to create account. Please try again.';
+      const errorMessage =
+        error instanceof Error && 'response' in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+            'Failed to create account. Please try again.'
+          : 'Failed to create account. Please try again.';
 
       toast({
         title: 'Registration failed',

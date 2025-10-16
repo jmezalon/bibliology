@@ -7,7 +7,7 @@ import {
   FileText,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -45,7 +45,7 @@ export function TeacherSidebar({ className }: SidebarProps) {
       className={cn(
         'flex flex-col bg-card border-r transition-all duration-300',
         isCollapsed ? 'w-16' : 'w-64',
-        className
+        className,
       )}
       aria-label="Teacher navigation sidebar"
     >
@@ -62,19 +62,15 @@ export function TeacherSidebar({ className }: SidebarProps) {
           className="p-2 hover:bg-accent rounded-md transition-colors"
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2" aria-label="Primary">
         {navigation.map((item) => {
-          const isActive = location.pathname === item.href ||
-                          location.pathname.startsWith(item.href + '/');
+          const isActive =
+            location.pathname === item.href || location.pathname.startsWith(item.href + '/');
           const Icon = item.icon;
 
           return (
@@ -86,7 +82,7 @@ export function TeacherSidebar({ className }: SidebarProps) {
                 isActive
                   ? 'bg-primary text-primary-foreground'
                   : 'hover:bg-accent hover:text-accent-foreground',
-                isCollapsed && 'justify-center'
+                isCollapsed && 'justify-center',
               )}
               aria-current={isActive ? 'page' : undefined}
               title={isCollapsed ? item.name : undefined}
@@ -101,10 +97,7 @@ export function TeacherSidebar({ className }: SidebarProps) {
       {/* User Profile */}
       <div className="p-4 border-t">
         {user && (
-          <div className={cn(
-            'flex items-center gap-3',
-            isCollapsed && 'justify-center'
-          )}>
+          <div className={cn('flex items-center gap-3', isCollapsed && 'justify-center')}>
             <Avatar className="h-10 w-10">
               {user.avatar_url && <AvatarImage src={user.avatar_url} alt={user.name} />}
               <AvatarFallback className="bg-primary text-primary-foreground">
