@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { getInitials } from '../../lib/utils';
 import { useAuthStore } from '../../store/auth.store';
+import { UserRole } from '../../types/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 
@@ -33,7 +34,7 @@ export function Header() {
           <nav className="hidden md:flex items-center gap-6">
             <Link
               to={
-                user?.role === 'TEACHER' || user?.role === 'ADMIN'
+                user?.role === UserRole.TEACHER || user?.role === UserRole.ADMIN
                   ? '/teacher/dashboard'
                   : '/dashboard'
               }

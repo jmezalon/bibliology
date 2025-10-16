@@ -1,5 +1,4 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { Test, TestingModule } from '@nestjs/testing';
 import {
   NotFoundException,
   ForbiddenException,
@@ -13,10 +12,39 @@ import { CoursesService } from '../../src/courses/courses.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { CreateLessonDto, UpdateLessonDto, ReorderSlidesDto } from '../../src/courses/dto';
 
+// Create mock classes
+class MockCoursesService {
+  verifyOwnership = vi.fn();
+}
+
+class MockPrismaService {
+  lesson = {
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  };
+  lessonProgress = {
+    count: vi.fn(),
+  };
+  slide = {
+    findMany: vi.fn(),
+    update: vi.fn(),
+  };
+  $transaction = vi.fn();
+  $connect = vi.fn();
+  $disconnect = vi.fn();
+  onModuleInit = vi.fn();
+  onModuleDestroy = vi.fn();
+}
+
 describe('LessonsService', () => {
   let lessonsService: LessonsService;
-  let coursesService: CoursesService;
-  let prismaService: PrismaService;
+  let coursesService: any;
+  let prismaService: any;
 
   const mockLesson = {
     id: 'lesson-1',
@@ -44,44 +72,13 @@ describe('LessonsService', () => {
     },
   };
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        LessonsService,
-        {
-          provide: CoursesService,
-          useValue: {
-            verifyOwnership: vi.fn(),
-          },
-        },
-        {
-          provide: PrismaService,
-          useValue: {
-            lesson: {
-              findUnique: vi.fn(),
-              findFirst: vi.fn(),
-              findMany: vi.fn(),
-              create: vi.fn(),
-              update: vi.fn(),
-              delete: vi.fn(),
-              count: vi.fn(),
-            },
-            lessonProgress: {
-              count: vi.fn(),
-            },
-            slide: {
-              findMany: vi.fn(),
-              update: vi.fn(),
-            },
-            $transaction: vi.fn(),
-          },
-        },
-      ],
-    }).compile();
+  beforeEach(() => {
+    // Create fresh mock instances
+    coursesService = new MockCoursesService();
+    prismaService = new MockPrismaService();
 
-    lessonsService = module.get<LessonsService>(LessonsService);
-    coursesService = module.get<CoursesService>(CoursesService);
-    prismaService = module.get<PrismaService>(PrismaService);
+    // Directly instantiate the service with mocks
+    lessonsService = new LessonsService(prismaService as any, coursesService as any);
   });
 
   describe('create', () => {
@@ -93,10 +90,10 @@ describe('LessonsService', () => {
         lesson_order: 1,
       };
 
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(null);
-      vi.spyOn(prismaService.lesson, 'findFirst').mockResolvedValue(null);
-      vi.spyOn(prismaService.lesson, 'create').mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lesson.findUnique.mockResolvedValue(null);
+      prismaService.lesson.findFirst.mockResolvedValue(null);
+      prismaService.lesson.create.mockResolvedValue(mockLesson);
 
       const result = await lessonsService.create('teacher-1', createDto);
 
@@ -132,8 +129,8 @@ describe('LessonsService', () => {
         lesson_order: 1,
       };
 
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
 
       await expect(
         lessonsService.create('teacher-1', createDto),
@@ -153,9 +150,9 @@ describe('LessonsService', () => {
         lesson_order: 1,
       };
 
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(null);
-      vi.spyOn(prismaService.lesson, 'findFirst').mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lesson.findUnique.mockResolvedValue(null);
+      prismaService.lesson.findFirst.mockResolvedValue(mockLesson);
 
       await expect(
         lessonsService.create('teacher-1', createDto),
@@ -177,10 +174,10 @@ describe('LessonsService', () => {
         original_filename: 'presentation.pptx',
       };
 
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(null);
-      vi.spyOn(prismaService.lesson, 'findFirst').mockResolvedValue(null);
-      vi.spyOn(prismaService.lesson, 'create').mockResolvedValue({
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lesson.findUnique.mockResolvedValue(null);
+      prismaService.lesson.findFirst.mockResolvedValue(null);
+      prismaService.lesson.create.mockResolvedValue({
         ...mockLesson,
         imported_from_pptx: true,
         import_date: new Date(),
@@ -197,9 +194,9 @@ describe('LessonsService', () => {
     it('should return paginated list of lessons for course', async () => {
       const lessons = [mockLesson];
 
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lesson, 'findMany').mockResolvedValue(lessons);
-      vi.spyOn(prismaService.lesson, 'count').mockResolvedValue(1);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lesson.findMany.mockResolvedValue(lessons);
+      prismaService.lesson.count.mockResolvedValue(1);
 
       const result = await lessonsService.findAllForCourse(
         'course-1',
@@ -225,9 +222,9 @@ describe('LessonsService', () => {
     });
 
     it('should order lessons by lesson_order ascending', async () => {
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lesson, 'findMany').mockResolvedValue([]);
-      vi.spyOn(prismaService.lesson, 'count').mockResolvedValue(0);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lesson.findMany.mockResolvedValue([]);
+      prismaService.lesson.count.mockResolvedValue(0);
 
       await lessonsService.findAllForCourse('course-1', 'teacher-1', 1, 10);
 
@@ -239,8 +236,8 @@ describe('LessonsService', () => {
     });
 
     it('should not verify ownership if teacherId is not provided', async () => {
-      vi.spyOn(prismaService.lesson, 'findMany').mockResolvedValue([]);
-      vi.spyOn(prismaService.lesson, 'count').mockResolvedValue(0);
+      prismaService.lesson.findMany.mockResolvedValue([]);
+      prismaService.lesson.count.mockResolvedValue(0);
 
       await lessonsService.findAllForCourse('course-1', undefined, 1, 10);
 
@@ -268,7 +265,7 @@ describe('LessonsService', () => {
         ],
       };
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(
+      prismaService.lesson.findUnique.mockResolvedValue(
         lessonWithSlides,
       );
 
@@ -281,7 +278,7 @@ describe('LessonsService', () => {
     });
 
     it('should throw NotFoundException if lesson does not exist', async () => {
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(null);
+      prismaService.lesson.findUnique.mockResolvedValue(null);
 
       await expect(lessonsService.findOne('invalid-id')).rejects.toThrow(
         NotFoundException,
@@ -292,7 +289,7 @@ describe('LessonsService', () => {
     });
 
     it('should throw ForbiddenException if teacher does not own lesson', async () => {
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
 
       await expect(
         lessonsService.findOne('lesson-1', 'other-teacher'),
@@ -315,8 +312,8 @@ describe('LessonsService', () => {
         ...updateDto,
       };
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(prismaService.lesson, 'update').mockResolvedValue(updatedLesson);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      prismaService.lesson.update.mockResolvedValue(updatedLesson);
 
       const result = await lessonsService.update(
         'lesson-1',
@@ -338,9 +335,9 @@ describe('LessonsService', () => {
         slug: 'new-unique-slug',
       };
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(prismaService.lesson, 'findFirst').mockResolvedValue(null);
-      vi.spyOn(prismaService.lesson, 'update').mockResolvedValue({
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      prismaService.lesson.findFirst.mockResolvedValue(null);
+      prismaService.lesson.update.mockResolvedValue({
         ...mockLesson,
         ...updateDto,
       });
@@ -367,8 +364,8 @@ describe('LessonsService', () => {
         slug: 'existing-slug',
       };
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(prismaService.lesson, 'findFirst').mockResolvedValue(otherLesson);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      prismaService.lesson.findFirst.mockResolvedValue(otherLesson);
 
       await expect(
         lessonsService.update('lesson-1', 'teacher-1', updateDto),
@@ -391,8 +388,8 @@ describe('LessonsService', () => {
         lesson_order: 2,
       };
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(prismaService.lesson, 'findFirst').mockResolvedValue(otherLesson);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      prismaService.lesson.findFirst.mockResolvedValue(otherLesson);
 
       await expect(
         lessonsService.update('lesson-1', 'teacher-1', updateDto),
@@ -407,10 +404,10 @@ describe('LessonsService', () => {
 
   describe('remove', () => {
     it('should successfully delete a lesson with no student progress', async () => {
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lessonProgress, 'count').mockResolvedValue(0);
-      vi.spyOn(prismaService.lesson, 'delete').mockResolvedValue(mockLesson);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lessonProgress.count.mockResolvedValue(0);
+      prismaService.lesson.delete.mockResolvedValue(mockLesson);
 
       await lessonsService.remove('lesson-1', 'teacher-1');
 
@@ -420,9 +417,9 @@ describe('LessonsService', () => {
     });
 
     it('should throw BadRequestException if lesson has student progress', async () => {
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.lessonProgress, 'count').mockResolvedValue(3);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.lessonProgress.count.mockResolvedValue(3);
 
       await expect(
         lessonsService.remove('lesson-1', 'teacher-1'),
@@ -437,8 +434,8 @@ describe('LessonsService', () => {
     });
 
     it('should throw ForbiddenException if teacher does not own course', async () => {
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(coursesService, 'verifyOwnership').mockRejectedValue(
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockRejectedValue(
         new ForbiddenException(),
       );
 
@@ -462,10 +459,10 @@ describe('LessonsService', () => {
         { id: 'slide-3' },
       ];
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.slide, 'findMany').mockResolvedValue(slides as any);
-      vi.spyOn(prismaService, '$transaction').mockImplementation(
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.slide.findMany.mockResolvedValue(slides as any);
+      prismaService.$transaction.mockImplementation(
         async (operations: any[]) => {
           return Promise.all(operations.map((op: any) => op));
         },
@@ -493,9 +490,9 @@ describe('LessonsService', () => {
 
       const slides = [{ id: 'slide-1' }, { id: 'slide-2' }];
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(coursesService, 'verifyOwnership').mockResolvedValue(true);
-      vi.spyOn(prismaService.slide, 'findMany').mockResolvedValue(slides as any);
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockResolvedValue(true);
+      prismaService.slide.findMany.mockResolvedValue(slides as any);
 
       await expect(
         lessonsService.reorderSlides('lesson-1', 'teacher-1', reorderDto),
@@ -512,8 +509,8 @@ describe('LessonsService', () => {
         slide_ids: ['slide-1', 'slide-2'],
       };
 
-      vi.spyOn(prismaService.lesson, 'findUnique').mockResolvedValue(mockLesson);
-      vi.spyOn(coursesService, 'verifyOwnership').mockRejectedValue(
+      prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
+      coursesService.verifyOwnership.mockRejectedValue(
         new ForbiddenException(),
       );
 

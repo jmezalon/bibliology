@@ -15,6 +15,7 @@ import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
 import { useAuthStore } from '../store/auth.store';
 import type { LoginRequest } from '../types/auth';
+import { UserRole } from '../types/auth';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ export function LoginPage() {
 
       // Redirect based on user role
       const redirectPath =
-        loggedInUser.role === 'TEACHER' || loggedInUser.role === 'ADMIN'
+        loggedInUser.role === UserRole.TEACHER || loggedInUser.role === UserRole.ADMIN
           ? '/teacher/dashboard'
           : from === '/dashboard'
             ? '/dashboard'

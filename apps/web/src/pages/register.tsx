@@ -15,6 +15,7 @@ import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
 import { useAuthStore } from '../store/auth.store';
 import type { RegisterRequest } from '../types/auth';
+import { UserRole } from '../types/auth';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -44,7 +45,7 @@ export function RegisterPage() {
 
       // Redirect based on user role (future-proof for teacher registration)
       const redirectPath =
-        newUser.role === 'TEACHER' || newUser.role === 'ADMIN'
+        newUser.role === UserRole.TEACHER || newUser.role === UserRole.ADMIN
           ? '/teacher/dashboard'
           : '/dashboard';
 

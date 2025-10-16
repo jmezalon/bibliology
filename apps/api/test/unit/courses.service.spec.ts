@@ -12,9 +12,32 @@ import { CoursesService } from '../../src/courses/courses.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { CreateCourseDto, UpdateCourseDto } from '../../src/courses/dto';
 
+// Create a mock Prisma class
+class MockPrismaService {
+  course = {
+    findUnique: vi.fn(),
+    findFirst: vi.fn(),
+    findMany: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    count: vi.fn(),
+  };
+  lesson = {
+    count: vi.fn(),
+  };
+  enrollment = {
+    count: vi.fn(),
+  };
+  $connect = vi.fn();
+  $disconnect = vi.fn();
+  onModuleInit = vi.fn();
+  onModuleDestroy = vi.fn();
+}
+
 describe('CoursesService', () => {
   let coursesService: CoursesService;
-  let prismaService: PrismaService;
+  let prismaService: any; // Use any to avoid type issues with mocks
 
   const mockTeacher = {
     id: 'teacher-1',
@@ -49,34 +72,11 @@ describe('CoursesService', () => {
   };
 
   beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        CoursesService,
-        {
-          provide: PrismaService,
-          useValue: {
-            course: {
-              findUnique: vi.fn(),
-              findFirst: vi.fn(),
-              findMany: vi.fn(),
-              create: vi.fn(),
-              update: vi.fn(),
-              delete: vi.fn(),
-              count: vi.fn(),
-            },
-            lesson: {
-              count: vi.fn(),
-            },
-            enrollment: {
-              count: vi.fn(),
-            },
-          },
-        },
-      ],
-    }).compile();
+    // Create a fresh mock instance
+    prismaService = new MockPrismaService();
 
-    coursesService = module.get<CoursesService>(CoursesService);
-    prismaService = module.get<PrismaService>(PrismaService);
+    // Directly instantiate the service with the mock
+    coursesService = new CoursesService(prismaService as any);
   });
 
   describe('create', () => {
@@ -88,8 +88,8 @@ describe('CoursesService', () => {
         status: LessonStatus.DRAFT,
       };
 
-      vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(null);
-      vi.spyOn(prismaService.course, 'create').mockResolvedValue(mockCourse);
+      prismaService.course.findUnique.mockResolvedValue(null);
+      prismaService.course.create.mockResolvedValue(mockCourse);
 
       const result = await coursesService.create('teacher-1', createDto);
 
