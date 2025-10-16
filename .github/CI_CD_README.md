@@ -17,11 +17,13 @@ Welcome to the Bibliology CI/CD system. This directory contains all GitHub Actio
 **Main deployment workflow** - Handles testing, building, and deployment to staging/production.
 
 **Triggers:**
+
 - Push to `main` or `develop`
 - Pull requests to `main` or `develop`
 - Manual workflow dispatch
 
 **Jobs:**
+
 ```
 quality → Linting, type checking, formatting
 security → Security audit, secret scanning
@@ -34,6 +36,7 @@ deploy-production → Deploy to production (main branch, manual approval)
 ```
 
 **Usage:**
+
 ```bash
 # Automatic on PR
 git checkout -b feature/new-feature
@@ -55,9 +58,11 @@ git push origin main
 **PR preview deployments** - Creates preview deployment for every PR.
 
 **Triggers:**
+
 - Pull request opened/updated
 
 **Features:**
+
 - Automatic preview URL in PR comments
 - Uses staging API endpoint
 - Updates on each commit
@@ -70,6 +75,7 @@ git push origin main
 **Maintenance workflow** - Cleans up old artifacts and branches.
 
 **Triggers:**
+
 - PR closed (branch cleanup)
 - Weekly schedule (Sunday 2 AM UTC)
 - Manual dispatch
@@ -79,11 +85,13 @@ git push origin main
 ## Environment Configuration
 
 ### Development (Local)
+
 - Database: Local PostgreSQL
 - API: localhost:3000
 - Web: localhost:5173
 
 ### Staging
+
 - Deploys from: `develop` branch
 - Database: Render PostgreSQL (staging)
 - API: Render (staging service)
@@ -91,6 +99,7 @@ git push origin main
 - Approval: Automatic
 
 ### Production
+
 - Deploys from: `main` branch
 - Database: Render PostgreSQL (production)
 - API: Render (production service)
@@ -104,6 +113,7 @@ git push origin main
 See [SETUP_SECRETS.md](./SETUP_SECRETS.md) for detailed setup.
 
 **Essential:**
+
 - `DATABASE_URL` - Production database
 - `JWT_SECRET` - JWT signing key
 - `RENDER_DEPLOY_HOOK_API` - API deployment
@@ -117,17 +127,20 @@ See [SETUP_SECRETS.md](./SETUP_SECRETS.md) for detailed setup.
 ## Quick Commands
 
 **Deploy to Staging:**
+
 ```bash
 git push origin develop
 ```
 
 **Deploy to Production:**
+
 ```bash
 git push origin main
 # Then approve in GitHub Actions UI
 ```
 
 **Manual Deployment:**
+
 1. GitHub → Actions → CI/CD Pipeline
 2. Run workflow → Select environment
 3. Approve if production

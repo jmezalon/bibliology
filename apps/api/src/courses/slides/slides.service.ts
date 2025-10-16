@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Slide, ContentBlock, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -337,7 +333,9 @@ export class SlidesService {
             block_type: block.block_type,
             content_en: block.content_en as Prisma.InputJsonObject,
             content_fr: block.content_fr ? (block.content_fr as Prisma.InputJsonObject) : undefined,
-            style_config: block.style_config ? (block.style_config as Prisma.InputJsonObject) : undefined,
+            style_config: block.style_config
+              ? (block.style_config as Prisma.InputJsonObject)
+              : undefined,
           })),
         },
       },
@@ -521,9 +519,7 @@ export class SlidesService {
   /**
    * Map Prisma Slide to SlideResponseDto
    */
-  private mapToSlideResponse(
-    slide: Slide & { content_blocks: ContentBlock[] },
-  ): SlideResponseDto {
+  private mapToSlideResponse(slide: Slide & { content_blocks: ContentBlock[] }): SlideResponseDto {
     return {
       id: slide.id,
       lesson_id: slide.lesson_id,

@@ -42,6 +42,7 @@ This comprehensive guide covers the complete deployment process for the Bibliolo
 **Recommended: Vercel**
 
 **Pros:**
+
 - Automatic preview deployments for PRs
 - Instant rollbacks
 - Global CDN with edge caching
@@ -51,15 +52,18 @@ This comprehensive guide covers the complete deployment process for the Bibliolo
 - Built-in analytics
 
 **Cons:**
+
 - Can get expensive with high bandwidth
 - Limited control over infrastructure
 
 **Alternatives:**
+
 - **Netlify:** Similar to Vercel, good alternative
 - **Cloudflare Pages:** Great performance, generous free tier
 - **AWS Amplify:** Good if already on AWS
 
 **Cost:** Free tier includes:
+
 - 100 GB bandwidth/month
 - Unlimited deployments
 - Automatic SSL
@@ -71,6 +75,7 @@ This comprehensive guide covers the complete deployment process for the Bibliolo
 **Recommended: Render**
 
 **Pros:**
+
 - Simple deployment (Docker or native builds)
 - Managed PostgreSQL and Redis
 - Auto-scaling
@@ -80,11 +85,13 @@ This comprehensive guide covers the complete deployment process for the Bibliolo
 - Zero DevOps overhead
 
 **Cons:**
+
 - Can be slower than VPS
 - Limited customization
 - Cold starts on free tier
 
 **Cost:**
+
 - **Starter Plan:** $7/month per service
 - **Database:** $7/month (1 GB storage)
 - **Redis:** $10/month
@@ -292,22 +299,26 @@ SLACK_WEBHOOK_URL               # Deployment notifications
 ### Generating Secrets
 
 **JWT Secrets:**
+
 ```bash
 # Generate secure random secrets
 openssl rand -base64 64
 ```
 
 **Vercel Token:**
+
 1. Visit https://vercel.com/account/tokens
 2. Create new token with deployment permissions
 3. Copy token to GitHub secrets
 
 **Render Deploy Hooks:**
+
 1. Visit Render dashboard → Service → Settings
 2. Scroll to "Deploy Hooks"
 3. Create hook and copy URL
 
 **Vercel Project IDs:**
+
 ```bash
 cd apps/web
 vercel link
@@ -321,12 +332,14 @@ vercel link
 ### Automatic Deployments
 
 #### Pull Request (Preview)
+
 1. Open PR → Automatic checks run
 2. Preview deployment created (Vercel)
 3. Status posted in PR comments
 4. Updates on each commit
 
 #### Staging (develop branch)
+
 1. Merge PR to `develop`
 2. CI/CD runs all tests
 3. Auto-deploy to staging
@@ -334,6 +347,7 @@ vercel link
 5. Notification sent
 
 #### Production (main branch)
+
 1. Merge PR to `main`
 2. Full CI/CD pipeline runs
 3. **Manual approval required** (GitHub environment)
@@ -350,6 +364,7 @@ vercel link
 ### Manual Deployment
 
 **Deploy to Production (Manual):**
+
 ```bash
 # Via GitHub UI
 1. Go to Actions tab
@@ -360,6 +375,7 @@ vercel link
 ```
 
 **Deploy to Staging (Manual):**
+
 ```bash
 # Via GitHub UI
 1. Go to Actions tab
@@ -416,6 +432,7 @@ Migrations run automatically during deployment:
 ### Manual Migration Deployment
 
 **Production (with caution):**
+
 ```bash
 # Connect to production database
 export DATABASE_URL="<production-db-url>"
@@ -450,11 +467,13 @@ npx prisma migrate resolve --rolled-back <migration-name>
 ### Health Check Endpoints
 
 **API Health Check:**
+
 ```bash
 curl https://api.bibliology.com/health
 ```
 
 Expected response:
+
 ```json
 {
   "status": "ok",
@@ -464,6 +483,7 @@ Expected response:
 ```
 
 **Frontend Health:**
+
 ```bash
 curl https://bibliology.com
 # Should return 200 OK
@@ -493,6 +513,7 @@ curl https://bibliology.com
 ### Setting Up Monitoring
 
 **Render (Built-in):**
+
 - Navigate to service → Metrics
 - Monitor CPU, memory, and response times
 - Set up alerts for critical thresholds
@@ -500,6 +521,7 @@ curl https://bibliology.com
 **Recommended Tools:**
 
 1. **Sentry (Error Tracking)** - Free tier available
+
    ```bash
    # Install
    pnpm add @sentry/node @sentry/react
@@ -520,12 +542,14 @@ curl https://bibliology.com
 ### Alerts Configuration
 
 **Critical Alerts (immediate):**
+
 - API health check fails
 - Database connection lost
 - 5xx error rate > 5%
 - Deployment failure
 
 **Warning Alerts (business hours):**
+
 - 4xx error rate > 10%
 - API response time > 2s
 - High CPU/memory usage
@@ -538,6 +562,7 @@ curl https://bibliology.com
 ### Frontend Rollback (Vercel)
 
 **Method 1: Vercel Dashboard (Instant)**
+
 1. Visit Vercel dashboard
 2. Select project
 3. Go to Deployments
@@ -546,6 +571,7 @@ curl https://bibliology.com
 6. Confirm
 
 **Method 2: Vercel CLI**
+
 ```bash
 # List recent deployments
 vercel ls
@@ -561,6 +587,7 @@ vercel rollback <deployment-url>
 ### Backend Rollback (Render)
 
 **Method 1: Render Dashboard**
+
 1. Visit Render dashboard
 2. Select service
 3. Go to "Events" tab
@@ -569,6 +596,7 @@ vercel rollback <deployment-url>
 6. Confirm
 
 **Method 2: Redeploy Previous Commit**
+
 ```bash
 # Find working commit
 git log --oneline
@@ -588,6 +616,7 @@ git push origin rollback-to-<commit> --force
 ### Database Rollback
 
 **Scenario 1: Migration Failed**
+
 ```bash
 cd apps/api
 
@@ -601,6 +630,7 @@ npx prisma migrate deploy
 **Scenario 2: Need to Restore Data**
 
 **From Render Backup:**
+
 1. Go to Render → Database → Backups
 2. Select backup point
 3. Click "Restore"
@@ -608,6 +638,7 @@ npx prisma migrate deploy
 5. Update DATABASE_URL in services
 
 **From Manual Backup:**
+
 ```bash
 # Restore from pg_dump
 pg_restore -d <database-url> backup.sql
@@ -657,11 +688,13 @@ npx prisma migrate resolve --rolled-back <migration>
 **Symptom:** CI/CD build fails
 
 **Causes:**
+
 - TypeScript errors
 - Missing dependencies
 - Prisma schema issues
 
 **Solution:**
+
 ```bash
 # Test locally first
 pnpm install
@@ -679,12 +712,14 @@ pnpm db:generate
 **Symptom:** API returns 500 errors, health check shows "disconnected"
 
 **Causes:**
+
 - Wrong DATABASE_URL
 - Database down
 - Connection pool exhausted
 - Firewall/network issues
 
 **Solution:**
+
 ```bash
 # Test connection
 psql $DATABASE_URL -c "SELECT 1"
@@ -703,11 +738,13 @@ psql $DATABASE_URL -c "SELECT 1"
 **Symptom:** Migration fails during deployment
 
 **Causes:**
+
 - Schema conflicts
 - Data integrity issues
 - Syntax errors
 
 **Solution:**
+
 ```bash
 # Check migration status
 npx prisma migrate status
@@ -726,11 +763,13 @@ pnpm db:migrate:dev --name fix_previous_migration
 **Symptom:** White screen or 404 errors
 
 **Causes:**
+
 - API_URL misconfigured
 - CORS issues
 - JavaScript errors
 
 **Solution:**
+
 ```bash
 # Check environment variables in Vercel
 vercel env ls
@@ -750,11 +789,13 @@ curl https://api.bibliology.com/health
 **Symptom:** Slow API responses, timeouts
 
 **Causes:**
+
 - Unoptimized queries
 - Missing indexes
 - High load
 
 **Solution:**
+
 ```bash
 # Check slow queries in Render logs
 # Dashboard → Service → Logs
@@ -774,11 +815,13 @@ curl https://api.bibliology.com/health
 **Symptom:** JWT errors, unable to login
 
 **Causes:**
+
 - JWT secrets mismatch
 - Token expiration
 - Cookie issues
 
 **Solution:**
+
 ```bash
 # Verify JWT secrets are set
 # GitHub → Settings → Secrets
@@ -827,12 +870,14 @@ After deploying to production:
 ## Getting Help
 
 **Critical Production Issues:**
+
 1. Check #incidents Slack channel
 2. Review recent deployments
 3. Check Render/Vercel status pages
 4. Contact on-call engineer
 
 **Non-Critical Issues:**
+
 1. Check this documentation
 2. Review logs in Render/Vercel
 3. Ask in #engineering Slack channel

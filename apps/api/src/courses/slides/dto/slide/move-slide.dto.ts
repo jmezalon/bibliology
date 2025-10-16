@@ -7,7 +7,9 @@ export class MoveSlideDto {
   @IsNotEmpty()
   target_lesson_id: string;
 
-  @ApiPropertyOptional({ description: 'New order position in target lesson (auto-calculated if omitted)' })
+  @ApiPropertyOptional({
+    description: 'New order position in target lesson (auto-calculated if omitted)',
+  })
   @IsOptional()
   @IsInt()
   @Min(0)

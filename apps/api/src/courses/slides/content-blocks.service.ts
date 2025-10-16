@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { ContentBlock, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../../prisma/prisma.service';
@@ -94,7 +90,9 @@ export class ContentBlocksService {
         block_type: createBlockDto.type,
         block_order: blockOrder,
         content_en: contentJson as Prisma.InputJsonObject,
-        style_config: createBlockDto.metadata ? (createBlockDto.metadata as Prisma.InputJsonObject) : undefined,
+        style_config: createBlockDto.metadata
+          ? (createBlockDto.metadata as Prisma.InputJsonObject)
+          : undefined,
       },
     });
 
@@ -137,10 +135,7 @@ export class ContentBlocksService {
   /**
    * Get all content blocks for a slide
    */
-  async findAllForSlide(
-    slideId: string,
-    teacherId?: string,
-  ): Promise<ContentBlockResponseDto[]> {
+  async findAllForSlide(slideId: string, teacherId?: string): Promise<ContentBlockResponseDto[]> {
     // Verify slide exists and ownership
     const slide = await this.prisma.slide.findUnique({
       where: { id: slideId },
@@ -232,7 +227,9 @@ export class ContentBlocksService {
       where: { id: blockId },
       data: {
         content_en: contentJson !== undefined ? (contentJson as Prisma.InputJsonObject) : undefined,
-        style_config: updateBlockDto.metadata ? (updateBlockDto.metadata as Prisma.InputJsonObject) : undefined,
+        style_config: updateBlockDto.metadata
+          ? (updateBlockDto.metadata as Prisma.InputJsonObject)
+          : undefined,
       },
     });
 
@@ -391,8 +388,12 @@ export class ContentBlocksService {
         block_order: newBlockOrder,
         block_type: originalBlock.block_type,
         content_en: originalBlock.content_en as Prisma.InputJsonObject,
-        content_fr: originalBlock.content_fr ? (originalBlock.content_fr as Prisma.InputJsonObject) : undefined,
-        style_config: originalBlock.style_config ? (originalBlock.style_config as Prisma.InputJsonObject) : undefined,
+        content_fr: originalBlock.content_fr
+          ? (originalBlock.content_fr as Prisma.InputJsonObject)
+          : undefined,
+        style_config: originalBlock.style_config
+          ? (originalBlock.style_config as Prisma.InputJsonObject)
+          : undefined,
       },
     });
 

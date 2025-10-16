@@ -47,19 +47,20 @@ Comprehensive guide for monitoring the Bibliology application in production, set
 
 ### Recommended Setup (Cost-Effective)
 
-| Component | Tool | Cost | Purpose |
-|-----------|------|------|---------|
-| **Error Tracking** | Sentry | Free tier | Frontend & backend errors |
-| **Uptime Monitoring** | BetterUptime | Free tier | Health checks, status page |
-| **Logging** | Render Logs | Included | Centralized logs |
-| **Metrics** | Render Metrics | Included | CPU, memory, response times |
-| **APM** | (Optional) New Relic | Free tier | Deep performance insights |
+| Component             | Tool                 | Cost      | Purpose                     |
+| --------------------- | -------------------- | --------- | --------------------------- |
+| **Error Tracking**    | Sentry               | Free tier | Frontend & backend errors   |
+| **Uptime Monitoring** | BetterUptime         | Free tier | Health checks, status page  |
+| **Logging**           | Render Logs          | Included  | Centralized logs            |
+| **Metrics**           | Render Metrics       | Included  | CPU, memory, response times |
+| **APM**               | (Optional) New Relic | Free tier | Deep performance insights   |
 
 **Total Cost:** $0-20/month for small project
 
 ### Alternative: Full Observability Stack
 
 For production-grade monitoring:
+
 - **Datadog** (~$31/month) - All-in-one
 - **New Relic** (~$25/month) - APM + Logs
 - **LogRocket** (~$99/month) - Session replay + monitoring
@@ -71,6 +72,7 @@ For production-grade monitoring:
 ### Frontend Metrics
 
 #### Core Web Vitals
+
 ```javascript
 // Largest Contentful Paint (LCP)
 Target: < 2.5s
@@ -90,6 +92,7 @@ Warning: > 0.25
 ```
 
 #### JavaScript Errors
+
 ```
 Target: < 0.1% of page loads
 Warning: > 1% of page loads
@@ -97,6 +100,7 @@ Critical: > 5% of page loads
 ```
 
 #### API Request Success Rate
+
 ```
 Target: > 99%
 Warning: < 98%
@@ -108,6 +112,7 @@ Critical: < 95%
 ### Backend Metrics
 
 #### Response Time (p50, p95, p99)
+
 ```
 p50 (Median):
   Target: < 200ms
@@ -126,6 +131,7 @@ p99 (99th percentile):
 ```
 
 #### Error Rates
+
 ```
 2xx Success Rate:
   Target: > 99%
@@ -143,6 +149,7 @@ p99 (99th percentile):
 ```
 
 #### Request Rate
+
 ```
 Monitor for:
 - Sudden spikes (possible DDoS)
@@ -155,6 +162,7 @@ Monitor for:
 ### Database Metrics
 
 #### Query Performance
+
 ```
 Average Query Time:
   Target: < 50ms
@@ -168,6 +176,7 @@ Slow Queries (> 1s):
 ```
 
 #### Connection Pool
+
 ```
 Active Connections:
   Target: < 50% of pool
@@ -181,6 +190,7 @@ Connection Errors:
 ```
 
 #### Storage
+
 ```
 Disk Usage:
   Warning: > 70%
@@ -196,6 +206,7 @@ Database Size Growth:
 ### Infrastructure Metrics
 
 #### CPU Usage
+
 ```
 Target: < 60%
 Warning: > 75%
@@ -203,6 +214,7 @@ Critical: > 90%
 ```
 
 #### Memory Usage
+
 ```
 Target: < 70%
 Warning: > 85%
@@ -210,6 +222,7 @@ Critical: > 95%
 ```
 
 #### Disk I/O
+
 ```
 Target: < 70%
 Warning: > 85%
@@ -225,6 +238,7 @@ Critical: > 95%
 **Endpoint:** `GET /health`
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -327,6 +341,7 @@ logger.debug('Processing lesson block', { blockId, type });
 ### What to Log
 
 **DO Log:**
+
 - Authentication events (login, logout, failed attempts)
 - Critical business operations (lesson created, quiz completed)
 - Errors with context (user ID, request ID, stack trace)
@@ -335,6 +350,7 @@ logger.debug('Processing lesson block', { blockId, type });
 - Unusual patterns (multiple failures, spikes)
 
 **DON'T Log:**
+
 - Passwords or secrets
 - Personal information (unless hashed)
 - Credit card numbers
@@ -358,11 +374,13 @@ logger.info(`User ${user.id} created lesson ${lesson.id}`);
 ### Accessing Logs
 
 **Render:**
+
 1. Dashboard → Service → Logs
 2. Filter by severity, search by keyword
 3. Download logs for analysis
 
 **Better Alternative (BetterStack):**
+
 1. Sign up at https://betterstack.com/logs
 2. Install logging integration
 3. Query logs with SQL-like syntax
@@ -375,6 +393,7 @@ logger.info(`User ${user.id} created lesson ${lesson.id}`);
 ### Sentry Setup
 
 **1. Install Sentry:**
+
 ```bash
 # Backend
 cd apps/api
@@ -386,6 +405,7 @@ pnpm add @sentry/react
 ```
 
 **2. Configure Backend:**
+
 ```typescript
 // apps/api/src/main.ts
 import * as Sentry from '@sentry/node';
@@ -411,6 +431,7 @@ async function bootstrap() {
 ```
 
 **3. Configure Frontend:**
+
 ```typescript
 // apps/web/src/main.tsx
 import * as Sentry from '@sentry/react';
@@ -434,6 +455,7 @@ if (import.meta.env.PROD) {
 ```
 
 **4. Error Boundaries:**
+
 ```typescript
 // apps/web/src/components/ErrorBoundary.tsx
 import { ErrorBoundary as SentryErrorBoundary } from '@sentry/react';
@@ -464,6 +486,7 @@ export function ErrorBoundary({ children }) {
 ### API Performance
 
 **Using Render Metrics (Built-in):**
+
 1. Dashboard → Service → Metrics
 2. Monitor:
    - Response time (p50, p95, p99)
@@ -472,6 +495,7 @@ export function ErrorBoundary({ children }) {
    - CPU/Memory usage
 
 **Using New Relic (Optional):**
+
 ```typescript
 // Install
 pnpm add newrelic
@@ -488,6 +512,7 @@ if (process.env.NODE_ENV === 'production') {
 ### Database Performance
 
 **Slow Query Logging:**
+
 ```typescript
 // apps/api/src/prisma/prisma.service.ts
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
@@ -525,6 +550,7 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
 ```
 
 **Query Analysis:**
+
 ```sql
 -- In Render database console
 -- Find slow queries
@@ -545,10 +571,12 @@ LIMIT 10;
 ### BetterUptime Setup (Recommended)
 
 **1. Create Account:**
+
 - Visit https://betteruptime.com
 - Sign up (free tier available)
 
 **2. Add Health Check Monitor:**
+
 1. Dashboard → Monitors → Create monitor
 2. Configure:
    - **Name:** Bibliology API Health
@@ -561,8 +589,10 @@ LIMIT 10;
 3. Add notification channels (email, Slack, SMS)
 
 **3. Add Heartbeat Monitor (for worker):**
+
 1. Create heartbeat monitor
 2. Add heartbeat call to worker:
+
 ```typescript
 // apps/worker/src/worker.service.ts
 async processJob() {
@@ -649,29 +679,34 @@ Unusual Traffic Spike:
 ### Response Playbook
 
 **1. Alert Triggered → Acknowledge (< 5 min)**
+
 - Acknowledge alert in monitoring tool
 - Notify team in #incidents channel
 - Start timer for SLA tracking
 
 **2. Assess Impact (< 10 min)**
+
 - Check health endpoints
 - Review error rates in Sentry
 - Check recent deployments
 - Determine user impact
 
 **3. Mitigate (< 30 min)**
+
 - If recent deployment: Consider rollback
 - If database issue: Check connections, restart
 - If external service: Check status pages
 - If DDoS: Enable rate limiting
 
 **4. Restore Service (< 1 hour)**
+
 - Apply fix or rollback
 - Verify health checks pass
 - Monitor for 15 minutes
 - Confirm with users if needed
 
 **5. Post-Mortem (< 24 hours)**
+
 - Document timeline
 - Identify root cause
 - List action items
@@ -684,6 +719,7 @@ Unusual Traffic Spike:
 **Symptoms:** High 5xx error rate, health check fails
 
 **Quick Checks:**
+
 ```bash
 # Check API health
 curl https://api.bibliology.com/health
@@ -696,12 +732,14 @@ curl https://api.bibliology.com/health
 ```
 
 **Likely Causes:**
+
 1. Database connection lost
 2. Recent deployment introduced bug
 3. Out of memory
 4. Disk full
 
 **Resolution:**
+
 1. If database issue: Restart API service
 2. If deployment: Rollback (see DEPLOYMENT.md)
 3. If resource: Scale up service
@@ -714,6 +752,7 @@ curl https://api.bibliology.com/health
 **Symptoms:** p95 > 2s, users report slowness
 
 **Quick Checks:**
+
 ```bash
 # Check Render metrics
 # Dashboard → Service → Metrics → Response time
@@ -726,12 +765,14 @@ curl https://api.bibliology.com/health
 ```
 
 **Likely Causes:**
+
 1. Unoptimized database queries
 2. High traffic
 3. External API slowness
 4. Memory leak
 
 **Resolution:**
+
 1. Identify slow queries in logs
 2. Add database indexes if needed
 3. Scale up API service
@@ -745,6 +786,7 @@ curl https://api.bibliology.com/health
 **Symptoms:** Health check shows "disconnected", 5xx errors
 
 **Quick Checks:**
+
 ```bash
 # Check database status
 # Render Dashboard → Database → Status
@@ -757,6 +799,7 @@ psql $DATABASE_URL -c "SELECT 1"
 ```
 
 **Resolution:**
+
 1. Verify database is running
 2. Check DATABASE_URL is correct
 3. Increase connection pool size
@@ -770,6 +813,7 @@ psql $DATABASE_URL -c "SELECT 1"
 ### Render Dashboard
 
 **What to Monitor:**
+
 1. **API Service:**
    - Response time (p50, p95)
    - Request rate
@@ -795,25 +839,25 @@ Create a simple dashboard:
 <!-- dashboard.html -->
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Bibliology Status</title>
-  <script>
-    async function checkHealth() {
-      const api = await fetch('https://api.bibliology.com/health');
-      const apiData = await api.json();
+  <head>
+    <title>Bibliology Status</title>
+    <script>
+      async function checkHealth() {
+        const api = await fetch('https://api.bibliology.com/health');
+        const apiData = await api.json();
 
-      document.getElementById('api-status').textContent =
-        apiData.status === 'ok' ? '✅ Healthy' : '❌ Down';
-    }
+        document.getElementById('api-status').textContent =
+          apiData.status === 'ok' ? '✅ Healthy' : '❌ Down';
+      }
 
-    setInterval(checkHealth, 30000); // Check every 30s
-    checkHealth();
-  </script>
-</head>
-<body>
-  <h1>Bibliology Status</h1>
-  <div id="api-status">Loading...</div>
-</body>
+      setInterval(checkHealth, 30000); // Check every 30s
+      checkHealth();
+    </script>
+  </head>
+  <body>
+    <h1>Bibliology Status</h1>
+    <div id="api-status">Loading...</div>
+  </body>
 </html>
 ```
 
@@ -822,17 +866,20 @@ Create a simple dashboard:
 ## Monitoring Checklist
 
 **Daily:**
+
 - [ ] Check error rates in Sentry
 - [ ] Review slow queries
 - [ ] Check disk space
 
 **Weekly:**
+
 - [ ] Review performance trends
 - [ ] Check for outdated dependencies
 - [ ] Review failed deployments
 - [ ] Update documentation
 
 **Monthly:**
+
 - [ ] Review alert thresholds
 - [ ] Audit access logs
 - [ ] Review and archive old data
@@ -840,6 +887,7 @@ Create a simple dashboard:
 - [ ] Rotate secrets
 
 **Quarterly:**
+
 - [ ] Load testing
 - [ ] Disaster recovery drill
 - [ ] Review and update runbooks

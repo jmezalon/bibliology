@@ -5,7 +5,11 @@ import { ContentBlockType } from '@prisma/client';
 // Mock DOMPurify before any imports that use it
 vi.mock('isomorphic-dompurify', () => ({
   default: {
-    sanitize: (html: string) => html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/on\w+="[^"]*"/g, '').replace(/javascript:/gi, ''),
+    sanitize: (html: string) =>
+      html
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        .replace(/on\w+="[^"]*"/g, '')
+        .replace(/javascript:/gi, ''),
   },
 }));
 

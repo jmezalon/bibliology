@@ -32,6 +32,7 @@ Save these securely - you'll need them for both GitHub secrets and Render enviro
 ### 2. Set Up Render
 
 #### Create Render Account
+
 1. Visit https://render.com
 2. Sign up / Log in
 3. Connect your GitHub repository
@@ -95,6 +96,7 @@ Save these securely - you'll need them for both GitHub secrets and Render enviro
 #### Get Deploy Hooks
 
 For each service (API and Worker):
+
 1. Go to Service → Settings
 2. Scroll to "Deploy Hook"
 3. Click "Create Deploy Hook"
@@ -109,6 +111,7 @@ For each service (API and Worker):
 ### 3. Set Up Vercel
 
 #### Create Vercel Account
+
 1. Visit https://vercel.com
 2. Sign up / Log in with GitHub
 3. Import your repository
@@ -154,10 +157,12 @@ cat .vercel/project.json
 ```
 
 Copy from the JSON:
+
 - `orgId` → Save as `VERCEL_ORG_ID`
 - `projectId` → Save as `VERCEL_PROJECT_ID_WEB`
 
 Or get from Vercel dashboard:
+
 1. Project Settings → General
 2. Copy "Project ID"
 3. Copy "Team ID" (if team project) or "User ID"
@@ -171,6 +176,7 @@ Go to: **GitHub Repository → Settings → Secrets and variables → Actions**
 Click **"New repository secret"** for each:
 
 #### Database & Cache
+
 ```
 DATABASE_URL
 Value: postgresql://user:pass@host:5432/bibliology
@@ -182,6 +188,7 @@ Value: postgresql://user:pass@staging-host:5432/bibliology_staging
 ```
 
 #### Authentication
+
 ```
 JWT_SECRET
 Value: <64-char random string from step 1>
@@ -191,6 +198,7 @@ Value: <64-char random string from step 1>
 ```
 
 #### Render Deployment
+
 ```
 RENDER_DEPLOY_HOOK_API
 Value: https://api.render.com/deploy/srv-xxxxx?key=xxxxx
@@ -214,6 +222,7 @@ Value: https://bibliology-api-staging.onrender.com
 ```
 
 #### Vercel Deployment
+
 ```
 VERCEL_TOKEN
 Value: <token from Vercel account>
@@ -234,6 +243,7 @@ Value: https://staging-bibliology.vercel.app
 ```
 
 #### Optional (but recommended)
+
 ```
 CODECOV_TOKEN
 Value: <from codecov.io after connecting repo>
@@ -291,6 +301,7 @@ S3_REGION=us-east-1
 ```
 
 For **Worker Service**, add:
+
 ```bash
 NODE_ENV=production
 DATABASE_URL=${bibliology-db.DATABASE_URL}
@@ -303,6 +314,7 @@ REDIS_PORT=${bibliology-redis.REDIS_PORT}
 ### 6. Verify Setup
 
 #### Test GitHub Secrets
+
 ```bash
 # Push a commit to trigger CI
 git commit --allow-empty -m "Test CI/CD setup"
@@ -312,6 +324,7 @@ git push origin develop
 ```
 
 #### Test API Health
+
 ```bash
 # After deployment
 curl https://your-api-url.onrender.com/health
@@ -321,6 +334,7 @@ curl https://your-api-url.onrender.com/health
 ```
 
 #### Test Frontend
+
 ```bash
 # Visit your Vercel URL
 open https://your-app.vercel.app
@@ -335,71 +349,75 @@ open https://your-app.vercel.app
 
 ### API Service (Render)
 
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `NODE_ENV` | Yes | Environment | `production` |
-| `PORT` | Yes | Server port | `3000` |
-| `DATABASE_URL` | Yes | PostgreSQL connection | `postgresql://...` |
-| `REDIS_HOST` | Yes | Redis hostname | `redis-internal` |
-| `REDIS_PORT` | Yes | Redis port | `6379` |
-| `JWT_SECRET` | Yes | JWT signing key | `<64-char random>` |
-| `JWT_REFRESH_SECRET` | Yes | Refresh token key | `<64-char random>` |
-| `CORS_ORIGIN` | Yes | Allowed origin | `https://app.com` |
-| `API_PREFIX` | No | API route prefix | `api` |
-| `MAX_FILE_SIZE` | No | Max upload size | `52428800` (50MB) |
-| `THROTTLE_TTL` | No | Rate limit window | `60` (seconds) |
-| `THROTTLE_LIMIT` | No | Max requests | `100` |
+| Variable             | Required | Description           | Example            |
+| -------------------- | -------- | --------------------- | ------------------ |
+| `NODE_ENV`           | Yes      | Environment           | `production`       |
+| `PORT`               | Yes      | Server port           | `3000`             |
+| `DATABASE_URL`       | Yes      | PostgreSQL connection | `postgresql://...` |
+| `REDIS_HOST`         | Yes      | Redis hostname        | `redis-internal`   |
+| `REDIS_PORT`         | Yes      | Redis port            | `6379`             |
+| `JWT_SECRET`         | Yes      | JWT signing key       | `<64-char random>` |
+| `JWT_REFRESH_SECRET` | Yes      | Refresh token key     | `<64-char random>` |
+| `CORS_ORIGIN`        | Yes      | Allowed origin        | `https://app.com`  |
+| `API_PREFIX`         | No       | API route prefix      | `api`              |
+| `MAX_FILE_SIZE`      | No       | Max upload size       | `52428800` (50MB)  |
+| `THROTTLE_TTL`       | No       | Rate limit window     | `60` (seconds)     |
+| `THROTTLE_LIMIT`     | No       | Max requests          | `100`              |
 
 ### Frontend (Vercel)
 
-| Variable | Required | Description | Example |
-|----------|----------|-------------|---------|
-| `VITE_API_URL` | Yes | Backend API URL | `https://api.app.com/api` |
-| `VITE_ENV` | Yes | Environment | `production` |
-| `VITE_APP_NAME` | No | App name | `Bibliology` |
-| `VITE_ENABLE_ANALYTICS` | No | Enable analytics | `true` |
-| `VITE_ENABLE_ERROR_REPORTING` | No | Enable Sentry | `true` |
+| Variable                      | Required | Description      | Example                   |
+| ----------------------------- | -------- | ---------------- | ------------------------- |
+| `VITE_API_URL`                | Yes      | Backend API URL  | `https://api.app.com/api` |
+| `VITE_ENV`                    | Yes      | Environment      | `production`              |
+| `VITE_APP_NAME`               | No       | App name         | `Bibliology`              |
+| `VITE_ENABLE_ANALYTICS`       | No       | Enable analytics | `true`                    |
+| `VITE_ENABLE_ERROR_REPORTING` | No       | Enable Sentry    | `true`                    |
 
 ### GitHub Secrets
 
-| Secret | Required | Description |
-|--------|----------|-------------|
-| `DATABASE_URL` | Yes | Production database |
-| `STAGING_DATABASE_URL` | For staging | Staging database |
-| `JWT_SECRET` | Yes | Production JWT secret |
-| `JWT_REFRESH_SECRET` | Yes | Production refresh secret |
-| `RENDER_DEPLOY_HOOK_API` | Yes | API deploy webhook |
-| `RENDER_DEPLOY_HOOK_API_STAGING` | For staging | Staging API webhook |
-| `RENDER_DEPLOY_HOOK_WORKER` | Yes | Worker deploy webhook |
-| `API_URL` | Yes | Production API URL |
-| `STAGING_API_URL` | For staging | Staging API URL |
-| `VERCEL_TOKEN` | Yes | Vercel auth token |
-| `VERCEL_ORG_ID` | Yes | Vercel org/team ID |
-| `VERCEL_PROJECT_ID_WEB` | Yes | Frontend project ID |
-| `PRODUCTION_WEB_URL` | Yes | Production web URL |
-| `STAGING_WEB_URL` | For staging | Staging web URL |
-| `CODECOV_TOKEN` | Optional | Code coverage |
-| `SENTRY_DSN` | Optional | Error tracking |
+| Secret                           | Required    | Description               |
+| -------------------------------- | ----------- | ------------------------- |
+| `DATABASE_URL`                   | Yes         | Production database       |
+| `STAGING_DATABASE_URL`           | For staging | Staging database          |
+| `JWT_SECRET`                     | Yes         | Production JWT secret     |
+| `JWT_REFRESH_SECRET`             | Yes         | Production refresh secret |
+| `RENDER_DEPLOY_HOOK_API`         | Yes         | API deploy webhook        |
+| `RENDER_DEPLOY_HOOK_API_STAGING` | For staging | Staging API webhook       |
+| `RENDER_DEPLOY_HOOK_WORKER`      | Yes         | Worker deploy webhook     |
+| `API_URL`                        | Yes         | Production API URL        |
+| `STAGING_API_URL`                | For staging | Staging API URL           |
+| `VERCEL_TOKEN`                   | Yes         | Vercel auth token         |
+| `VERCEL_ORG_ID`                  | Yes         | Vercel org/team ID        |
+| `VERCEL_PROJECT_ID_WEB`          | Yes         | Frontend project ID       |
+| `PRODUCTION_WEB_URL`             | Yes         | Production web URL        |
+| `STAGING_WEB_URL`                | For staging | Staging web URL           |
+| `CODECOV_TOKEN`                  | Optional    | Code coverage             |
+| `SENTRY_DSN`                     | Optional    | Error tracking            |
 
 ---
 
 ## Troubleshooting
 
 ### "Secret not found" error
+
 - Check secret name matches exactly (case-sensitive)
 - Verify secret is set at repository level (not environment)
 
 ### Database connection fails
+
 - Check DATABASE_URL format: `postgresql://user:pass@host:5432/db`
 - Verify database is running in Render
 - Check firewall rules
 
 ### Deployment webhook fails
+
 - Verify webhook URL is complete and correct
 - Check Render service is not already deploying
 - Ensure service has manual deploy enabled
 
 ### Vercel deployment fails
+
 - Verify VERCEL_TOKEN is valid
 - Check project IDs are correct
 - Ensure build command is correct for monorepo
@@ -421,6 +439,7 @@ open https://your-app.vercel.app
 ## Next Steps
 
 After setup:
+
 1. Test staging deployment: Push to `develop` branch
 2. Test production deployment: Push to `main` branch (with approval)
 3. Set up monitoring and alerts
@@ -433,6 +452,7 @@ After setup:
 ## Support
 
 If you encounter issues:
+
 1. Check [DEPLOYMENT.md](../DEPLOYMENT.md) for troubleshooting
 2. Review Render/Vercel logs
 3. Verify all secrets are set correctly

@@ -271,7 +271,10 @@ class ApiClient {
   /**
    * Update a content block
    */
-  async updateContentBlock(blockId: string, data: UpdateContentBlockRequest): Promise<ContentBlock> {
+  async updateContentBlock(
+    blockId: string,
+    data: UpdateContentBlockRequest,
+  ): Promise<ContentBlock> {
     return this.request(
       `/content-blocks/${blockId}`,
       {

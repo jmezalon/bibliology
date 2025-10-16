@@ -13,6 +13,7 @@ The lesson builder implementation demonstrates solid architecture with good comp
 ### 1.1 Component Structure & Organization ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Clear component hierarchy with reusable blocks
 - ✅ Good separation of concerns (content-block wrapper vs individual block components)
 - ✅ Proper use of compound patterns (BlockPalette, ContentBlock)
@@ -20,17 +21,19 @@ The lesson builder implementation demonstrates solid architecture with good comp
 **Issues:**
 
 #### Issue #1: Missing Main Page Component
+
 **Severity**: CRITICAL
 **File**: N/A - Not found
 
 The main lesson builder page component is missing. There's no integration point connecting the slide canvas and sidebar.
 
 **Recommendation:**
+
 ```tsx
 // apps/web/src/app/(dashboard)/courses/[courseId]/lessons/[lessonId]/builder/page.tsx
 'use client';
 
-import { use} from 'react';
+import { use } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SlideCanvas } from '@/components/lesson-builder/slide-canvas';
 import { SlideSidebar } from '@/components/lesson-builder/slide-sidebar';
@@ -52,9 +55,7 @@ export default function LessonBuilderPage({
     queryFn: () => apiClient.getSlides(lessonId),
   });
 
-  const [selectedSlideId, setSelectedSlideId] = useState<string | null>(
-    slides?.[0]?.id ?? null
-  );
+  const [selectedSlideId, setSelectedSlideId] = useState<string | null>(slides?.[0]?.id ?? null);
 
   // Auto-save implementation
   const autoSave = useAutoSave({
@@ -94,11 +95,13 @@ export default function LessonBuilderPage({
 ```
 
 #### Issue #2: Component File Organization
+
 **Severity**: MEDIUM
 
 All block components are in a flat `blocks/` directory. For 8+ block types, this can become difficult to navigate.
 
 **Recommendation:**
+
 ```
 components/lesson-builder/
 ├── blocks/
@@ -121,16 +124,19 @@ components/lesson-builder/
 **Issues:**
 
 #### Issue #3: No React Query Integration Found
+
 **Severity**: CRITICAL
 **Files**: All component files
 
 No React Query hooks are being used for API calls. This means:
+
 - No automatic caching
 - No optimistic updates
 - Manual loading/error state management
 - Potential state synchronization issues
 
 **Recommendation:**
+
 ```tsx
 // hooks/use-slides.ts
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -181,11 +187,13 @@ export function useCreateContentBlock(slideId: string) {
 ```
 
 #### Issue #4: Missing Query Invalidation Strategy
+
 **Severity**: HIGH
 
 When slides or blocks are updated, related queries need to be invalidated.
 
 **Recommendation:**
+
 ```tsx
 // Use query keys consistently
 const queryKeys = {
@@ -199,7 +207,7 @@ const queryKeys = {
 onSuccess: () => {
   void queryClient.invalidateQueries({ queryKey: queryKeys.slides(lessonId) });
   void queryClient.invalidateQueries({ queryKey: queryKeys.lesson(lessonId) });
-}
+};
 ```
 
 ---
@@ -209,10 +217,12 @@ onSuccess: () => {
 **Issues:**
 
 #### Issue #5: Unnecessary Re-renders in SlideCanvas
+
 **Severity**: HIGH
 **File**: `components/lesson-builder/slide-canvas.tsx:109`
 
 Every time `slide.content_blocks` changes, the entire array is sorted:
+
 ```tsx
 const sortedBlocks = [...slide.content_blocks].sort((a, b) => a.order - b.order);
 ```
@@ -220,6 +230,7 @@ const sortedBlocks = [...slide.content_blocks].sort((a, b) => a.order - b.order)
 This happens on every render, even if the blocks haven't changed.
 
 **Fix:**
+
 ```tsx
 import { useMemo } from 'react';
 
@@ -235,10 +246,12 @@ export function SlideCanvas({ slide, ...props }: SlideCanvasProps) {
 ```
 
 #### Issue #6: Non-Memoized Callbacks
+
 **Severity**: MEDIUM
 **File**: `components/lesson-builder/content-block.tsx:157-163`
 
 Inline arrow functions are recreated on every render:
+
 ```tsx
 onUpdate={(content: string, metadata?: any) =>
   onContentBlockUpdate(block.id, content, metadata)
@@ -246,6 +259,7 @@ onUpdate={(content: string, metadata?: any) =>
 ```
 
 **Fix:**
+
 ```tsx
 import { useCallback } from 'react';
 
@@ -254,7 +268,7 @@ export function ContentBlock({ block, onUpdate, ...props }: ContentBlockProps) {
     (content: string, metadata?: ContentBlockType['metadata']) => {
       onUpdate(content, metadata);
     },
-    [onUpdate]
+    [onUpdate],
   );
 
   const handleDelete = useCallback(() => {
@@ -270,29 +284,30 @@ export function ContentBlock({ block, onUpdate, ...props }: ContentBlockProps) {
 ```
 
 #### Issue #7: Missing React.memo for Block Components
+
 **Severity**: MEDIUM
 
 Block components re-render when parent re-renders, even if props haven't changed.
 
 **Fix:**
+
 ```tsx
 // blocks/text-block.tsx
 import { memo } from 'react';
 
-export const TextBlock = memo(function TextBlock({
-  content,
-  onUpdate,
-  editable,
-}: TextBlockProps) {
-  // Component implementation
-}, (prevProps, nextProps) => {
-  // Custom comparison for better performance
-  return (
-    prevProps.content === nextProps.content &&
-    prevProps.editable === nextProps.editable &&
-    prevProps.language === nextProps.language
-  );
-});
+export const TextBlock = memo(
+  function TextBlock({ content, onUpdate, editable }: TextBlockProps) {
+    // Component implementation
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison for better performance
+    return (
+      prevProps.content === nextProps.content &&
+      prevProps.editable === nextProps.editable &&
+      prevProps.language === nextProps.language
+    );
+  },
+);
 ```
 
 ---
@@ -302,11 +317,13 @@ export const TextBlock = memo(function TextBlock({
 **Issues:**
 
 #### Issue #8: Missing Keyboard Shortcuts
+
 **Severity**: HIGH
 
 The lesson builder lacks keyboard shortcuts for common operations.
 
 **Recommendation:**
+
 ```tsx
 // hooks/use-keyboard-shortcuts.ts
 import { useEffect } from 'react';
@@ -362,14 +379,18 @@ useKeyboardShortcuts({
 ```
 
 #### Issue #9: Missing ARIA Labels
+
 **Severity**: MEDIUM
 **File**: `components/lesson-builder/content-block.tsx:178-315`
 
 Drag handles and action buttons lack proper ARIA labels.
 
 **Fix:**
+
 ```tsx
-{/* Drag Handle */}
+{
+  /* Drag Handle */
+}
 <div
   {...attributes}
   {...listeners}
@@ -389,9 +410,11 @@ Drag handles and action buttons lack proper ARIA labels.
   className={/* ... */}
 >
   <GripVertical className="h-4 w-4" aria-hidden="true" />
-</div>
+</div>;
 
-{/* Settings Button */}
+{
+  /* Settings Button */
+}
 <Button
   aria-label={`Settings for ${block.type} block`}
   aria-expanded={settingsOpen}
@@ -399,15 +422,17 @@ Drag handles and action buttons lack proper ARIA labels.
   // ...
 >
   <Settings className="h-3 w-3" aria-hidden="true" />
-</Button>
+</Button>;
 ```
 
 #### Issue #10: No Focus Management
+
 **Severity**: MEDIUM
 
 When adding/deleting blocks, focus is not managed, making keyboard navigation difficult.
 
 **Fix:**
+
 ```tsx
 import { useRef, useEffect } from 'react';
 
@@ -454,6 +479,7 @@ export function SlideCanvas({ slide, ... }: SlideCanvasProps) {
 ### 1.5 TypeScript Type Safety ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Good use of discriminated unions for content block types
 - ✅ Proper typing for props interfaces
 - ✅ Good use of type imports
@@ -461,16 +487,19 @@ export function SlideCanvas({ slide, ... }: SlideCanvasProps) {
 **Issues:**
 
 #### Issue #11: Excessive use of `any` and `as any`
+
 **Severity**: MEDIUM
 **File**: `components/lesson-builder/content-block.tsx:94,104,117,129,139,152,162`
 
 Multiple instances of `as any` casting bypass type safety:
+
 ```tsx
 metadata={block.metadata as any}
 ```
 
 **Fix:**
 Create proper type guards and narrow types:
+
 ```tsx
 // types/lesson-builder.ts
 export type HeadingBlockMetadata = {
@@ -486,7 +515,7 @@ export type ImageBlockMetadata = {
 
 // Type guard function
 function isHeadingBlock(
-  block: ContentBlock
+  block: ContentBlock,
 ): block is ContentBlock & { type: ContentBlockType.HEADING; metadata: HeadingBlockMetadata } {
   return block.type === ContentBlockType.HEADING;
 }
@@ -514,6 +543,7 @@ const renderBlockContent = () => {
 ### 2.1 API Endpoint Design ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ RESTful design with nested routes
 - ✅ Proper HTTP verbs and status codes
 - ✅ Comprehensive Swagger documentation
@@ -522,12 +552,14 @@ const renderBlockContent = () => {
 **Issues:**
 
 #### Issue #12: Missing Pagination for Slides
+
 **Severity**: MEDIUM
 **File**: `api/src/courses/slides/slides.controller.ts:186-201`
 
 The `GET /lessons/:lessonId/slides` endpoint returns all slides without pagination. For lessons with 100+ slides, this could be a performance issue.
 
 **Recommendation:**
+
 ```typescript
 // slides.controller.ts
 @Get()
@@ -557,11 +589,13 @@ async findAllForLesson(
 ```
 
 #### Issue #13: No Partial Updates for Nested Blocks
+
 **Severity**: LOW
 
 Updating a slide requires sending all content blocks even if only one changed.
 
 **Recommendation:**
+
 ```typescript
 // Add PATCH endpoint for individual block updates
 @Patch(':slideId/blocks/:blockId')
@@ -582,12 +616,14 @@ async updateSingleBlock(
 **Issues:**
 
 #### Issue #14: N+1 Query Problem
+
 **Severity**: HIGH
 **File**: `api/src/courses/slides/slides.service.ts:85-100`
 
 The `findOne` method includes both `content_blocks` AND `lesson.course.teacher_id`, which creates multiple queries.
 
 **Current:**
+
 ```typescript
 const slide = await this.prisma.slide.findUnique({
   where: { id: slideId },
@@ -609,6 +645,7 @@ const slide = await this.prisma.slide.findUnique({
 This generates multiple queries. Better approach:
 
 **Fix:**
+
 ```typescript
 // Optimize by selecting only what's needed for ownership check first
 async findOne(slideId: string, teacherId?: string): Promise<SlideResponseDto> {
@@ -649,12 +686,14 @@ async findOne(slideId: string, teacherId?: string): Promise<SlideResponseDto> {
 ```
 
 #### Issue #15: Missing Database Indexes
+
 **Severity**: HIGH
 **File**: `prisma/schema.prisma`
 
 The `ContentBlock` model needs an additional composite index for common queries.
 
 **Recommendation:**
+
 ```prisma
 model ContentBlock {
   id           String           @id @default(cuid())
@@ -673,12 +712,14 @@ model ContentBlock {
 ```
 
 #### Issue #16: Inefficient Bulk Delete
+
 **Severity**: MEDIUM
 **File**: `api/src/courses/slides/slides.service.ts:495-518`
 
 The bulk delete operation generates many UPDATE queries in the transaction.
 
 **Current Approach:**
+
 ```typescript
 await this.prisma.$transaction([
   this.prisma.slide.deleteMany({ where: { id: { in: slideIds } } }),
@@ -698,6 +739,7 @@ await this.prisma.$transaction([
 ```
 
 **Better Approach:**
+
 ```typescript
 // Use raw SQL for bulk operations
 await this.prisma.$transaction(async (tx) => {
@@ -727,6 +769,7 @@ await this.prisma.$transaction(async (tx) => {
 ### 2.3 JSONB Validation ⭐⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Excellent use of Zod schemas
 - ✅ Type-specific validation
 - ✅ Clear error messages
@@ -735,12 +778,14 @@ await this.prisma.$transaction(async (tx) => {
 **Minor Issue:**
 
 #### Issue #17: Missing Bilingual Content Validation
+
 **Severity**: LOW
 **File**: `api/src/courses/slides/content-blocks.service.ts:52-64`
 
 Only validates `content_en`, but schema has `content_fr` field.
 
 **Recommendation:**
+
 ```typescript
 async create(teacherId: string, createBlockDto: CreateContentBlockDto) {
   // ... ownership checks
@@ -785,17 +830,20 @@ async create(teacherId: string, createBlockDto: CreateContentBlockDto) {
 ### 2.4 Transaction Usage ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Proper use of transactions for complex operations
 - ✅ Good understanding of atomicity requirements
 
 **Issues:**
 
 #### Issue #18: Missing Transaction Isolation Levels
+
 **Severity**: MEDIUM
 
 For operations like reordering, serializable isolation might be needed to prevent race conditions.
 
 **Recommendation:**
+
 ```typescript
 async bulkReorderSlides(
   lessonId: string,
@@ -828,12 +876,14 @@ async bulkReorderSlides(
 **Issues:**
 
 #### Issue #19: Generic Error Messages
+
 **Severity**: MEDIUM
 **File**: Various service files
 
 Error messages don't provide context about which resource failed.
 
 **Fix:**
+
 ```typescript
 // Before
 throw new NotFoundException('Slide not found');
@@ -843,20 +893,20 @@ throw new NotFoundException(`Slide with ID '${slideId}' not found`);
 
 // For batch operations
 if (slides.length !== slideIds.length) {
-  const foundIds = slides.map(s => s.id);
-  const missingIds = slideIds.filter(id => !foundIds.includes(id));
-  throw new NotFoundException(
-    `Slides not found: ${missingIds.join(', ')}`
-  );
+  const foundIds = slides.map((s) => s.id);
+  const missingIds = slideIds.filter((id) => !foundIds.includes(id));
+  throw new NotFoundException(`Slides not found: ${missingIds.join(', ')}`);
 }
 ```
 
 #### Issue #20: No Error Logging
+
 **Severity**: HIGH
 
 Errors are thrown but not logged, making debugging difficult.
 
 **Recommendation:**
+
 ```typescript
 import { Logger } from '@nestjs/common';
 
@@ -872,7 +922,7 @@ export class SlidesService {
     } catch (error) {
       this.logger.error(
         `Failed to create slide for lesson: ${createSlideDto.lesson_id}`,
-        error.stack
+        error.stack,
       );
       throw error;
     }
@@ -889,12 +939,14 @@ export class SlidesService {
 **Issues:**
 
 #### Issue #21: Type Mismatch - Content Storage
+
 **Severity**: HIGH
 
 **Backend**: Stores content as JSONB with separate `content_en` and `content_fr` fields.
 **Frontend**: Expects single `content` string field.
 
 **Current Backend Schema:**
+
 ```typescript
 // Prisma
 model ContentBlock {
@@ -904,21 +956,23 @@ model ContentBlock {
 ```
 
 **Current Frontend Type:**
+
 ```typescript
 export interface ContentBlock {
   id: string;
   type: ContentBlockType;
-  content: string;  // ❌ Mismatch!
+  content: string; // ❌ Mismatch!
   metadata?: Record<string, unknown>;
 }
 ```
 
 **Fix - Align Frontend Types:**
+
 ```typescript
 export interface ContentBlock {
   id: string;
   type: ContentBlockType;
-  content_en: string;  // JSON string
+  content_en: string; // JSON string
   content_fr?: string; // JSON string
   metadata?: Record<string, unknown>;
   order: number;
@@ -928,7 +982,7 @@ export interface ContentBlock {
 export type ParsedContentBlock<T extends ContentBlockType> = {
   id: string;
   type: T;
-  content_en: ContentTypeMap[T];  // Parsed JSON
+  content_en: ContentTypeMap[T]; // Parsed JSON
   content_fr?: ContentTypeMap[T];
   metadata?: BlockMetadataMap[T];
   order: number;
@@ -936,11 +990,13 @@ export type ParsedContentBlock<T extends ContentBlockType> = {
 ```
 
 #### Issue #22: Missing API Client
+
 **Severity**: CRITICAL
 
 No centralized API client for type-safe backend calls.
 
 **Recommendation:**
+
 ```typescript
 // lib/api-client.ts
 import { z } from 'zod';
@@ -961,12 +1017,9 @@ export class ApiClient {
   constructor(private readonly baseUrl: string) {}
 
   async getSlides(lessonId: string): Promise<Slide[]> {
-    const response = await fetch(
-      `${this.baseUrl}/lessons/${lessonId}/slides`,
-      {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      }
-    );
+    const response = await fetch(`${this.baseUrl}/lessons/${lessonId}/slides`, {
+      headers: { Authorization: `Bearer ${getToken()}` },
+    });
 
     if (!response.ok) {
       throw new ApiError(response.status, await response.text());
@@ -976,21 +1029,15 @@ export class ApiClient {
     return z.array(SlideResponseSchema).parse(data);
   }
 
-  async createContentBlock(
-    slideId: string,
-    data: CreateContentBlockData
-  ): Promise<ContentBlock> {
-    const response = await fetch(
-      `${this.baseUrl}/slides/${slideId}/content-blocks`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${getToken()}`,
-        },
-        body: JSON.stringify(data),
-      }
-    );
+  async createContentBlock(slideId: string, data: CreateContentBlockData): Promise<ContentBlock> {
+    const response = await fetch(`${this.baseUrl}/slides/${slideId}/content-blocks`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify(data),
+    });
 
     if (!response.ok) {
       const error = await response.json();
@@ -1011,11 +1058,13 @@ export const apiClient = new ApiClient(process.env.NEXT_PUBLIC_API_URL!);
 **Issues:**
 
 #### Issue #23: No Websocket/SSE for Real-time Updates
+
 **Severity**: MEDIUM
 
 If multiple teachers edit the same lesson, changes aren't reflected in real-time.
 
 **Recommendation:**
+
 ```typescript
 // Backend - Add WebSocket gateway
 @WebSocketGateway({
@@ -1061,9 +1110,7 @@ export function useLessonSync(lessonId: string) {
     socket.on('block-updated', ({ slideId, block }) => {
       queryClient.setQueryData(['slides', slideId], (old: Slide) => ({
         ...old,
-        content_blocks: old.content_blocks.map(b =>
-          b.id === block.id ? block : b
-        ),
+        content_blocks: old.content_blocks.map((b) => (b.id === block.id ? block : b)),
       }));
     });
 
@@ -1079,6 +1126,7 @@ export function useLessonSync(lessonId: string) {
 ### 3.3 Optimistic Updates ⭐⭐
 
 #### Issue #24: No Optimistic UI Updates
+
 **Severity**: MEDIUM
 
 When adding/updating blocks, UI waits for server response before updating.
@@ -1090,11 +1138,13 @@ When adding/updating blocks, UI waits for server response before updating.
 ### 3.4 Conflict Resolution ⭐
 
 #### Issue #25: No Conflict Resolution Strategy
+
 **Severity**: HIGH
 
 If two users edit the same block simultaneously, last write wins (data loss).
 
 **Recommendation:**
+
 ```typescript
 // Add version field to ContentBlock
 model ContentBlock {
@@ -1148,16 +1198,19 @@ const updateBlock = useMutation({
 ### 3.5 Auto-save Implementation ⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Good debounce logic
 - ✅ Queue handling for rapid changes
 
 **Issues:**
 
 #### Issue #26: Missing Dependencies in useCallback
+
 **Severity**: MEDIUM
 **File**: `hooks/use-auto-save.ts:59-88`
 
 The `onSave` function is not in the dependency array:
+
 ```typescript
 const executeSave = useCallback(async () => {
   // ... uses onSave
@@ -1167,11 +1220,13 @@ const executeSave = useCallback(async () => {
 **Current code is correct!** But beware of:
 
 #### Issue #27: No Retry Logic for Failed Saves
+
 **Severity**: MEDIUM
 
 If save fails due to network error, it's lost.
 
 **Fix:**
+
 ```typescript
 export function useAutoSave({ onSave, delay = 2000, maxRetries = 3 }: UseAutoSaveOptions) {
   const [retryCount, setRetryCount] = useState(0);
@@ -1190,7 +1245,7 @@ export function useAutoSave({ onSave, delay = 2000, maxRetries = 3 }: UseAutoSav
         // Retry with exponential backoff
         const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
         setTimeout(() => {
-          setRetryCount(prev => prev + 1);
+          setRetryCount((prev) => prev + 1);
           void executeSave();
         }, backoffDelay);
       } else {
@@ -1214,11 +1269,13 @@ export function useAutoSave({ onSave, delay = 2000, maxRetries = 3 }: UseAutoSav
 **Issues:**
 
 #### Issue #28: No Loading Skeletons
+
 **Severity**: MEDIUM
 
 While slides load, users see blank screen.
 
 **Recommendation:**
+
 ```tsx
 // components/lesson-builder/slide-skeleton.tsx
 export function SlideSkeleton() {
@@ -1226,7 +1283,7 @@ export function SlideSkeleton() {
     <div className="animate-pulse">
       <div className="h-8 bg-gray-200 rounded w-3/4 mb-4" />
       <div className="space-y-4">
-        {[1, 2, 3].map(i => (
+        {[1, 2, 3].map((i) => (
           <div key={i} className="h-24 bg-gray-100 rounded" />
         ))}
       </div>
@@ -1235,7 +1292,9 @@ export function SlideSkeleton() {
 }
 
 // Usage
-{isLoading ? <SlideSkeleton /> : <SlideCanvas slide={slide} />}
+{
+  isLoading ? <SlideSkeleton /> : <SlideCanvas slide={slide} />;
+}
 ```
 
 ---
@@ -1245,11 +1304,13 @@ export function SlideSkeleton() {
 **Issues:**
 
 #### Issue #29: No User-Friendly Error Display
+
 **Severity**: MEDIUM
 
 Errors are logged to console but not shown to user.
 
 **Recommendation:**
+
 ```tsx
 // components/lesson-builder/error-boundary.tsx
 import { ErrorBoundary } from 'react-error-boundary';
@@ -1268,7 +1329,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 // Wrap lesson builder
 <ErrorBoundary FallbackComponent={ErrorFallback} onReset={() => queryClient.resetQueries()}>
   <LessonBuilder />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 ---
@@ -1276,6 +1337,7 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 ### 4.3 Empty States ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Good empty states in SlideCanvas (line 94-106, 174-188)
 
 ---
@@ -1289,24 +1351,25 @@ function ErrorFallback({ error, resetErrorBoundary }) {
 ### 4.5 Drag and Drop ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Good implementation with dnd-kit
 - ✅ Proper keyboard support
 
 **Minor Issue:**
 
 #### Issue #30: No Visual Feedback During Drag
+
 **Severity**: LOW
 
 Could add overlay to show drop target.
 
 **Enhancement:**
+
 ```tsx
 import { DragOverlay } from '@dnd-kit/core';
 
 <DndContext /* ... */>
-  <SortableContext /* ... */>
-    {/* ... blocks */}
-  </SortableContext>
+  <SortableContext /* ... */>{/* ... blocks */}</SortableContext>
 
   <DragOverlay>
     {activeId ? (
@@ -1315,7 +1378,7 @@ import { DragOverlay } from '@dnd-kit/core';
       </div>
     ) : null}
   </DragOverlay>
-</DndContext>
+</DndContext>;
 ```
 
 ---
@@ -1325,6 +1388,7 @@ import { DragOverlay } from '@dnd-kit/core';
 ### 5.1 Authorization Checks ⭐⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Excellent ownership verification chain
 - ✅ Consistent authorization across all endpoints
 - ✅ Proper use of guards and decorators
@@ -1334,17 +1398,20 @@ import { DragOverlay } from '@dnd-kit/core';
 ### 5.2 Input Sanitization ⭐⭐⭐⭐
 
 **Strengths:**
+
 - ✅ Good validation with class-validator
 - ✅ Zod validation for JSONB
 
 **Issues:**
 
 #### Issue #31: Missing File Upload Validation
+
 **Severity**: HIGH
 
 Image blocks accept any URL but don't validate file uploads.
 
 **Recommendation:**
+
 ```typescript
 // Add file upload endpoint with validation
 @Post('upload-image')
@@ -1383,12 +1450,14 @@ async uploadImage(@UploadedFile() file: Express.Multer.File) {
 **Issues:**
 
 #### Issue #32: No HTML Sanitization on Backend
+
 **Severity**: HIGH
 **File**: `api/src/courses/slides/validators/content-validator.ts:108-118`
 
 The `sanitizeContentHtml` function exists but is NOT CALLED anywhere!
 
 **Fix:**
+
 ```typescript
 // content-blocks.service.ts
 async create(teacherId: string, createBlockDto: CreateContentBlockDto) {
@@ -1408,22 +1477,35 @@ async create(teacherId: string, createBlockDto: CreateContentBlockDto) {
 ```
 
 **Better:** Use a library like `DOMPurify`:
+
 ```typescript
 import DOMPurify from 'isomorphic-dompurify';
 
 export function sanitizeHtml(html: string): string {
   return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'u', 's', 'a', 'ul', 'ol', 'li',
-      'h1', 'h2', 'h3', 'span'
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      's',
+      'a',
+      'ul',
+      'ol',
+      'li',
+      'h1',
+      'h2',
+      'h3',
+      'span',
     ],
     ALLOWED_ATTR: ['href', 'class', 'style'],
     ALLOWED_STYLES: {
       '*': {
-        'color': [/^#[0-9A-Fa-f]{6}$/],
+        color: [/^#[0-9A-Fa-f]{6}$/],
         'text-align': [/^(left|center|right|justify)$/],
-      }
-    }
+      },
+    },
   });
 }
 ```
@@ -1439,6 +1521,7 @@ export function sanitizeHtml(html: string): string {
 ## Priority Recommendations
 
 ### CRITICAL (Fix Immediately)
+
 1. **Issue #1**: Create main lesson builder page with React Query integration
 2. **Issue #3**: Add React Query for data fetching and caching
 3. **Issue #21**: Fix type mismatch between frontend and backend
@@ -1446,6 +1529,7 @@ export function sanitizeHtml(html: string): string {
 5. **Issue #32**: Implement HTML sanitization on backend
 
 ### HIGH (Fix Soon)
+
 1. **Issue #5**: Add memoization to prevent unnecessary re-renders
 2. **Issue #8**: Implement keyboard shortcuts
 3. **Issue #14**: Optimize N+1 queries
@@ -1453,6 +1537,7 @@ export function sanitizeHtml(html: string): string {
 5. **Issue #31**: Add file upload validation
 
 ### MEDIUM (Fix When Possible)
+
 1. **Issue #6-7**: Memoize callbacks and add React.memo
 2. **Issue #12**: Add pagination to slides endpoint
 3. **Issue #15**: Add database indexes
@@ -1460,6 +1545,7 @@ export function sanitizeHtml(html: string): string {
 5. **Issue #23**: Add real-time synchronization
 
 ### LOW (Nice to Have)
+
 1. **Issue #2**: Reorganize block components
 2. **Issue #13**: Add partial update endpoints
 3. **Issue #17**: Validate bilingual content
@@ -1470,6 +1556,7 @@ export function sanitizeHtml(html: string): string {
 ## Summary
 
 **What's Working Well:**
+
 - Solid component architecture
 - Good TypeScript usage
 - Excellent backend authorization
@@ -1477,6 +1564,7 @@ export function sanitizeHtml(html: string): string {
 - Proper transaction handling
 
 **Critical Gaps:**
+
 - Missing main page component and React Query integration
 - Type mismatches between frontend/backend
 - No HTML sanitization despite function existing
@@ -1484,6 +1572,7 @@ export function sanitizeHtml(html: string): string {
 - Performance issues with re-renders and queries
 
 **Next Steps:**
+
 1. Create main lesson builder page
 2. Integrate React Query
 3. Fix type contracts

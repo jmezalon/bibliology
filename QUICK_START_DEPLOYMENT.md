@@ -55,7 +55,7 @@ This is a streamlined guide to get your CI/CD pipeline up and running. For detai
    - Name: `bibliology-api`
    - Region: **Oregon**
    - Branch: `main`
-   - Root Directory: *(leave empty)*
+   - Root Directory: _(leave empty)_
    - Runtime: **Docker**
    - Dockerfile Path: `./apps/api/Dockerfile`
    - Docker Context: `.`
@@ -63,6 +63,7 @@ This is a streamlined guide to get your CI/CD pipeline up and running. For detai
    - **Auto-Deploy: OFF** (we'll use GitHub Actions)
 
 4. **Environment Variables** (click "Advanced"):
+
    ```bash
    NODE_ENV=production
    PORT=3000
@@ -98,6 +99,7 @@ This is a streamlined guide to get your CI/CD pipeline up and running. For detai
 ### Generate JWT Secrets
 
 In your terminal:
+
 ```bash
 # JWT_SECRET
 openssl rand -base64 64
@@ -123,11 +125,13 @@ Copy these values to Render environment variables.
    - Install Command: `cd ../.. && pnpm install`
 
 3. **Environment Variables:**
+
    ```bash
    VITE_API_URL=https://bibliology-api.onrender.com/api
    VITE_APP_NAME=Bibliology
    VITE_ENV=production
    ```
+
    (Update API URL with your Render URL)
 
 4. Click **Deploy**
@@ -203,6 +207,7 @@ STAGING_API_URL=<if using staging>
 ### Test Deployment
 
 1. **Push to main branch:**
+
    ```bash
    git add .
    git commit -m "ci: Configure CI/CD pipeline"
@@ -215,6 +220,7 @@ STAGING_API_URL=<if using staging>
    - **Approve production deployment** when prompted
 
 3. **Verify Deployment:**
+
    ```bash
    # Test API health
    curl https://your-api-url.onrender.com/health
@@ -280,11 +286,13 @@ Your deployment is successful when:
 ### Configure Custom Domain (Optional)
 
 **Vercel:**
+
 1. Dashboard → Project → Settings → Domains
 2. Add your domain (e.g., bibliology.com)
 3. Configure DNS (automatic)
 
 **Render:**
+
 1. Service → Settings → Custom Domain
 2. Add your API domain (e.g., api.bibliology.com)
 3. Configure DNS records
@@ -298,6 +306,7 @@ Your deployment is successful when:
 **Cause:** Database connection issue
 
 **Fix:**
+
 1. Verify `DATABASE_URL` is correct in Render
 2. Check database is running
 3. Restart API service
@@ -309,6 +318,7 @@ Your deployment is successful when:
 **Cause:** Missing Prisma Client
 
 **Fix:**
+
 ```bash
 cd apps/api
 pnpm db:generate
@@ -324,6 +334,7 @@ git push
 **Cause:** Token or project ID mismatch
 
 **Fix:**
+
 1. Regenerate Vercel token
 2. Run `vercel link` to get correct IDs
 3. Update GitHub secrets
@@ -335,6 +346,7 @@ git push
 **Cause:** Wrong CORS_ORIGIN in Render
 
 **Fix:**
+
 1. Render → Service → Environment
 2. Update `CORS_ORIGIN` to match Vercel URL
 3. Manual Deploy
@@ -377,6 +389,7 @@ git push origin test/ci-pipeline
 ## Cost Summary
 
 **Monthly Costs:**
+
 - Render API: $7
 - Render Database: $7
 - Render Redis: $10
@@ -390,6 +403,7 @@ git push origin test/ci-pipeline
 ## Support
 
 **Issues?**
+
 1. Check [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed troubleshooting
 2. Review logs in Render/Vercel dashboards
 3. Check GitHub Actions logs
@@ -400,6 +414,7 @@ git push origin test/ci-pipeline
 ## Success! 🎉
 
 You now have:
+
 - ✅ Automated CI/CD pipeline
 - ✅ Production-ready deployment
 - ✅ Health monitoring
@@ -411,6 +426,7 @@ You now have:
 ---
 
 **For detailed documentation:**
+
 - [Complete Deployment Guide](./DEPLOYMENT.md)
 - [Secrets Setup Guide](./.github/SETUP_SECRETS.md)
 - [Monitoring Guide](./MONITORING.md)

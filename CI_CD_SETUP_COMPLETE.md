@@ -11,6 +11,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 ### 1. GitHub Actions Workflows
 
 #### `.github/workflows/ci-cd.yml` (20KB) - Main Pipeline
+
 - **Quality checks:** Linting, type checking, formatting
 - **Security scanning:** Dependency audit, secret detection
 - **Testing:** Unit tests on Node 18 & 20 with PostgreSQL/Redis
@@ -22,12 +23,14 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - **Post-deployment:** Health checks, monitoring, tagging
 
 #### `.github/workflows/preview-deploy.yml` - PR Previews
+
 - Automatic preview deployment for every PR
 - Comments preview URL in PR
 - Updates on each commit
 - Uses staging API endpoint
 
 #### `.github/workflows/cleanup.yml` - Maintenance
+
 - Cleans up merged branches
 - Removes old artifacts (7+ days)
 - Deletes old workflow runs (30+ days)
@@ -38,6 +41,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 ### 2. Deployment Configuration Files
 
 #### `apps/api/Dockerfile` - Backend Container
+
 - Multi-stage build for optimization
 - Production-ready with security best practices
 - Non-root user
@@ -46,10 +50,12 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - Final image size: ~150-200MB
 
 #### `apps/api/.dockerignore`
+
 - Excludes unnecessary files from Docker context
 - Reduces build time and image size
 
 #### `apps/api/render.yaml` - Infrastructure as Code
+
 - PostgreSQL database configuration
 - Redis cache configuration
 - API web service configuration
@@ -58,6 +64,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - Auto-scaling settings
 
 #### `apps/web/vercel.json` - Frontend Config (Enhanced)
+
 - Security headers (XSS, clickjacking protection)
 - Cache control for static assets
 - SPA routing configuration
@@ -69,7 +76,9 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 ### 3. Comprehensive Documentation
 
 #### `DEPLOYMENT.md` (15KB) - Complete Deployment Guide
+
 **Contents:**
+
 - Architecture overview
 - Hosting recommendations (with pros/cons/costs)
 - Environment setup (dev, staging, production)
@@ -82,7 +91,9 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - Pre/post-deployment checklists
 
 #### `.github/SETUP_SECRETS.md` (12KB) - Secrets Setup Guide
+
 **Contents:**
+
 - Step-by-step GitHub secrets setup
 - Render account setup
 - Vercel account setup
@@ -93,7 +104,9 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - Troubleshooting
 
 #### `MONITORING.md` (14KB) - Monitoring & Alerting
+
 **Contents:**
+
 - Monitoring philosophy and stack
 - Key metrics (frontend, backend, database, infrastructure)
 - Health check implementation
@@ -105,7 +118,9 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - Dashboard setup
 
 #### `.github/CI_CD_README.md` - Quick Reference
+
 **Contents:**
+
 - Workflow overview
 - Environment configuration
 - Quick commands
@@ -117,6 +132,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 ## Key Features
 
 ### Automated Testing
+
 - ✅ Linting and type checking
 - ✅ Unit tests with coverage reporting
 - ✅ E2E tests on production deployments
@@ -124,6 +140,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - ✅ Test on Node 18 & 20
 
 ### Security
+
 - ✅ Dependency security scanning
 - ✅ Secret detection
 - ✅ No hardcoded credentials check
@@ -131,6 +148,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - ✅ Docker image security best practices
 
 ### Deployment Safety
+
 - ✅ Database migrations validated before deploy
 - ✅ Staging environment for testing
 - ✅ Manual approval required for production
@@ -140,6 +158,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - ✅ Deployment tagging for tracking
 
 ### Developer Experience
+
 - ✅ PR preview deployments
 - ✅ Fast CI feedback (~7 minutes)
 - ✅ Parallel job execution
@@ -148,6 +167,7 @@ A comprehensive, production-ready CI/CD pipeline has been set up for the Bibliol
 - ✅ Deployment status in PR
 
 ### Monitoring & Observability
+
 - ✅ Health check endpoints
 - ✅ Structured logging
 - ✅ Error tracking ready (Sentry)
@@ -220,6 +240,7 @@ Health Checks + 30min Monitoring
 ### Hosting (Monthly)
 
 **Render.com:**
+
 - API Service (Starter): $7
 - Worker Service (Starter): $7
 - PostgreSQL (Starter): $7
@@ -227,12 +248,14 @@ Health Checks + 30min Monitoring
 - **Subtotal:** $31/month
 
 **Vercel:**
+
 - Free tier (suitable for this project)
 - 100 GB bandwidth/month
 - Unlimited deployments
 - **Subtotal:** $0/month
 
 **Optional Tools:**
+
 - BetterUptime (monitoring): Free tier
 - Sentry (error tracking): Free tier
 - Codecov (code coverage): Free tier
@@ -242,6 +265,7 @@ Health Checks + 30min Monitoring
 ### Scaling Costs
 
 If the project grows:
+
 - Render Standard: $25/service/month (better performance)
 - Render Pro: $100/service/month (autoscaling)
 - Vercel Pro: $20/month (for analytics, custom domains)
@@ -254,6 +278,7 @@ If the project grows:
 ### Frontend: Vercel (Recommended)
 
 **Why Vercel:**
+
 - ✅ Perfect for React/Vite applications
 - ✅ Automatic preview deployments
 - ✅ Instant rollbacks
@@ -263,6 +288,7 @@ If the project grows:
 - ✅ Generous free tier
 
 **Alternatives:**
+
 - Netlify (similar features)
 - Cloudflare Pages (better performance, steeper learning curve)
 - AWS Amplify (if already on AWS)
@@ -272,6 +298,7 @@ If the project grows:
 ### Backend: Render (Recommended)
 
 **Why Render:**
+
 - ✅ Simple deployment (Docker or native)
 - ✅ Managed PostgreSQL and Redis included
 - ✅ Auto-scaling and health checks
@@ -280,6 +307,7 @@ If the project grows:
 - ✅ Great documentation
 
 **Alternatives:**
+
 - Railway ($5-20/month, usage-based)
 - Fly.io ($0-20/month, edge computing)
 - DigitalOcean App Platform ($5-12/month, predictable pricing)
@@ -291,6 +319,7 @@ If the project grows:
 ### 1. Set Up Hosting (1 hour)
 
 **Render Setup:**
+
 1. Create account at https://render.com
 2. Create PostgreSQL database
 3. Create Redis instance
@@ -299,6 +328,7 @@ If the project grows:
 6. Get deploy webhook URLs
 
 **Vercel Setup:**
+
 1. Create account at https://vercel.com
 2. Import GitHub repository
 3. Configure build settings
@@ -313,6 +343,7 @@ If the project grows:
 Add these secrets to GitHub repository:
 
 **Required:**
+
 ```bash
 DATABASE_URL                    # From Render PostgreSQL
 STAGING_DATABASE_URL            # Create separate database
@@ -331,6 +362,7 @@ STAGING_WEB_URL                 # Your staging web URL
 ```
 
 **Optional:**
+
 ```bash
 CODECOV_TOKEN                   # From codecov.io
 SENTRY_DSN                      # From Sentry project
@@ -345,6 +377,7 @@ SENTRY_DSN                      # From Sentry project
 In Render dashboard, add environment variables for each service:
 
 **API Service:**
+
 - `NODE_ENV=production`
 - `DATABASE_URL=${bibliology-db.DATABASE_URL}` (linked)
 - `REDIS_HOST=${bibliology-redis.REDIS_INTERNAL_HOST}` (linked)
@@ -358,6 +391,7 @@ In Render dashboard, add environment variables for each service:
 ### 4. Test Deployment (30 minutes)
 
 **Test Staging:**
+
 ```bash
 # Push to develop branch
 git checkout develop
@@ -369,6 +403,7 @@ git push origin develop
 ```
 
 **Test Production:**
+
 ```bash
 # Push to main branch
 git checkout main
@@ -385,11 +420,13 @@ git push origin main
 ### 5. Set Up Monitoring (30 minutes)
 
 **Basic (Free):**
+
 1. Use Render built-in metrics
 2. Set up email alerts in Render
 3. Monitor GitHub Actions
 
 **Recommended (Free tier available):**
+
 1. BetterUptime for uptime monitoring
 2. Sentry for error tracking
 3. Set up Slack notifications
@@ -470,11 +507,13 @@ git push origin main
 ## Rollback Testing
 
 **Test frontend rollback:**
+
 1. Deploy a "broken" version (console.log in render)
 2. Use Vercel dashboard to rollback
 3. Verify: < 1 minute to rollback
 
 **Test backend rollback:**
+
 1. Deploy a "broken" version (health check fails)
 2. Use Render dashboard to rollback
 3. Verify: < 5 minutes to rollback
@@ -486,6 +525,7 @@ git push origin main
 ### Build Fails
 
 **Check:**
+
 1. TypeScript errors: `pnpm typecheck`
 2. Linting errors: `pnpm lint`
 3. Tests failing: `pnpm test`
@@ -498,6 +538,7 @@ git push origin main
 ### Health Check Fails
 
 **Check:**
+
 1. Render logs for errors
 2. Database connection (verify DATABASE_URL)
 3. Redis connection
@@ -510,6 +551,7 @@ git push origin main
 ### Deployment Timeout
 
 **Check:**
+
 1. Render service status
 2. Build logs for slow steps
 3. Database migrations (may take time)
@@ -521,6 +563,7 @@ git push origin main
 ### Preview Deployment Fails
 
 **Check:**
+
 1. Vercel token is valid
 2. Project IDs are correct
 3. Build command works locally
@@ -532,15 +575,18 @@ git push origin main
 ## Maintenance
 
 ### Daily
+
 - Monitor error rates (Sentry)
 - Check deployment status
 
 ### Weekly
+
 - Review slow queries
 - Check disk space
 - Update dependencies (Dependabot PRs)
 
 ### Monthly
+
 - Review alert thresholds
 - Test rollback procedures
 - Rotate secrets (quarterly)
@@ -593,11 +639,13 @@ Your CI/CD is working correctly when:
 ## What Makes This Production-Ready
 
 ✅ **Comprehensive Testing**
+
 - Unit tests, E2E tests, type checking, linting
 - Tests on multiple Node versions
 - Database migrations validated
 
 ✅ **Security First**
+
 - Dependency scanning
 - Secret detection
 - Security headers
@@ -605,12 +653,14 @@ Your CI/CD is working correctly when:
 - Environment-specific secrets
 
 ✅ **Zero-Downtime Deployments**
+
 - Health checks before routing traffic
 - Automatic rollback on failure
 - Staging environment for validation
 - Manual production approval
 
 ✅ **Observability**
+
 - Structured logging
 - Health check endpoints
 - Error tracking ready
@@ -618,6 +668,7 @@ Your CI/CD is working correctly when:
 - Alert templates
 
 ✅ **Disaster Recovery**
+
 - Automated backups (Render)
 - Instant frontend rollback (Vercel)
 - Fast backend rollback (Render)
@@ -625,6 +676,7 @@ Your CI/CD is working correctly when:
 - Documented incident response
 
 ✅ **Developer Experience**
+
 - Fast CI feedback (~7 min)
 - PR preview deployments
 - Clear error messages
@@ -632,6 +684,7 @@ Your CI/CD is working correctly when:
 - Automated cleanup
 
 ✅ **Cost Effective**
+
 - ~$30-35/month for production
 - Free tier for staging
 - No unnecessary services
@@ -642,6 +695,7 @@ Your CI/CD is working correctly when:
 ## Acknowledgments
 
 This CI/CD setup follows industry best practices from:
+
 - Google SRE principles
 - GitHub Actions best practices
 - Docker multi-stage build patterns

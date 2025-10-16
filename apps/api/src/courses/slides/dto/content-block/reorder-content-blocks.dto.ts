@@ -1,6 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsArray, IsString, IsNotEmpty, IsInt, Min, ValidateNested, ArrayMinSize } from 'class-validator';
+import {
+  IsArray,
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  Min,
+  ValidateNested,
+  ArrayMinSize,
+} from 'class-validator';
 
 export class BlockOrderItem {
   @ApiProperty({ description: 'Content block ID' })

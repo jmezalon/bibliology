@@ -4,14 +4,20 @@ import { z } from 'zod';
 
 // Heading content schema
 const HeadingContentSchema = z.object({
-  text: z.string().min(1, 'Heading text is required').max(200, 'Heading must not exceed 200 characters'),
+  text: z
+    .string()
+    .min(1, 'Heading text is required')
+    .max(200, 'Heading must not exceed 200 characters'),
   level: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   alignment: z.enum(['left', 'center', 'right']).optional(),
 });
 
 // Text content schema
 const TextContentSchema = z.object({
-  html: z.string().min(1, 'Text content is required').max(5000, 'Text must not exceed 5000 characters'),
+  html: z
+    .string()
+    .min(1, 'Text content is required')
+    .max(5000, 'Text must not exceed 5000 characters'),
 });
 
 // Image content schema
@@ -29,32 +35,37 @@ const VerseContentSchema = z.object({
 });
 
 // Vocabulary content schema
-const VocabularyContentSchema = z.object({
-  term_en: z.string().optional(),
-  term_fr: z.string().optional(),
-  definition: z.string().min(1, 'Definition is required'),
-  partOfSpeech: z
-    .enum([
-      'noun',
-      'verb',
-      'adjective',
-      'adverb',
-      'pronoun',
-      'preposition',
-      'conjunction',
-      'interjection',
-      'other',
-    ])
-    .optional(),
-  pronunciation: z.string().optional(),
-}).refine((data) => data.term_en || data.term_fr, {
-  message: 'At least one term (English or French) is required',
-});
+const VocabularyContentSchema = z
+  .object({
+    term_en: z.string().optional(),
+    term_fr: z.string().optional(),
+    definition: z.string().min(1, 'Definition is required'),
+    partOfSpeech: z
+      .enum([
+        'noun',
+        'verb',
+        'adjective',
+        'adverb',
+        'pronoun',
+        'preposition',
+        'conjunction',
+        'interjection',
+        'other',
+      ])
+      .optional(),
+    pronunciation: z.string().optional(),
+  })
+  .refine((data) => data.term_en || data.term_fr, {
+    message: 'At least one term (English or French) is required',
+  });
 
 // List content schema
 const ListContentSchema = z.object({
   listStyle: z.enum(['bullet', 'numbered']),
-  items: z.array(z.string()).min(1, 'List must have at least one item').max(20, 'List must not exceed 20 items'),
+  items: z
+    .array(z.string())
+    .min(1, 'List must have at least one item')
+    .max(20, 'List must not exceed 20 items'),
 });
 
 // Callout content schema
@@ -68,7 +79,10 @@ const CalloutContentSchema = z.object({
 const DividerContentSchema = z.object({
   style: z.enum(['solid', 'dashed', 'dotted']).default('solid'),
   width: z.enum(['full', 'half', 'quarter']).default('full'),
-  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
 });
 
 // Quiz content schema (quiz blocks reference Quiz model via quiz_id)

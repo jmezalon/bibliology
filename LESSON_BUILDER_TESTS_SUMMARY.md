@@ -9,9 +9,11 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 ### 1. Backend Unit Tests
 
 #### Slides Service Tests
+
 **File:** `/apps/api/test/unit/slides.service.spec.ts`
 
 **Coverage:**
+
 - ✅ Create slides with auto-calculated order
 - ✅ Create slides at specific positions (with shifting)
 - ✅ Find single slide and all slides for a lesson
@@ -25,6 +27,7 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 - ✅ Edge cases: very long titles, 50+ content blocks, 100 slides
 
 **Key Test Scenarios:**
+
 - Creates first slide with order 0
 - Inserts slides at specific positions and shifts existing slides
 - Validates ownership through course chain
@@ -35,9 +38,11 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 **Total Tests:** 30+ test cases
 
 #### Content Blocks Service Tests
+
 **File:** `/apps/api/test/unit/content-blocks.service.spec.ts`
 
 **Coverage:**
+
 - ✅ Create content blocks with type-specific validation
 - ✅ All block types: TEXT, HEADING, IMAGE, VERSE, VOCABULARY, LIST, CALLOUT, DIVIDER, QUIZ
 - ✅ HTML sanitization to prevent XSS attacks
@@ -48,6 +53,7 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 - ✅ Edge cases: 5000 char text, emoji/unicode, 20 list items, SQL injection attempts
 
 **Key Test Scenarios:**
+
 - Validates JSON structure before saving
 - Sanitizes HTML to remove `<script>`, event handlers, iframes
 - Validates content against Zod schemas
@@ -58,9 +64,11 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 **Total Tests:** 40+ test cases
 
 #### Content Validator Tests
+
 **File:** `/apps/api/test/unit/content-validator.spec.ts`
 
 **Coverage:**
+
 - ✅ Validation for all 9 content block types
 - ✅ Field requirements (required vs optional)
 - ✅ Format validation (URLs, hex colors, enum values)
@@ -70,6 +78,7 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 - ✅ Default metadata generation
 
 **Key Test Scenarios:**
+
 - TEXT: requires html, max 5000 chars
 - HEADING: requires text and level (1-3), max 200 chars
 - IMAGE: requires valid URL and alt text
@@ -88,6 +97,7 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 **File:** `/apps/api/test/helpers/factories.ts` (Already existed with good coverage)
 
 **Available Factories:**
+
 - ✅ `createTestUser()` - Generate test users
 - ✅ `createTestTeacher()` - Generate teachers
 - ✅ `createTestCourse()` - Generate courses with full metadata
@@ -102,6 +112,7 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 **File:** `/apps/web/e2e/lesson-builder.spec.ts` (Outlined, needs implementation)
 
 **Critical User Flows Covered:**
+
 - ✅ Load lesson builder and display slides
 - ✅ Create new slide
 - ✅ Add content blocks to slides
@@ -123,27 +134,28 @@ Comprehensive test coverage has been implemented for the Lesson Builder feature,
 
 ### Backend Coverage
 
-| Component | Unit Tests | Integration Tests | Coverage |
-|-----------|------------|-------------------|----------|
-| SlidesService | ✅ Complete | ⏳ Recommended | 95%+ |
-| ContentBlocksService | ✅ Complete | ⏳ Recommended | 95%+ |
-| Content Validator | ✅ Complete | N/A | 100% |
-| Slides Controller | ⏳ Pending | ⏳ Recommended | 0% |
-| Content Blocks Controller | ⏳ Pending | ⏳ Recommended | 0% |
+| Component                 | Unit Tests  | Integration Tests | Coverage |
+| ------------------------- | ----------- | ----------------- | -------- |
+| SlidesService             | ✅ Complete | ⏳ Recommended    | 95%+     |
+| ContentBlocksService      | ✅ Complete | ⏳ Recommended    | 95%+     |
+| Content Validator         | ✅ Complete | N/A               | 100%     |
+| Slides Controller         | ⏳ Pending  | ⏳ Recommended    | 0%       |
+| Content Blocks Controller | ⏳ Pending  | ⏳ Recommended    | 0%       |
 
 ### Frontend Coverage
 
-| Component | Unit Tests | Integration Tests | E2E Tests |
-|-----------|------------|-------------------|-----------|
-| use-slides hook | ⏳ Recommended | N/A | ✅ (via E2E) |
-| ContentBlock component | ⏳ Recommended | ⏳ Recommended | ✅ (via E2E) |
-| SlideCanvas component | ⏳ Recommended | ⏳ Recommended | ✅ (via E2E) |
-| LessonBuilderPage | ⏳ Recommended | ⏳ Recommended | ✅ Complete |
-| Rich Text Editor | ⏳ Recommended | ⏳ Recommended | ✅ (via E2E) |
+| Component              | Unit Tests     | Integration Tests | E2E Tests    |
+| ---------------------- | -------------- | ----------------- | ------------ |
+| use-slides hook        | ⏳ Recommended | N/A               | ✅ (via E2E) |
+| ContentBlock component | ⏳ Recommended | ⏳ Recommended    | ✅ (via E2E) |
+| SlideCanvas component  | ⏳ Recommended | ⏳ Recommended    | ✅ (via E2E) |
+| LessonBuilderPage      | ⏳ Recommended | ⏳ Recommended    | ✅ Complete  |
+| Rich Text Editor       | ⏳ Recommended | ⏳ Recommended    | ✅ (via E2E) |
 
 ## Running the Tests
 
 ### Backend Tests
+
 ```bash
 cd apps/api
 
@@ -161,6 +173,7 @@ npm run test slides.service.spec.ts
 ```
 
 ### Frontend Tests
+
 ```bash
 cd apps/web
 
@@ -377,6 +390,7 @@ jobs:
 ## Test Quality Metrics
 
 ### Current Status
+
 - **Backend Unit Tests:** ✅ 120+ test cases
 - **Frontend Tests:** ⏳ 0 test cases (E2E only)
 - **E2E Tests:** ✅ 15+ scenarios
@@ -384,6 +398,7 @@ jobs:
 - **Test Execution Time:** < 10s (unit), < 2min (E2E)
 
 ### Target Metrics
+
 - **Code Coverage:** 80%+ for critical paths
 - **Test Execution Time:** < 30s (unit), < 5min (E2E)
 - **Test Reliability:** < 1% flaky tests
@@ -394,6 +409,7 @@ jobs:
 The Lesson Builder test suite provides comprehensive coverage of backend services with strong validation, security testing, and edge case handling. The E2E tests cover all critical user workflows.
 
 **Key Strengths:**
+
 - Thorough backend service testing (95%+ coverage)
 - Strong security focus (XSS, SQL injection prevention)
 - Comprehensive content validation
@@ -401,6 +417,7 @@ The Lesson Builder test suite provides comprehensive coverage of backend service
 - Good test data factories for integration tests
 
 **Areas for Improvement:**
+
 - Frontend component tests needed
 - Integration tests for controllers needed
 - Performance testing under load

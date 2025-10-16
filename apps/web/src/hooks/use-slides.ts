@@ -498,7 +498,8 @@ export function useReorderContentBlocks(slideId: string, lessonId: string) {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: ReorderContentBlocksRequest) => apiClient.reorderContentBlocks(slideId, data),
+    mutationFn: (data: ReorderContentBlocksRequest) =>
+      apiClient.reorderContentBlocks(slideId, data),
 
     onMutate: async (data) => {
       await queryClient.cancelQueries({ queryKey: slidesKeys.detail(slideId) });

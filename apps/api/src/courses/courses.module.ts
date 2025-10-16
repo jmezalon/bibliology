@@ -6,7 +6,10 @@ import { CoursesController } from './courses.controller';
 import { CoursesService } from './courses.service';
 import { LessonsController, CourseLessonsController } from './lessons.controller';
 import { LessonsService } from './lessons.service';
-import { ContentBlocksController, SlideContentBlocksController } from './slides/content-blocks.controller';
+import {
+  ContentBlocksController,
+  SlideContentBlocksController,
+} from './slides/content-blocks.controller';
 import { ContentBlocksService } from './slides/content-blocks.service';
 import { SlidesController, LessonSlidesController } from './slides/slides.controller';
 import { SlidesService } from './slides/slides.service';
