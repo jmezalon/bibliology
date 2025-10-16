@@ -204,6 +204,12 @@ export function validateBlock(
   metadata?: Record<string, unknown>,
 ): BlockValidation {
   const rules = BLOCK_VALIDATION_RULES[blockType];
+
+  // If no rules exist for this block type, it's valid by default
+  if (!rules || rules.length === 0) {
+    return { isValid: true, errors: [] };
+  }
+
   const errors: { field: string; message: string }[] = [];
 
   for (const rule of rules) {

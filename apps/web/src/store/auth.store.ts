@@ -6,6 +6,7 @@ import type { User, LoginRequest, RegisterRequest } from '../types/auth';
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -27,6 +28,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -40,8 +42,12 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authApi.login(credentials);
 
+          // Store token in localStorage for API clients
+          localStorage.setItem('auth_token', response.access_token);
+
           set({
             user: response.user,
+            token: response.access_token,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -55,8 +61,12 @@ export const useAuthStore = create<AuthState>()(
                 'Login failed. Please try again.'
               : 'Login failed. Please try again.';
 
+          // Clear token on error
+          localStorage.removeItem('auth_token');
+
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
             isLoading: false,
             error: errorMessage,
@@ -75,8 +85,12 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authApi.register(data);
 
+          // Store token in localStorage for API clients
+          localStorage.setItem('auth_token', response.access_token);
+
           set({
             user: response.user,
+            token: response.access_token,
             isAuthenticated: true,
             isLoading: false,
             error: null,
@@ -90,8 +104,12 @@ export const useAuthStore = create<AuthState>()(
                 'Registration failed. Please try again.'
               : 'Registration failed. Please try again.';
 
+          // Clear token on error
+          localStorage.removeItem('auth_token');
+
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
             isLoading: false,
             error: errorMessage,
@@ -110,8 +128,12 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           console.error('Logout error:', error);
         } finally {
+          // Clear token from localStorage
+          localStorage.removeItem('auth_token');
+
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
             isLoading: false,
             error: null,
@@ -137,8 +159,12 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: unknown) {
           console.error('Failed to refresh user:', error);
 
+          // Clear token on refresh failure
+          localStorage.removeItem('auth_token');
+
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
             isLoading: false,
             error: null,
@@ -169,6 +195,7 @@ export const useAuthStore = create<AuthState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
     },

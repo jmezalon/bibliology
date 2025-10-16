@@ -16,6 +16,7 @@ import type {
   ReorderSlidesRequest,
   ReorderContentBlocksRequest,
 } from '../types/lesson-builder';
+import { SlideLayoutType } from '../types/lesson-builder';
 
 import { toast } from './use-toast';
 
@@ -86,7 +87,7 @@ export function useCreateSlide(lessonId: string) {
         const optimisticSlide: Slide = {
           id: tempId,
           lesson_id: lessonId,
-          layout: newSlide.layout,
+          layout: newSlide.layout || SlideLayoutType.CONTENT,
           slide_order: previousSlides.length,
           title_en: newSlide.title_en,
           title_fr: newSlide.title_fr,
@@ -367,6 +368,7 @@ export function useCreateContentBlock(slideId: string, lessonId: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: slidesKeys.detail(slideId) });
       void queryClient.invalidateQueries({ queryKey: slidesKeys.list(lessonId) });
+      void queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] });
     },
   });
 }
@@ -409,6 +411,7 @@ export function useUpdateContentBlock(slideId: string, lessonId: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: slidesKeys.detail(slideId) });
       void queryClient.invalidateQueries({ queryKey: slidesKeys.list(lessonId) });
+      void queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] });
     },
   });
 }
@@ -459,6 +462,7 @@ export function useDeleteContentBlock(slideId: string, lessonId: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: slidesKeys.detail(slideId) });
       void queryClient.invalidateQueries({ queryKey: slidesKeys.list(lessonId) });
+      void queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] });
     },
   });
 }
@@ -479,6 +483,7 @@ export function useDuplicateContentBlock(slideId: string, lessonId: string) {
       });
       void queryClient.invalidateQueries({ queryKey: slidesKeys.detail(slideId) });
       void queryClient.invalidateQueries({ queryKey: slidesKeys.list(lessonId) });
+      void queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] });
     },
 
     onError: (err) => {
@@ -537,6 +542,7 @@ export function useReorderContentBlocks(slideId: string, lessonId: string) {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: slidesKeys.detail(slideId) });
       void queryClient.invalidateQueries({ queryKey: slidesKeys.list(lessonId) });
+      void queryClient.invalidateQueries({ queryKey: ['lessons', lessonId] });
     },
   });
 }

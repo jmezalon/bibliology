@@ -47,12 +47,13 @@ export interface Lesson {
 }
 
 export interface CreateCourseRequest {
+  slug: string;
   title_en: string;
   title_fr?: string;
   description_en: string;
   description_fr?: string;
-  level: CourseLevel;
-  category: string;
+  difficulty?: string;
+  category?: string;
   thumbnail_url?: string;
 }
 
@@ -62,12 +63,13 @@ export interface UpdateCourseRequest extends Partial<CreateCourseRequest> {
 
 export interface CreateLessonRequest {
   course_id: string;
+  slug: string;
   title_en: string;
   title_fr?: string;
-  description_en: string;
+  description_en?: string;
   description_fr?: string;
-  duration_minutes: number;
-  order?: number;
+  lesson_order: number;
+  estimated_minutes?: number;
 }
 
 export interface UpdateLessonRequest extends Partial<CreateLessonRequest> {

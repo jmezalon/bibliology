@@ -1,8 +1,4 @@
-import type {
-  Course,
-  CreateCourseRequest,
-  UpdateCourseRequest,
-} from '../../types/course';
+import type { Course, CreateCourseRequest, UpdateCourseRequest } from '../../types/course';
 
 import apiClient from './client';
 

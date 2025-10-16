@@ -141,8 +141,8 @@ export interface LessonWithSlides {
 
 export interface CreateSlideRequest {
   lesson_id: string;
-  layout: SlideLayoutType;
-  order?: number;
+  layout?: SlideLayoutType;
+  slide_order?: number;
   title_en?: string;
   title_fr?: string;
 }

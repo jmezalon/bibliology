@@ -1,8 +1,4 @@
-import type {
-  Lesson,
-  CreateLessonRequest,
-  UpdateLessonRequest,
-} from '../../types/course';
+import type { Lesson, CreateLessonRequest, UpdateLessonRequest } from '../../types/course';
 
 import apiClient from './client';
 
@@ -35,17 +31,10 @@ export const lessonsApi = {
   /**
    * Get all lessons for a course
    */
-  getAllForCourse: async (
-    courseId: string,
-    page = 1,
-    limit = 10,
-  ): Promise<LessonListResponse> => {
-    const response = await apiClient.get<LessonListResponse>(
-      `/courses/${courseId}/lessons`,
-      {
-        params: { page, limit },
-      },
-    );
+  getAllForCourse: async (courseId: string, page = 1, limit = 10): Promise<LessonListResponse> => {
+    const response = await apiClient.get<LessonListResponse>(`/courses/${courseId}/lessons`, {
+      params: { page, limit },
+    });
     return response.data;
   },
 
@@ -75,14 +64,8 @@ export const lessonsApi = {
   /**
    * Reorder slides within a lesson
    */
-  reorderSlides: async (
-    lessonId: string,
-    slideIds: string[],
-  ): Promise<Lesson> => {
-    const response = await apiClient.patch<Lesson>(
-      `/lessons/${lessonId}/reorder`,
-      { slideIds },
-    );
+  reorderSlides: async (lessonId: string, slideIds: string[]): Promise<Lesson> => {
+    const response = await apiClient.patch<Lesson>(`/lessons/${lessonId}/reorder`, { slideIds });
     return response.data;
   },
 };
