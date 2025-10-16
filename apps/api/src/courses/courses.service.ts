@@ -9,12 +9,7 @@ import { LessonStatus, Prisma } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import {
-  CreateCourseDto,
-  UpdateCourseDto,
-  CourseResponseDto,
-  CourseListResponseDto,
-} from './dto';
+import { CreateCourseDto, UpdateCourseDto, CourseResponseDto, CourseListResponseDto } from './dto';
 
 // Type for course with teacher and counts
 type CourseWithRelations = Prisma.CourseGetPayload<{
@@ -46,19 +41,14 @@ export class CoursesService {
    * @param createCourseDto - Course creation data
    * @returns Created course
    */
-  async create(
-    teacherId: string,
-    createCourseDto: CreateCourseDto,
-  ): Promise<CourseResponseDto> {
+  async create(teacherId: string, createCourseDto: CreateCourseDto): Promise<CourseResponseDto> {
     // Check if slug is already taken
     const existingCourse = await this.prisma.course.findUnique({
       where: { slug: createCourseDto.slug },
     });
 
     if (existingCourse) {
-      throw new ConflictException(
-        `Course with slug '${createCourseDto.slug}' already exists`,
-      );
+      throw new ConflictException(`Course with slug '${createCourseDto.slug}' already exists`);
     }
 
     // Create course
@@ -96,11 +86,7 @@ export class CoursesService {
    * @param limit - Items per page
    * @returns Paginated list of courses
    */
-  async findAllForTeacher(
-    teacherId: string,
-    page = 1,
-    limit = 10,
-  ): Promise<CourseListResponseDto> {
+  async findAllForTeacher(teacherId: string, page = 1, limit = 10): Promise<CourseListResponseDto> {
     const skip = (page - 1) * limit;
 
     const [courses, total] = await Promise.all([
@@ -146,10 +132,7 @@ export class CoursesService {
    * @param teacherId - Optional teacher ID for ownership verification
    * @returns Course details
    */
-  async findOne(
-    id: string,
-    teacherId?: string,
-  ): Promise<CourseResponseDto> {
+  async findOne(id: string, teacherId?: string): Promise<CourseResponseDto> {
     const course = await this.prisma.course.findUnique({
       where: { id },
       include: {
@@ -176,9 +159,7 @@ export class CoursesService {
 
     // Verify ownership if teacherId is provided
     if (teacherId && course.teacher_id !== teacherId) {
-      throw new ForbiddenException(
-        'You do not have permission to access this course',
-      );
+      throw new ForbiddenException('You do not have permission to access this course');
     }
 
     return this.mapToCourseResponse(course);
@@ -209,9 +190,7 @@ export class CoursesService {
       });
 
       if (existingCourse) {
-        throw new ConflictException(
-          `Course with slug '${updateCourseDto.slug}' already exists`,
-        );
+        throw new ConflictException(`Course with slug '${updateCourseDto.slug}' already exists`);
       }
     }
 
@@ -276,11 +255,7 @@ export class CoursesService {
    * @param publish - true to publish, false to unpublish
    * @returns Updated course
    */
-  async togglePublish(
-    id: string,
-    teacherId: string,
-    publish: boolean,
-  ): Promise<CourseResponseDto> {
+  async togglePublish(id: string, teacherId: string, publish: boolean): Promise<CourseResponseDto> {
     // Verify course exists and teacher owns it
     await this.findOne(id, teacherId);
 
@@ -291,9 +266,7 @@ export class CoursesService {
       });
 
       if (lessonCount === 0) {
-        throw new BadRequestException(
-          'Cannot publish a course without any lessons',
-        );
+        throw new BadRequestException('Cannot publish a course without any lessons');
       }
     }
 
@@ -343,9 +316,7 @@ export class CoursesService {
     }
 
     if (course.teacher_id !== teacherId) {
-      throw new ForbiddenException(
-        'You do not have permission to access this course',
-      );
+      throw new ForbiddenException('You do not have permission to access this course');
     }
 
     return true;
@@ -354,9 +325,7 @@ export class CoursesService {
   /**
    * Map Prisma course object to CourseResponseDto
    */
-  private mapToCourseResponse = (
-    course: CourseWithRelations,
-  ): CourseResponseDto => {
+  private mapToCourseResponse = (course: CourseWithRelations): CourseResponseDto => {
     return {
       id: course.id,
       slug: course.slug,

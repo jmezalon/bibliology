@@ -279,17 +279,13 @@ describe('Auth E2E Tests', () => {
       const cookies = response.headers['set-cookie'];
       expect(cookies).toBeDefined();
       if (Array.isArray(cookies)) {
-        const accessTokenCookie = cookies.find((c: string) =>
-          c.startsWith('access_token='),
-        );
+        const accessTokenCookie = cookies.find((c: string) => c.startsWith('access_token='));
         expect(accessTokenCookie).toContain('Max-Age=0');
       }
     });
 
     it('should require authentication', async () => {
-      await request(app.getHttpServer())
-        .post('/auth/logout')
-        .expect(401);
+      await request(app.getHttpServer()).post('/auth/logout').expect(401);
     });
   });
 
@@ -327,9 +323,7 @@ describe('Auth E2E Tests', () => {
     });
 
     it('should return 401 without token', async () => {
-      await request(app.getHttpServer())
-        .get('/auth/me')
-        .expect(401);
+      await request(app.getHttpServer()).get('/auth/me').expect(401);
     });
 
     it('should return 401 with invalid token', async () => {
@@ -352,12 +346,10 @@ describe('Auth E2E Tests', () => {
       const password = 'Password123!';
       const user = await createTestUser({ password });
 
-      const loginResponse = await request(app.getHttpServer())
-        .post('/auth/login')
-        .send({
-          email: user.email,
-          password,
-        });
+      const loginResponse = await request(app.getHttpServer()).post('/auth/login').send({
+        email: user.email,
+        password,
+      });
 
       const token = loginResponse.body.access_token;
 

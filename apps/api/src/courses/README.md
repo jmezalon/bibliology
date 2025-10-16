@@ -5,6 +5,7 @@ Comprehensive backend API for managing courses and lessons in the Bibliology lea
 ## Overview
 
 This module provides REST API endpoints for:
+
 - Course creation, retrieval, updating, and deletion
 - Lesson management within courses
 - Authorization and ownership verification
@@ -14,6 +15,7 @@ This module provides REST API endpoints for:
 ## Architecture
 
 ### Modules
+
 - **CoursesModule**: Main module that exports services and controllers
   - `CoursesService`: Business logic for course operations
   - `LessonsService`: Business logic for lesson operations
@@ -22,6 +24,7 @@ This module provides REST API endpoints for:
   - `CourseLessonsController`: Nested route for course lessons
 
 ### Security
+
 - **JWT Authentication**: All endpoints require valid JWT token
 - **Role-Based Access**: Only `TEACHER` and `ADMIN` roles can access these endpoints
 - **Ownership Verification**: Teachers can only manage their own courses
@@ -32,9 +35,11 @@ This module provides REST API endpoints for:
 ### Course Endpoints
 
 #### `POST /api/courses`
+
 Create a new course (teachers only)
 
 **Request Body:**
+
 ```json
 {
   "slug": "introduction-to-pneumatology",
@@ -51,6 +56,7 @@ Create a new course (teachers only)
 ```
 
 **Response:** `201 Created`
+
 ```json
 {
   "id": "clxxx...",
@@ -82,19 +88,23 @@ Create a new course (teachers only)
 ```
 
 **Errors:**
+
 - `400`: Invalid input data
 - `409`: Course slug already exists
 
 ---
 
 #### `GET /api/courses`
+
 Get all courses for the authenticated teacher (with pagination)
 
 **Query Parameters:**
+
 - `page` (optional): Page number (default: 1)
 - `limit` (optional): Items per page (default: 10)
 
 **Response:** `200 OK`
+
 ```json
 {
   "data": [
@@ -116,9 +126,11 @@ Get all courses for the authenticated teacher (with pagination)
 ---
 
 #### `GET /api/courses/:id`
+
 Get a single course by ID
 
 **Response:** `200 OK`
+
 ```json
 {
   "id": "clxxx...",
@@ -129,12 +141,14 @@ Get a single course by ID
 ```
 
 **Errors:**
+
 - `404`: Course not found
 - `403`: Not authorized to access this course
 
 ---
 
 #### `PUT /api/courses/:id`
+
 Update a course (owner only)
 
 **Request Body:** Same as create, all fields optional
@@ -142,6 +156,7 @@ Update a course (owner only)
 **Response:** `200 OK` - Updated course object
 
 **Errors:**
+
 - `404`: Course not found
 - `403`: Not authorized to update this course
 - `409`: Course slug already exists
@@ -149,16 +164,19 @@ Update a course (owner only)
 ---
 
 #### `DELETE /api/courses/:id`
+
 Delete a course with cascade (owner only)
 
 **Response:** `204 No Content`
 
 **Errors:**
+
 - `404`: Course not found
 - `403`: Not authorized to delete this course
 - `400`: Cannot delete course with active enrollments
 
 **Note:** This operation cascades to:
+
 - All lessons in the course
 - All slides in those lessons
 - All content blocks in those slides
@@ -167,9 +185,11 @@ Delete a course with cascade (owner only)
 ---
 
 #### `PATCH /api/courses/:id/publish`
+
 Publish or unpublish a course (owner only)
 
 **Request Body:**
+
 ```json
 {
   "publish": true
@@ -179,6 +199,7 @@ Publish or unpublish a course (owner only)
 **Response:** `200 OK` - Updated course object
 
 **Errors:**
+
 - `404`: Course not found
 - `403`: Not authorized to publish this course
 - `400`: Cannot publish course without lessons
@@ -188,9 +209,11 @@ Publish or unpublish a course (owner only)
 ### Lesson Endpoints
 
 #### `POST /api/lessons`
+
 Create a new lesson in a course (course owner only)
 
 **Request Body:**
+
 ```json
 {
   "course_id": "clxxx...",
@@ -207,6 +230,7 @@ Create a new lesson in a course (course owner only)
 ```
 
 **Response:** `201 Created`
+
 ```json
 {
   "id": "clzzz...",
@@ -235,6 +259,7 @@ Create a new lesson in a course (course owner only)
 ```
 
 **Errors:**
+
 - `400`: Invalid input data
 - `403`: Not authorized to access this course
 - `409`: Lesson slug or order already exists
@@ -242,9 +267,11 @@ Create a new lesson in a course (course owner only)
 ---
 
 #### `GET /api/courses/:courseId/lessons`
+
 Get all lessons for a course
 
 **Response:** `200 OK`
+
 ```json
 {
   "data": [
@@ -261,15 +288,18 @@ Get all lessons for a course
 ```
 
 **Errors:**
+
 - `404`: Course not found
 - `403`: Not authorized to access this course
 
 ---
 
 #### `GET /api/lessons/:id`
+
 Get a single lesson with all slides and content blocks
 
 **Response:** `200 OK`
+
 ```json
 {
   "id": "clzzz...",
@@ -306,12 +336,14 @@ Get a single lesson with all slides and content blocks
 ```
 
 **Errors:**
+
 - `404`: Lesson not found
 - `403`: Not authorized to access this lesson
 
 ---
 
 #### `PUT /api/lessons/:id`
+
 Update a lesson (course owner only)
 
 **Request Body:** Same as create (except course_id), all fields optional
@@ -319,6 +351,7 @@ Update a lesson (course owner only)
 **Response:** `200 OK` - Updated lesson object
 
 **Errors:**
+
 - `404`: Lesson not found
 - `403`: Not authorized to update this lesson
 - `409`: Lesson slug or order already exists
@@ -326,16 +359,19 @@ Update a lesson (course owner only)
 ---
 
 #### `DELETE /api/lessons/:id`
+
 Delete a lesson with cascade (course owner only)
 
 **Response:** `204 No Content`
 
 **Errors:**
+
 - `404`: Lesson not found
 - `403`: Not authorized to delete this lesson
 - `400`: Cannot delete lesson with student progress
 
 **Note:** This operation cascades to:
+
 - All slides in the lesson
 - All content blocks in those slides
 - All quizzes and questions
@@ -343,9 +379,11 @@ Delete a lesson with cascade (course owner only)
 ---
 
 #### `PATCH /api/lessons/:id/reorder`
+
 Reorder slides within a lesson (course owner only)
 
 **Request Body:**
+
 ```json
 {
   "slide_ids": ["claaa...", "clbbb...", "clccc..."]
@@ -355,6 +393,7 @@ Reorder slides within a lesson (course owner only)
 **Response:** `200 OK` - Updated lesson object with reordered slides
 
 **Errors:**
+
 - `404`: Lesson not found
 - `403`: Not authorized to modify this lesson
 - `400`: Invalid slide IDs provided (must all belong to this lesson)
@@ -364,6 +403,7 @@ Reorder slides within a lesson (course owner only)
 ## Data Models
 
 ### Course
+
 ```typescript
 {
   id: string;
@@ -387,6 +427,7 @@ Reorder slides within a lesson (course owner only)
 ```
 
 ### Lesson
+
 ```typescript
 {
   id: string;
@@ -409,6 +450,7 @@ Reorder slides within a lesson (course owner only)
 ```
 
 ### Slide
+
 ```typescript
 {
   id: string;
@@ -424,6 +466,7 @@ Reorder slides within a lesson (course owner only)
 ```
 
 ### ContentBlock
+
 ```typescript
 {
   id: string;
@@ -442,18 +485,22 @@ Reorder slides within a lesson (course owner only)
 ## Business Logic
 
 ### Authorization Rules
+
 1. **Course Access**: Teachers can only view/edit/delete their own courses
 2. **Lesson Access**: Teachers can only manage lessons in courses they own
 3. **Role Requirement**: All endpoints require `TEACHER` or `ADMIN` role
 
 ### Validation Rules
+
 1. **Unique Slugs**: Course and lesson slugs must be globally unique
 2. **Lesson Ordering**: Lesson orders must be unique within a course
 3. **Publishing**: Courses must have at least one lesson to be published
 4. **Deletion**: Cannot delete courses with active enrollments or lessons with student progress
 
 ### Transactions
+
 Complex operations use database transactions to ensure data integrity:
+
 - Course deletion (cascades to lessons, slides, content blocks)
 - Lesson deletion (cascades to slides, content blocks)
 - Slide reordering (updates multiple records atomically)
@@ -463,6 +510,7 @@ Complex operations use database transactions to ensure data integrity:
 ## Error Handling
 
 All endpoints return standard HTTP status codes:
+
 - `200`: Success
 - `201`: Created
 - `204`: No Content (successful deletion)
@@ -474,6 +522,7 @@ All endpoints return standard HTTP status codes:
 - `500`: Internal Server Error
 
 Error response format:
+
 ```json
 {
   "statusCode": 400,
@@ -489,6 +538,7 @@ Error response format:
 ### Manual Testing with cURL
 
 **Create a course:**
+
 ```bash
 curl -X POST http://localhost:3000/api/courses \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -501,12 +551,14 @@ curl -X POST http://localhost:3000/api/courses \
 ```
 
 **Get all courses:**
+
 ```bash
 curl -X GET http://localhost:3000/api/courses?page=1&limit=10 \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 **Create a lesson:**
+
 ```bash
 curl -X POST http://localhost:3000/api/lessons \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
@@ -538,6 +590,7 @@ curl -X POST http://localhost:3000/api/lessons \
 See `/apps/api/prisma/schema.prisma` for the complete database schema.
 
 Key relationships:
+
 - `Course` → `Lesson` (one-to-many, cascade delete)
 - `Lesson` → `Slide` (one-to-many, cascade delete)
 - `Slide` → `ContentBlock` (one-to-many, cascade delete)

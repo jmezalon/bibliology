@@ -14,13 +14,7 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -149,10 +143,7 @@ export class CoursesController {
     status: 400,
     description: 'Cannot delete course with active enrollments',
   })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser('id') teacherId: string,
-  ): Promise<void> {
+  async remove(@Param('id') id: string, @CurrentUser('id') teacherId: string): Promise<void> {
     return this.coursesService.remove(id, teacherId);
   }
 

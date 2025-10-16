@@ -8,9 +8,7 @@ import { getTestJwtSecret } from './auth-helper';
  * Create a test NestJS application
  */
 export async function createTestApp(module: any): Promise<INestApplication> {
-  const moduleFixture: TestingModule = await Test.createTestingModule(
-    module,
-  ).compile();
+  const moduleFixture: TestingModule = await Test.createTestingModule(module).compile();
 
   const app = moduleFixture.createNestApplication();
 
@@ -46,10 +44,7 @@ export function createTestModule(imports: any[], providers: any[]) {
         signOptions: { expiresIn: '7d' },
       }),
     ],
-    providers: [
-      PrismaService,
-      ...providers,
-    ],
+    providers: [PrismaService, ...providers],
   };
 }
 
@@ -126,10 +121,7 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Extract cookies from response headers
  */
-export function extractCookie(
-  response: any,
-  cookieName: string,
-): string | undefined {
+export function extractCookie(response: any, cookieName: string): string | undefined {
   const cookies = response.headers['set-cookie'];
   if (!cookies) return undefined;
 

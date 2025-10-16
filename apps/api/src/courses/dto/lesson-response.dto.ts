@@ -142,7 +142,7 @@ export class ReorderSlidesDto {
   @ApiProperty({
     description: 'Array of slide IDs in the new order',
     type: [String],
-    example: ['uuid1', 'uuid2', 'uuid3']
+    example: ['uuid1', 'uuid2', 'uuid3'],
   })
   @IsArray()
   @ArrayMinSize(1, { message: 'At least one slide ID is required' })

@@ -1,8 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  ConflictException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
@@ -115,9 +112,7 @@ describe('AuthService', () => {
 
       prismaService.user.findUnique.mockResolvedValue(existingUser);
 
-      await expect(authService.register(registerDto)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(authService.register(registerDto)).rejects.toThrow(ConflictException);
       await expect(authService.register(registerDto)).rejects.toThrow(
         'User with this email already exists',
       );
@@ -278,12 +273,8 @@ describe('AuthService', () => {
 
       prismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        'Invalid credentials',
-      );
+      await expect(authService.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(authService.login(loginDto)).rejects.toThrow('Invalid credentials');
 
       // Verify update was never called
       expect(prismaService.user.update).not.toHaveBeenCalled();
@@ -310,12 +301,8 @@ describe('AuthService', () => {
 
       prismaService.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        'Invalid credentials',
-      );
+      await expect(authService.login(loginDto)).rejects.toThrow(UnauthorizedException);
+      await expect(authService.login(loginDto)).rejects.toThrow('Invalid credentials');
 
       // Verify update was never called
       expect(prismaService.user.update).not.toHaveBeenCalled();
@@ -329,9 +316,7 @@ describe('AuthService', () => {
 
       prismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(authService.login(loginDto)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(authService.login(loginDto)).rejects.toThrow(UnauthorizedException);
 
       // The service should still throw even when user doesn't exist
       // (bcrypt.compare runs with a dummy hash to prevent timing attacks)
@@ -367,12 +352,8 @@ describe('AuthService', () => {
     it('should throw UnauthorizedException when user not found', async () => {
       prismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(authService.validateUser('invalid-id')).rejects.toThrow(
-        UnauthorizedException,
-      );
-      await expect(authService.validateUser('invalid-id')).rejects.toThrow(
-        'User not found',
-      );
+      await expect(authService.validateUser('invalid-id')).rejects.toThrow(UnauthorizedException);
+      await expect(authService.validateUser('invalid-id')).rejects.toThrow('User not found');
     });
   });
 

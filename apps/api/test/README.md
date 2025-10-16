@@ -24,6 +24,7 @@ test/
 ## Running Tests
 
 ### Unit Tests (Fast, with mocked dependencies)
+
 ```bash
 npm run test:unit              # Run all unit tests
 npm run test:watch             # Run tests in watch mode
@@ -31,11 +32,13 @@ npm run test:cov:unit          # Run with coverage report
 ```
 
 ### E2E Tests (Slower, with real database)
+
 ```bash
 npm run test:e2e               # Run all E2E tests
 ```
 
 ### All Tests
+
 ```bash
 npm run test:all               # Run both unit and E2E tests
 npm run test:cov               # Run all tests with coverage
@@ -59,6 +62,7 @@ npm run db:migrate
 ## Coverage Thresholds
 
 The test suite enforces minimum coverage requirements:
+
 - Lines: 80%
 - Functions: 80%
 - Branches: 75%
@@ -69,13 +73,17 @@ View coverage reports in `/coverage/index.html` after running `npm run test:cov`
 ## Test Categories
 
 ### Unit Tests
+
 Tests individual service methods with mocked dependencies:
+
 - ✅ AuthService: register, login, validation, password hashing
 - ✅ CoursesService: CRUD operations, ownership verification, pagination
 - ✅ LessonsService: CRUD operations, slide reordering, cascade deletes
 
 ### E2E Tests
+
 Tests full API endpoints with real HTTP requests:
+
 - ✅ Auth endpoints: POST /auth/register, POST /auth/login, GET /auth/me, POST /auth/logout
 - ✅ Course endpoints: CRUD + publish/unpublish
 - ✅ Lesson endpoints: CRUD + slide reordering
@@ -83,6 +91,7 @@ Tests full API endpoints with real HTTP requests:
 ## Test Helpers
 
 ### Factories (`test/helpers/factories.ts`)
+
 - `createTestUser(overrides?)` - Create test user
 - `createTestTeacher(overrides?)` - Create test teacher
 - `createTestCourse(teacherId, overrides?)` - Create test course
@@ -93,11 +102,13 @@ Tests full API endpoints with real HTTP requests:
 - `seedTestData()` - Seed common test fixtures
 
 ### Auth Helpers (`test/helpers/auth-helper.ts`)
+
 - `generateAuthToken(jwtService, userId, email, role)` - Generate JWT token
 - `authenticatedRequest(app, options)` - Make authenticated HTTP request
 - `getTestJwtSecret()` - Get JWT secret for testing
 
 ### Utilities (`test/helpers/test-utils.ts`)
+
 - `createTestApp(module)` - Create NestJS test application
 - `randomEmail()` - Generate random email
 - `randomSlug()` - Generate random slug
@@ -107,6 +118,7 @@ Tests full API endpoints with real HTTP requests:
 ## Writing New Tests
 
 ### Unit Test Example
+
 ```typescript
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -144,6 +156,7 @@ describe('MyService', () => {
 ```
 
 ### E2E Test Example
+
 ```typescript
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
 import { INestApplication } from '@nestjs/common';
@@ -183,6 +196,7 @@ describe('My E2E Tests', () => {
 ## Test Scenarios Covered
 
 ### Authentication
+
 - ✅ Successful registration
 - ✅ Duplicate email rejection
 - ✅ Password validation
@@ -193,6 +207,7 @@ describe('My E2E Tests', () => {
 - ✅ Role-based access
 
 ### Courses
+
 - ✅ Create course as teacher
 - ✅ Student cannot create course (403)
 - ✅ Slug uniqueness validation
@@ -205,6 +220,7 @@ describe('My E2E Tests', () => {
 - ✅ Cannot publish without lessons
 
 ### Lessons
+
 - ✅ Create lesson in course
 - ✅ Only course owner can create lesson
 - ✅ Lesson order uniqueness in course
@@ -246,6 +262,7 @@ npm run test:unit -- --reporter=verbose
 ## CI/CD Integration
 
 Tests are designed to run in CI environments:
+
 - Fast unit tests run on every commit
 - E2E tests run on pull requests
 - Coverage reports uploaded to coverage services
@@ -254,6 +271,7 @@ Tests are designed to run in CI environments:
 ## Troubleshooting
 
 ### Database Connection Issues
+
 ```bash
 # Check database is running
 pg_isready
@@ -266,12 +284,14 @@ npm run db:reset
 ```
 
 ### Test Timeouts
+
 ```bash
 # Increase timeout for slow tests
 npm run test:e2e -- --testTimeout=60000
 ```
 
 ### Port Already in Use
+
 ```bash
 # Kill process on port
 lsof -ti:3000 | xargs kill -9
@@ -280,6 +300,7 @@ lsof -ti:3000 | xargs kill -9
 ## Contributing
 
 When adding new features:
+
 1. Write unit tests for services
 2. Write E2E tests for endpoints
 3. Update test data factories if needed

@@ -3,11 +3,13 @@
 ## Prerequisites
 
 1. Install dependencies:
+
 ```bash
 npm install
 ```
 
 2. Set up test database:
+
 ```bash
 # Create test database
 createdb bibliology_test
@@ -20,6 +22,7 @@ echo 'DATABASE_URL_TEST=postgresql://postgres:postgres@localhost:5432/bibliology
 ```
 
 3. Run migrations:
+
 ```bash
 npm run db:migrate
 ```
@@ -48,6 +51,7 @@ npm run test:watch
 ## Test Files Overview
 
 ### Unit Tests (test/unit/)
+
 - `auth.service.spec.ts` - 17 tests for authentication service
 - `courses.service.spec.ts` - 25 tests for courses service
 - `lessons.service.spec.ts` - 19 tests for lessons service
@@ -55,6 +59,7 @@ npm run test:watch
 **Total Unit Tests: 61 tests**
 
 ### E2E Tests (test/e2e/)
+
 - `auth.e2e-spec.ts` - 23 tests for auth endpoints
 - `courses.e2e-spec.ts` - 22 tests for course endpoints
 - `lessons.e2e-spec.ts` - 20 tests for lesson endpoints
@@ -62,6 +67,7 @@ npm run test:watch
 **Total E2E Tests: 65 tests**
 
 ### Test Helpers (test/helpers/)
+
 - `factories.ts` - Test data creation functions
 - `auth-helper.ts` - Authentication utilities
 - `test-utils.ts` - General test utilities
@@ -69,6 +75,7 @@ npm run test:watch
 ## Expected Output
 
 ### Successful Test Run
+
 ```
 ✓ test/unit/auth.service.spec.ts (17 tests) 234ms
 ✓ test/unit/courses.service.spec.ts (25 tests) 312ms
@@ -80,6 +87,7 @@ Duration    835ms
 ```
 
 ### Coverage Report
+
 ```
 Coverage report
 ----------------
@@ -94,21 +102,25 @@ All files                     |   85.23 |    81.45 |   87.12 |   85.67
 ## Debugging Failed Tests
 
 ### View detailed error messages
+
 ```bash
 npm run test:unit -- --reporter=verbose
 ```
 
 ### Run specific test file
+
 ```bash
 npm run test:unit auth.service.spec
 ```
 
 ### Run single test
+
 ```bash
 npm run test:unit -- -t "should successfully register"
 ```
 
 ### Check database state during E2E tests
+
 ```bash
 # In another terminal while tests are running
 psql bibliology_test
@@ -123,13 +135,17 @@ SELECT * FROM users;
 ## Common Issues & Solutions
 
 ### Issue: "DATABASE_URL_TEST is not set"
+
 **Solution:**
+
 ```bash
 export DATABASE_URL_TEST="postgresql://postgres:postgres@localhost:5432/bibliology_test"
 ```
 
 ### Issue: "Connection refused"
+
 **Solution:** Start PostgreSQL
+
 ```bash
 # macOS
 brew services start postgresql
@@ -139,20 +155,26 @@ sudo systemctl start postgresql
 ```
 
 ### Issue: "Database does not exist"
+
 **Solution:**
+
 ```bash
 createdb bibliology_test
 npm run db:migrate
 ```
 
 ### Issue: "Port 3000 already in use"
+
 **Solution:**
+
 ```bash
 lsof -ti:3000 | xargs kill -9
 ```
 
 ### Issue: Tests timeout
+
 **Solution:** Increase timeout
+
 ```bash
 npm run test:e2e -- --testTimeout=60000
 ```

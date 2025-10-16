@@ -277,9 +277,7 @@ describe('Courses E2E Tests', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      await request(app.getHttpServer())
-        .get('/courses')
-        .expect(401);
+      await request(app.getHttpServer()).get('/courses').expect(401);
     });
 
     it('should return 403 when authenticated as student', async () => {
@@ -328,7 +326,7 @@ describe('Courses E2E Tests', () => {
         .expect(404);
     });
 
-    it('should return 403 when accessing another teacher\'s course', async () => {
+    it("should return 403 when accessing another teacher's course", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -372,7 +370,7 @@ describe('Courses E2E Tests', () => {
       expect(response.body.description_en).toBe(updateData.description_en);
     });
 
-    it('should return 403 when updating another teacher\'s course', async () => {
+    it("should return 403 when updating another teacher's course", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -450,7 +448,7 @@ describe('Courses E2E Tests', () => {
       expect(response.body.message).toContain('active enrollment');
     });
 
-    it('should return 403 when deleting another teacher\'s course', async () => {
+    it("should return 403 when deleting another teacher's course", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -527,7 +525,7 @@ describe('Courses E2E Tests', () => {
       expect(response.body.published_at).toBeNull();
     });
 
-    it('should return 403 when publishing another teacher\'s course', async () => {
+    it("should return 403 when publishing another teacher's course", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',

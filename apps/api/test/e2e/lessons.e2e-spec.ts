@@ -69,7 +69,7 @@ describe('Lessons E2E Tests', () => {
         title_en: 'Introduction to the Holy Spirit',
         title_fr: 'Introduction au Saint-Esprit',
         description_en: 'Understanding the person and work of the Holy Spirit',
-        description_fr: 'Comprendre la personne et l\'œuvre du Saint-Esprit',
+        description_fr: "Comprendre la personne et l'œuvre du Saint-Esprit",
         lesson_order: 1,
         estimated_minutes: 45,
       };
@@ -124,7 +124,7 @@ describe('Lessons E2E Tests', () => {
         .expect(403);
     });
 
-    it('should return 403 when creating lesson in another teacher\'s course', async () => {
+    it("should return 403 when creating lesson in another teacher's course", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -277,7 +277,7 @@ describe('Lessons E2E Tests', () => {
       expect(response.body.totalPages).toBe(4);
     });
 
-    it('should return 403 when accessing another teacher\'s course', async () => {
+    it("should return 403 when accessing another teacher's course", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -329,7 +329,7 @@ describe('Lessons E2E Tests', () => {
         .expect(404);
     });
 
-    it('should return 403 when accessing another teacher\'s lesson', async () => {
+    it("should return 403 when accessing another teacher's lesson", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -373,7 +373,7 @@ describe('Lessons E2E Tests', () => {
       expect(response.body.description_en).toBe(updateData.description_en);
     });
 
-    it('should return 403 when updating another teacher\'s lesson', async () => {
+    it("should return 403 when updating another teacher's lesson", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -452,7 +452,7 @@ describe('Lessons E2E Tests', () => {
       expect(response.body.message).toContain('student progress');
     });
 
-    it('should return 403 when deleting another teacher\'s lesson', async () => {
+    it("should return 403 when deleting another teacher's lesson", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',
@@ -524,7 +524,7 @@ describe('Lessons E2E Tests', () => {
       expect(response.body.message).toContain('do not belong to this lesson');
     });
 
-    it('should return 403 when reordering another teacher\'s lesson', async () => {
+    it("should return 403 when reordering another teacher's lesson", async () => {
       const teacher1 = await createTestTeacher({
         email: 'teacher1@test.com',
         password: 'Password123!',

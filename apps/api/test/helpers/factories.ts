@@ -16,10 +16,7 @@ export async function createTestUser(
   } = {},
 ) {
   const defaultPassword = 'Password123!';
-  const password_hash = await bcrypt.hash(
-    overrides.password || defaultPassword,
-    10,
-  );
+  const password_hash = await bcrypt.hash(overrides.password || defaultPassword, 10);
 
   const user = await prisma.user.create({
     data: {
@@ -81,10 +78,8 @@ export async function createTestCourse(
       teacher_id: teacherId,
       title_en: overrides.title_en || 'Test Course',
       title_fr: overrides.title_fr || 'Cours de Test',
-      description_en:
-        overrides.description_en || 'This is a test course description',
-      description_fr:
-        overrides.description_fr || 'Ceci est une description de cours de test',
+      description_en: overrides.description_en || 'This is a test course description',
+      description_fr: overrides.description_fr || 'Ceci est une description de cours de test',
       status: overrides.status || LessonStatus.DRAFT,
       category: overrides.category || 'Biblical Studies',
       tags: overrides.tags || ['test', 'theology'],
@@ -139,11 +134,8 @@ export async function createTestLesson(
       course_id: courseId,
       title_en: overrides.title_en || 'Test Lesson',
       title_fr: overrides.title_fr || 'Leçon de Test',
-      description_en:
-        overrides.description_en || 'This is a test lesson description',
-      description_fr:
-        overrides.description_fr ||
-        'Ceci est une description de leçon de test',
+      description_en: overrides.description_en || 'This is a test lesson description',
+      description_fr: overrides.description_fr || 'Ceci est une description de leçon de test',
       lesson_order: overrides.lesson_order ?? 1,
       status: overrides.status || LessonStatus.DRAFT,
       estimated_minutes: overrides.estimated_minutes || 30,
@@ -187,7 +179,7 @@ export async function createTestSlide(
       title_en: overrides.title_en || 'Test Slide',
       title_fr: overrides.title_fr || 'Diapositive de Test',
       notes_en: overrides.notes_en || 'Teacher notes',
-      notes_fr: overrides.notes_fr || 'Notes de l\'enseignant',
+      notes_fr: overrides.notes_fr || "Notes de l'enseignant",
     },
   });
 

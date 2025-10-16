@@ -102,10 +102,7 @@ describe('LessonsService', () => {
       expect(result.course_id).toBe('course-1');
 
       // Verify ownership was checked
-      expect(coursesService.verifyOwnership).toHaveBeenCalledWith(
-        'course-1',
-        'teacher-1',
-      );
+      expect(coursesService.verifyOwnership).toHaveBeenCalledWith('course-1', 'teacher-1');
 
       // Verify slug uniqueness was checked
       expect(prismaService.lesson.findUnique).toHaveBeenCalledWith({
@@ -132,12 +129,12 @@ describe('LessonsService', () => {
       coursesService.verifyOwnership.mockResolvedValue(true);
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
 
-      await expect(
-        lessonsService.create('teacher-1', createDto),
-      ).rejects.toThrow(ConflictException);
-      await expect(
-        lessonsService.create('teacher-1', createDto),
-      ).rejects.toThrow("Lesson with slug 'existing-slug' already exists");
+      await expect(lessonsService.create('teacher-1', createDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(lessonsService.create('teacher-1', createDto)).rejects.toThrow(
+        "Lesson with slug 'existing-slug' already exists",
+      );
 
       expect(prismaService.lesson.create).not.toHaveBeenCalled();
     });
@@ -154,12 +151,12 @@ describe('LessonsService', () => {
       prismaService.lesson.findUnique.mockResolvedValue(null);
       prismaService.lesson.findFirst.mockResolvedValue(mockLesson);
 
-      await expect(
-        lessonsService.create('teacher-1', createDto),
-      ).rejects.toThrow(ConflictException);
-      await expect(
-        lessonsService.create('teacher-1', createDto),
-      ).rejects.toThrow('Lesson order 1 is already taken in this course');
+      await expect(lessonsService.create('teacher-1', createDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(lessonsService.create('teacher-1', createDto)).rejects.toThrow(
+        'Lesson order 1 is already taken in this course',
+      );
 
       expect(prismaService.lesson.create).not.toHaveBeenCalled();
     });
@@ -198,12 +195,7 @@ describe('LessonsService', () => {
       prismaService.lesson.findMany.mockResolvedValue(lessons);
       prismaService.lesson.count.mockResolvedValue(1);
 
-      const result = await lessonsService.findAllForCourse(
-        'course-1',
-        'teacher-1',
-        1,
-        10,
-      );
+      const result = await lessonsService.findAllForCourse('course-1', 'teacher-1', 1, 10);
 
       expect(result).toHaveProperty('data');
       expect(result).toHaveProperty('total');
@@ -215,10 +207,7 @@ describe('LessonsService', () => {
       expect(result.totalPages).toBe(1);
 
       // Verify ownership was checked
-      expect(coursesService.verifyOwnership).toHaveBeenCalledWith(
-        'course-1',
-        'teacher-1',
-      );
+      expect(coursesService.verifyOwnership).toHaveBeenCalledWith('course-1', 'teacher-1');
     });
 
     it('should order lessons by lesson_order ascending', async () => {
@@ -265,9 +254,7 @@ describe('LessonsService', () => {
         ],
       };
 
-      prismaService.lesson.findUnique.mockResolvedValue(
-        lessonWithSlides,
-      );
+      prismaService.lesson.findUnique.mockResolvedValue(lessonWithSlides);
 
       const result = await lessonsService.findOne('lesson-1');
 
@@ -280,9 +267,7 @@ describe('LessonsService', () => {
     it('should throw NotFoundException if lesson does not exist', async () => {
       prismaService.lesson.findUnique.mockResolvedValue(null);
 
-      await expect(lessonsService.findOne('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(lessonsService.findOne('invalid-id')).rejects.toThrow(NotFoundException);
       await expect(lessonsService.findOne('invalid-id')).rejects.toThrow(
         "Lesson with ID 'invalid-id' not found",
       );
@@ -291,12 +276,12 @@ describe('LessonsService', () => {
     it('should throw ForbiddenException if teacher does not own lesson', async () => {
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
 
-      await expect(
-        lessonsService.findOne('lesson-1', 'other-teacher'),
-      ).rejects.toThrow(ForbiddenException);
-      await expect(
-        lessonsService.findOne('lesson-1', 'other-teacher'),
-      ).rejects.toThrow('You do not have permission to access this lesson');
+      await expect(lessonsService.findOne('lesson-1', 'other-teacher')).rejects.toThrow(
+        ForbiddenException,
+      );
+      await expect(lessonsService.findOne('lesson-1', 'other-teacher')).rejects.toThrow(
+        'You do not have permission to access this lesson',
+      );
     });
   });
 
@@ -315,11 +300,7 @@ describe('LessonsService', () => {
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
       prismaService.lesson.update.mockResolvedValue(updatedLesson);
 
-      const result = await lessonsService.update(
-        'lesson-1',
-        'teacher-1',
-        updateDto,
-      );
+      const result = await lessonsService.update('lesson-1', 'teacher-1', updateDto);
 
       expect(result.title_en).toBe('Updated Lesson Title');
 
@@ -367,12 +348,12 @@ describe('LessonsService', () => {
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
       prismaService.lesson.findFirst.mockResolvedValue(otherLesson);
 
-      await expect(
-        lessonsService.update('lesson-1', 'teacher-1', updateDto),
-      ).rejects.toThrow(ConflictException);
-      await expect(
-        lessonsService.update('lesson-1', 'teacher-1', updateDto),
-      ).rejects.toThrow("Lesson with slug 'existing-slug' already exists");
+      await expect(lessonsService.update('lesson-1', 'teacher-1', updateDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(lessonsService.update('lesson-1', 'teacher-1', updateDto)).rejects.toThrow(
+        "Lesson with slug 'existing-slug' already exists",
+      );
 
       expect(prismaService.lesson.update).not.toHaveBeenCalled();
     });
@@ -391,12 +372,12 @@ describe('LessonsService', () => {
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
       prismaService.lesson.findFirst.mockResolvedValue(otherLesson);
 
-      await expect(
-        lessonsService.update('lesson-1', 'teacher-1', updateDto),
-      ).rejects.toThrow(ConflictException);
-      await expect(
-        lessonsService.update('lesson-1', 'teacher-1', updateDto),
-      ).rejects.toThrow('Lesson order 2 is already taken in this course');
+      await expect(lessonsService.update('lesson-1', 'teacher-1', updateDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(lessonsService.update('lesson-1', 'teacher-1', updateDto)).rejects.toThrow(
+        'Lesson order 2 is already taken in this course',
+      );
 
       expect(prismaService.lesson.update).not.toHaveBeenCalled();
     });
@@ -421,12 +402,10 @@ describe('LessonsService', () => {
       coursesService.verifyOwnership.mockResolvedValue(true);
       prismaService.lessonProgress.count.mockResolvedValue(3);
 
-      await expect(
-        lessonsService.remove('lesson-1', 'teacher-1'),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        lessonsService.remove('lesson-1', 'teacher-1'),
-      ).rejects.toThrow(
+      await expect(lessonsService.remove('lesson-1', 'teacher-1')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(lessonsService.remove('lesson-1', 'teacher-1')).rejects.toThrow(
         'Cannot delete lesson with 3 student progress record(s). Archive the lesson instead.',
       );
 
@@ -435,13 +414,11 @@ describe('LessonsService', () => {
 
     it('should throw ForbiddenException if teacher does not own course', async () => {
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
-      coursesService.verifyOwnership.mockRejectedValue(
-        new ForbiddenException(),
-      );
+      coursesService.verifyOwnership.mockRejectedValue(new ForbiddenException());
 
-      await expect(
-        lessonsService.remove('lesson-1', 'other-teacher'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(lessonsService.remove('lesson-1', 'other-teacher')).rejects.toThrow(
+        ForbiddenException,
+      );
 
       expect(prismaService.lesson.delete).not.toHaveBeenCalled();
     });
@@ -453,20 +430,14 @@ describe('LessonsService', () => {
         slide_ids: ['slide-1', 'slide-2', 'slide-3'],
       };
 
-      const slides = [
-        { id: 'slide-1' },
-        { id: 'slide-2' },
-        { id: 'slide-3' },
-      ];
+      const slides = [{ id: 'slide-1' }, { id: 'slide-2' }, { id: 'slide-3' }];
 
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
       coursesService.verifyOwnership.mockResolvedValue(true);
       prismaService.slide.findMany.mockResolvedValue(slides as any);
-      prismaService.$transaction.mockImplementation(
-        async (operations: any[]) => {
-          return Promise.all(operations.map((op: any) => op));
-        },
-      );
+      prismaService.$transaction.mockImplementation(async (operations: any[]) => {
+        return Promise.all(operations.map((op: any) => op));
+      });
 
       await lessonsService.reorderSlides('lesson-1', 'teacher-1', reorderDto);
 
@@ -510,9 +481,7 @@ describe('LessonsService', () => {
       };
 
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
-      coursesService.verifyOwnership.mockRejectedValue(
-        new ForbiddenException(),
-      );
+      coursesService.verifyOwnership.mockRejectedValue(new ForbiddenException());
 
       await expect(
         lessonsService.reorderSlides('lesson-1', 'other-teacher', reorderDto),

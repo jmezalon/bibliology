@@ -31,11 +31,9 @@ export interface AuthenticatedRequestOptions {
   query?: Record<string, any>;
 }
 
-export function authenticatedRequest(
-  app: INestApplication,
-  options: AuthenticatedRequestOptions,
-) {
-  const req = request(app.getHttpServer())[options.method](options.url)
+export function authenticatedRequest(app: INestApplication, options: AuthenticatedRequestOptions) {
+  const req = request(app.getHttpServer())
+    [options.method](options.url)
     .set('Authorization', `Bearer ${options.token}`)
     .set('Accept', 'application/json');
 

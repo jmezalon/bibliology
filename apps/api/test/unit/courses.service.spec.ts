@@ -115,12 +115,12 @@ describe('CoursesService', () => {
 
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
 
-      await expect(
-        coursesService.create('teacher-1', createDto),
-      ).rejects.toThrow(ConflictException);
-      await expect(
-        coursesService.create('teacher-1', createDto),
-      ).rejects.toThrow("Course with slug 'existing-slug' already exists");
+      await expect(coursesService.create('teacher-1', createDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(coursesService.create('teacher-1', createDto)).rejects.toThrow(
+        "Course with slug 'existing-slug' already exists",
+      );
 
       // Verify create was never called
       expect(prismaService.course.create).not.toHaveBeenCalled();
@@ -249,9 +249,7 @@ describe('CoursesService', () => {
     it('should throw NotFoundException if course does not exist', async () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(null);
 
-      await expect(coursesService.findOne('invalid-id')).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(coursesService.findOne('invalid-id')).rejects.toThrow(NotFoundException);
       await expect(coursesService.findOne('invalid-id')).rejects.toThrow(
         "Course with ID 'invalid-id' not found",
       );
@@ -268,12 +266,12 @@ describe('CoursesService', () => {
     it('should throw ForbiddenException if teacher does not own course', async () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
 
-      await expect(
-        coursesService.findOne('course-1', 'other-teacher'),
-      ).rejects.toThrow(ForbiddenException);
-      await expect(
-        coursesService.findOne('course-1', 'other-teacher'),
-      ).rejects.toThrow('You do not have permission to access this course');
+      await expect(coursesService.findOne('course-1', 'other-teacher')).rejects.toThrow(
+        ForbiddenException,
+      );
+      await expect(coursesService.findOne('course-1', 'other-teacher')).rejects.toThrow(
+        'You do not have permission to access this course',
+      );
     });
   });
 
@@ -292,11 +290,7 @@ describe('CoursesService', () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
       vi.spyOn(prismaService.course, 'update').mockResolvedValue(updatedCourse);
 
-      const result = await coursesService.update(
-        'course-1',
-        'teacher-1',
-        updateDto,
-      );
+      const result = await coursesService.update('course-1', 'teacher-1', updateDto);
 
       expect(result.title_en).toBe('Updated Course Title');
 
@@ -314,9 +308,9 @@ describe('CoursesService', () => {
 
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
 
-      await expect(
-        coursesService.update('course-1', 'other-teacher', updateDto),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(coursesService.update('course-1', 'other-teacher', updateDto)).rejects.toThrow(
+        ForbiddenException,
+      );
 
       expect(prismaService.course.update).not.toHaveBeenCalled();
     });
@@ -358,12 +352,12 @@ describe('CoursesService', () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
       vi.spyOn(prismaService.course, 'findFirst').mockResolvedValue(otherCourse);
 
-      await expect(
-        coursesService.update('course-1', 'teacher-1', updateDto),
-      ).rejects.toThrow(ConflictException);
-      await expect(
-        coursesService.update('course-1', 'teacher-1', updateDto),
-      ).rejects.toThrow("Course with slug 'existing-slug' already exists");
+      await expect(coursesService.update('course-1', 'teacher-1', updateDto)).rejects.toThrow(
+        ConflictException,
+      );
+      await expect(coursesService.update('course-1', 'teacher-1', updateDto)).rejects.toThrow(
+        "Course with slug 'existing-slug' already exists",
+      );
 
       expect(prismaService.course.update).not.toHaveBeenCalled();
     });
@@ -385,9 +379,9 @@ describe('CoursesService', () => {
     it('should throw ForbiddenException if teacher does not own course', async () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
 
-      await expect(
-        coursesService.remove('course-1', 'other-teacher'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(coursesService.remove('course-1', 'other-teacher')).rejects.toThrow(
+        ForbiddenException,
+      );
 
       expect(prismaService.course.delete).not.toHaveBeenCalled();
     });
@@ -396,12 +390,10 @@ describe('CoursesService', () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
       vi.spyOn(prismaService.enrollment, 'count').mockResolvedValue(5);
 
-      await expect(
-        coursesService.remove('course-1', 'teacher-1'),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        coursesService.remove('course-1', 'teacher-1'),
-      ).rejects.toThrow(
+      await expect(coursesService.remove('course-1', 'teacher-1')).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(coursesService.remove('course-1', 'teacher-1')).rejects.toThrow(
         'Cannot delete course with 5 active enrollment(s). Archive the course instead.',
       );
 
@@ -419,11 +411,7 @@ describe('CoursesService', () => {
         published_at: new Date(),
       });
 
-      const result = await coursesService.togglePublish(
-        'course-1',
-        'teacher-1',
-        true,
-      );
+      const result = await coursesService.togglePublish('course-1', 'teacher-1', true);
 
       expect(result.status).toBe(LessonStatus.PUBLISHED);
       expect(result.published_at).toBeDefined();
@@ -443,12 +431,12 @@ describe('CoursesService', () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
       vi.spyOn(prismaService.lesson, 'count').mockResolvedValue(0);
 
-      await expect(
-        coursesService.togglePublish('course-1', 'teacher-1', true),
-      ).rejects.toThrow(BadRequestException);
-      await expect(
-        coursesService.togglePublish('course-1', 'teacher-1', true),
-      ).rejects.toThrow('Cannot publish a course without any lessons');
+      await expect(coursesService.togglePublish('course-1', 'teacher-1', true)).rejects.toThrow(
+        BadRequestException,
+      );
+      await expect(coursesService.togglePublish('course-1', 'teacher-1', true)).rejects.toThrow(
+        'Cannot publish a course without any lessons',
+      );
 
       expect(prismaService.course.update).not.toHaveBeenCalled();
     });
@@ -467,11 +455,7 @@ describe('CoursesService', () => {
         published_at: null,
       });
 
-      const result = await coursesService.togglePublish(
-        'course-1',
-        'teacher-1',
-        false,
-      );
+      const result = await coursesService.togglePublish('course-1', 'teacher-1', false);
 
       expect(result.status).toBe(LessonStatus.DRAFT);
       expect(result.published_at).toBeNull();
@@ -489,9 +473,9 @@ describe('CoursesService', () => {
     it('should throw ForbiddenException if teacher does not own course', async () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(mockCourse);
 
-      await expect(
-        coursesService.togglePublish('course-1', 'other-teacher', true),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(coursesService.togglePublish('course-1', 'other-teacher', true)).rejects.toThrow(
+        ForbiddenException,
+      );
 
       expect(prismaService.course.update).not.toHaveBeenCalled();
     });
@@ -504,10 +488,7 @@ describe('CoursesService', () => {
         teacher_id: 'teacher-1',
       } as any);
 
-      const result = await coursesService.verifyOwnership(
-        'course-1',
-        'teacher-1',
-      );
+      const result = await coursesService.verifyOwnership('course-1', 'teacher-1');
 
       expect(result).toBe(true);
     });
@@ -515,9 +496,9 @@ describe('CoursesService', () => {
     it('should throw NotFoundException if course does not exist', async () => {
       vi.spyOn(prismaService.course, 'findUnique').mockResolvedValue(null);
 
-      await expect(
-        coursesService.verifyOwnership('invalid-id', 'teacher-1'),
-      ).rejects.toThrow(NotFoundException);
+      await expect(coursesService.verifyOwnership('invalid-id', 'teacher-1')).rejects.toThrow(
+        NotFoundException,
+      );
     });
 
     it('should throw ForbiddenException if teacher does not own course', async () => {
@@ -526,9 +507,9 @@ describe('CoursesService', () => {
         teacher_id: 'teacher-1',
       } as any);
 
-      await expect(
-        coursesService.verifyOwnership('course-1', 'other-teacher'),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(coursesService.verifyOwnership('course-1', 'other-teacher')).rejects.toThrow(
+        ForbiddenException,
+      );
     });
   });
 });

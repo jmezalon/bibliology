@@ -3,6 +3,7 @@
 ## Authentication (AuthService + /auth endpoints)
 
 ### Registration Tests
+
 - ✅ Successfully register new user with valid data
 - ✅ Register with default STUDENT role
 - ✅ Register with default language_pref "en"
@@ -20,6 +21,7 @@
 - ✅ Set last_login on registration
 
 ### Login Tests
+
 - ✅ Successfully login with valid credentials
 - ✅ Return JWT token and user data
 - ✅ Set HTTP-only authentication cookie
@@ -33,12 +35,14 @@
 - ✅ Create activity log entry for login
 
 ### Logout Tests
+
 - ✅ Successfully logout with valid token
 - ✅ Clear authentication cookie
 - ✅ Require authentication (401 without token)
 - ✅ Return success message
 
 ### Current User Tests
+
 - ✅ Return user data with valid token
 - ✅ Reject request without token (401 Unauthorized)
 - ✅ Reject request with invalid token (401 Unauthorized)
@@ -46,6 +50,7 @@
 - ✅ Do not expose password_hash
 
 ### JWT Token Tests
+
 - ✅ Generate valid JWT token on registration
 - ✅ Generate valid JWT token on login
 - ✅ Accept Bearer token in Authorization header
@@ -58,6 +63,7 @@
 ## Courses (CoursesService + /courses endpoints)
 
 ### Create Course Tests
+
 - ✅ Successfully create course as TEACHER
 - ✅ Successfully create course as ADMIN
 - ✅ Reject creation by unauthenticated user (401)
@@ -73,6 +79,7 @@
 - ✅ Return course with teacher info and counts
 
 ### List Courses Tests
+
 - ✅ Return paginated list of courses for teacher
 - ✅ Only return courses owned by authenticated teacher
 - ✅ Support pagination (page, limit)
@@ -84,6 +91,7 @@
 - ✅ Reject request by STUDENT (403 Forbidden)
 
 ### Get Single Course Tests
+
 - ✅ Return course details for owner
 - ✅ Include teacher information
 - ✅ Include lesson count and enrollment count
@@ -92,6 +100,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Update Course Tests
+
 - ✅ Successfully update course by owner
 - ✅ Allow updating title, description, status, etc.
 - ✅ Check slug uniqueness when updating slug
@@ -101,6 +110,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Delete Course Tests
+
 - ✅ Successfully delete course without enrollments
 - ✅ Cascade delete lessons, slides, content blocks
 - ✅ Reject deletion with active enrollments (400 Bad Request)
@@ -109,6 +119,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Publish/Unpublish Course Tests
+
 - ✅ Successfully publish course with lessons
 - ✅ Set status to PUBLISHED
 - ✅ Set published_at timestamp
@@ -120,6 +131,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Ownership Verification Tests
+
 - ✅ Verify course ownership returns true for owner
 - ✅ Throw NotFoundException for non-existent course
 - ✅ Throw ForbiddenException for non-owner
@@ -129,6 +141,7 @@
 ## Lessons (LessonsService + /lessons endpoints)
 
 ### Create Lesson Tests
+
 - ✅ Successfully create lesson as course owner
 - ✅ Associate lesson with course_id
 - ✅ Check slug uniqueness
@@ -144,6 +157,7 @@
 - ✅ Accept optional fields (description, estimated_minutes)
 
 ### List Lessons Tests
+
 - ✅ Return paginated list of lessons for course
 - ✅ Order lessons by lesson_order ascending
 - ✅ Support pagination (page, limit)
@@ -154,6 +168,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Get Single Lesson Tests
+
 - ✅ Return lesson details with slides and content blocks
 - ✅ Include course information
 - ✅ Order slides by slide_order ascending
@@ -163,6 +178,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Update Lesson Tests
+
 - ✅ Successfully update lesson by course owner
 - ✅ Allow updating title, description, lesson_order, etc.
 - ✅ Check slug uniqueness when updating slug
@@ -174,6 +190,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Delete Lesson Tests
+
 - ✅ Successfully delete lesson without student progress
 - ✅ Cascade delete slides and content blocks
 - ✅ Reject deletion with student progress (400 Bad Request)
@@ -182,6 +199,7 @@
 - ✅ Reject request by unauthenticated user (401)
 
 ### Reorder Slides Tests
+
 - ✅ Successfully reorder slides in lesson
 - ✅ Update slide_order for all slides in transaction
 - ✅ Verify all slide IDs belong to lesson
@@ -195,6 +213,7 @@
 ## Edge Cases & Security Tests
 
 ### Validation Tests
+
 - ✅ Slug format validation (lowercase, alphanumeric, hyphens)
 - ✅ URL validation for image URLs
 - ✅ Email format validation
@@ -204,6 +223,7 @@
 - ✅ Data type validation (integers, strings, arrays)
 
 ### Authorization Tests
+
 - ✅ Unauthenticated access blocked (401)
 - ✅ Students cannot create courses (403)
 - ✅ Students cannot create lessons (403)
@@ -212,6 +232,7 @@
 - ✅ Ownership verification for all write operations
 
 ### Business Logic Tests
+
 - ✅ Cannot delete course with active enrollments
 - ✅ Cannot delete lesson with student progress
 - ✅ Cannot publish course without lessons
@@ -220,6 +241,7 @@
 - ✅ Cascade deletes for related records
 
 ### Security Tests
+
 - ✅ Password hashing with bcrypt
 - ✅ Password hash not exposed in responses
 - ✅ Timing attack prevention in login
@@ -229,6 +251,7 @@
 - ✅ Activity logging for audit trail
 
 ### Database Tests
+
 - ✅ Transaction handling for slide reordering
 - ✅ Cascade deletes work correctly
 - ✅ Foreign key constraints enforced
@@ -237,6 +260,7 @@
 - ✅ Timestamps auto-updated
 
 ### Pagination Tests
+
 - ✅ Correct skip/take calculation
 - ✅ Total count returned
 - ✅ Total pages calculated correctly
@@ -255,11 +279,13 @@
 - **Code Coverage**: 80%+ target
 
 ### Coverage by Module
+
 - AuthService: 17 unit tests + 23 E2E tests = 40 tests
 - CoursesService: 25 unit tests + 22 E2E tests = 47 tests
 - LessonsService: 19 unit tests + 20 E2E tests = 39 tests
 
 ### Test Categories
+
 - Happy path tests: ~45%
 - Error handling tests: ~30%
 - Authorization tests: ~15%

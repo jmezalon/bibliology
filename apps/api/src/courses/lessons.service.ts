@@ -30,15 +30,9 @@ export class LessonsService {
    * @param createLessonDto - Lesson creation data
    * @returns Created lesson
    */
-  async create(
-    teacherId: string,
-    createLessonDto: CreateLessonDto,
-  ): Promise<LessonResponseDto> {
+  async create(teacherId: string, createLessonDto: CreateLessonDto): Promise<LessonResponseDto> {
     // Verify teacher owns the course
-    await this.coursesService.verifyOwnership(
-      createLessonDto.course_id,
-      teacherId,
-    );
+    await this.coursesService.verifyOwnership(createLessonDto.course_id, teacherId);
 
     // Check if slug is already taken
     const existingLesson = await this.prisma.lesson.findUnique({
@@ -46,9 +40,7 @@ export class LessonsService {
     });
 
     if (existingLesson) {
-      throw new ConflictException(
-        `Lesson with slug '${createLessonDto.slug}' already exists`,
-      );
+      throw new ConflictException(`Lesson with slug '${createLessonDto.slug}' already exists`);
     }
 
     // Check if lesson_order is already taken in this course
@@ -149,10 +141,7 @@ export class LessonsService {
    * @param teacherId - Optional teacher ID for ownership verification
    * @returns Lesson details with slides
    */
-  async findOne(
-    id: string,
-    teacherId?: string,
-  ): Promise<LessonResponseDto> {
+  async findOne(id: string, teacherId?: string): Promise<LessonResponseDto> {
     const lesson = await this.prisma.lesson.findUnique({
       where: { id },
       include: {
@@ -182,9 +171,7 @@ export class LessonsService {
 
     // Verify ownership if teacherId is provided
     if (teacherId && lesson.course.teacher_id !== teacherId) {
-      throw new ForbiddenException(
-        'You do not have permission to access this lesson',
-      );
+      throw new ForbiddenException('You do not have permission to access this lesson');
     }
 
     return this.mapToLessonResponse(lesson);
@@ -215,9 +202,7 @@ export class LessonsService {
       });
 
       if (existingSlug) {
-        throw new ConflictException(
-          `Lesson with slug '${updateLessonDto.slug}' already exists`,
-        );
+        throw new ConflictException(`Lesson with slug '${updateLessonDto.slug}' already exists`);
       }
     }
 
@@ -315,9 +300,7 @@ export class LessonsService {
     });
 
     if (slides.length !== reorderDto.slide_ids.length) {
-      throw new BadRequestException(
-        'Some slide IDs do not belong to this lesson',
-      );
+      throw new BadRequestException('Some slide IDs do not belong to this lesson');
     }
 
     // Update slide orders in transaction

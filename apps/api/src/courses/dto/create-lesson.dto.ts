@@ -1,6 +1,16 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LessonStatus } from '@prisma/client';
-import { IsString, IsNotEmpty, IsOptional, IsInt, IsEnum, IsBoolean, Min, MaxLength, Matches } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsInt,
+  IsEnum,
+  IsBoolean,
+  Min,
+  MaxLength,
+  Matches,
+} from 'class-validator';
 
 export class CreateLessonDto {
   @ApiProperty({ description: 'Course ID this lesson belongs to' })
@@ -10,7 +20,7 @@ export class CreateLessonDto {
 
   @ApiProperty({
     description: 'Unique URL-friendly slug for the lesson (lowercase, alphanumeric, hyphens only)',
-    example: 'lesson-1-introduction'
+    example: 'lesson-1-introduction',
   })
   @IsString()
   @IsNotEmpty()
@@ -53,7 +63,11 @@ export class CreateLessonDto {
   @Min(1)
   estimated_minutes?: number;
 
-  @ApiPropertyOptional({ description: 'Lesson status', enum: LessonStatus, default: LessonStatus.DRAFT })
+  @ApiPropertyOptional({
+    description: 'Lesson status',
+    enum: LessonStatus,
+    default: LessonStatus.DRAFT,
+  })
   @IsEnum(LessonStatus)
   @IsOptional()
   status?: LessonStatus;

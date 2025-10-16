@@ -1,11 +1,22 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LessonStatus } from '@prisma/client';
-import { IsString, IsNotEmpty, IsOptional, IsInt, IsEnum, IsArray, Min, MaxLength, Matches, IsUrl } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsInt,
+  IsEnum,
+  IsArray,
+  Min,
+  MaxLength,
+  Matches,
+  IsUrl,
+} from 'class-validator';
 
 export class CreateCourseDto {
   @ApiProperty({
     description: 'Unique URL-friendly slug for the course (lowercase, alphanumeric, hyphens only)',
-    example: 'introduction-to-theology'
+    example: 'introduction-to-theology',
   })
   @IsString()
   @IsNotEmpty()
@@ -52,7 +63,10 @@ export class CreateCourseDto {
   @IsOptional()
   category?: string;
 
-  @ApiPropertyOptional({ description: 'Course tags for searchability', example: ['Pneumatology', 'Holy Spirit'] })
+  @ApiPropertyOptional({
+    description: 'Course tags for searchability',
+    example: ['Pneumatology', 'Holy Spirit'],
+  })
   @IsArray()
   @IsString({ each: true })
   @IsOptional()
@@ -70,7 +84,11 @@ export class CreateCourseDto {
   @IsEnum(['Beginner', 'Intermediate', 'Advanced'])
   difficulty?: string;
 
-  @ApiPropertyOptional({ description: 'Course status', enum: LessonStatus, default: LessonStatus.DRAFT })
+  @ApiPropertyOptional({
+    description: 'Course status',
+    enum: LessonStatus,
+    default: LessonStatus.DRAFT,
+  })
   @IsEnum(LessonStatus)
   @IsOptional()
   status?: LessonStatus;

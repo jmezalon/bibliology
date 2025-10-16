@@ -14,13 +14,7 @@ import {
   ParseIntPipe,
   DefaultValuePipe,
 } from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -122,10 +116,7 @@ export class LessonsController {
     status: 400,
     description: 'Cannot delete lesson with student progress',
   })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser('id') teacherId: string,
-  ): Promise<void> {
+  async remove(@Param('id') id: string, @CurrentUser('id') teacherId: string): Promise<void> {
     return this.lessonsService.remove(id, teacherId);
   }
 
