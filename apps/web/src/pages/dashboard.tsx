@@ -1,7 +1,9 @@
-import { useAuthStore } from '../store/auth.store';
+import { BookOpen, Clock, Award, TrendingUp } from 'lucide-react';
+
 import { Container } from '../components/layout/container';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { BookOpen, Clock, Award, TrendingUp } from 'lucide-react';
+import { useAuthStore } from '../store/auth.store';
+
 
 export function DashboardPage() {
   const { user } = useAuthStore();

@@ -1,11 +1,12 @@
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { BookOpen } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { useAuthStore } from '../store/auth.store';
+import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
+import { useAuthStore } from '../store/auth.store';
 import type { LoginRequest } from '../types/auth';
 
 export function LoginPage() {
@@ -20,7 +21,7 @@ export function LoginPage() {
     formState: { errors },
   } = useForm<LoginRequest>();
 
-  const from = (location.state as any)?.from?.pathname || '/dashboard';
+  const from = (location.state as { from?: { pathname: string } } | null)?.from?.pathname || '/dashboard';
 
   const onSubmit = async (data: LoginRequest) => {
     try {
@@ -33,10 +34,14 @@ export function LoginPage() {
       });
 
       navigate(from, { replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error && 'response' in error
+        ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Invalid email or password.')
+        : 'Invalid email or password.';
+
       toast({
         title: 'Login failed',
-        description: error.response?.data?.message || 'Invalid email or password.',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -55,7 +60,7 @@ export function LoginPage() {
           <CardDescription>Enter your credentials to access your account</CardDescription>
         </CardHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
           <CardContent className="space-y-4">
             <Input
               label="Email"

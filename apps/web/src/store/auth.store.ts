@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { User, LoginRequest, RegisterRequest } from '../types/auth';
+
 import { authApi } from '../lib/api';
+import type { User, LoginRequest, RegisterRequest } from '../types/auth';
 
 interface AuthState {
   user: User | null;
@@ -45,8 +46,10 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
-        } catch (error: any) {
-          const errorMessage = error.response?.data?.message || 'Login failed. Please try again.';
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error && 'response' in error
+            ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Login failed. Please try again.')
+            : 'Login failed. Please try again.';
 
           set({
             user: null,
@@ -74,9 +77,10 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
-        } catch (error: any) {
-          const errorMessage =
-            error.response?.data?.message || 'Registration failed. Please try again.';
+        } catch (error: unknown) {
+          const errorMessage = error instanceof Error && 'response' in error
+            ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Registration failed. Please try again.')
+            : 'Registration failed. Please try again.';
 
           set({
             user: null,
@@ -122,7 +126,7 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Failed to refresh user:', error);
 
           set({

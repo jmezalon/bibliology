@@ -1,10 +1,11 @@
-import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { Logger } from 'nestjs-pino';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { Logger } from 'nestjs-pino';
+
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -66,4 +67,4 @@ async function bootstrap() {
   console.log(`📚 API Documentation available at http://localhost:${port}/api/docs`);
 }
 
-bootstrap();
+void bootstrap();

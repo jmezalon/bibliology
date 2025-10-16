@@ -9,9 +9,10 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto, AuthResponseDto, UserDto } from './dto';
 import { Public, CurrentUser } from './decorators';
+import { RegisterDto, LoginDto, AuthResponseDto, UserDto } from './dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -61,7 +62,7 @@ export class AuthController {
    */
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  async logout(@Res({ passthrough: true }) response: Response): Promise<{ message: string }> {
+  logout(@Res({ passthrough: true }) response: Response): { message: string } {
     // Clear cookie
     response.clearCookie('access_token', {
       httpOnly: true,
@@ -79,7 +80,7 @@ export class AuthController {
    */
   @UseGuards(JwtAuthGuard)
   @Get('me')
-  async getCurrentUser(@CurrentUser() user: UserDto): Promise<UserDto> {
+  getCurrentUser(@CurrentUser() user: UserDto): UserDto {
     return user;
   }
 

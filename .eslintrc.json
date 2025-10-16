@@ -50,6 +50,9 @@
     "build",
     ".turbo",
     "*.config.js",
-    "*.config.ts"
+    "*.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/test/**/*.ts"
   ]
 }

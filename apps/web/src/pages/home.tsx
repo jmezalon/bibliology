@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
 import { BookOpen, GraduationCap, Globe, Award } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
 import { Container } from '../components/layout/container';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';

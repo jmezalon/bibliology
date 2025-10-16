@@ -1,6 +1,7 @@
-import apiClient from './client';
-import type { User, UpdateUserRequest } from '../../types/auth';
 import type { PaginationParams } from '../../types/api';
+import type { User, UpdateUserRequest } from '../../types/auth';
+
+import apiClient from './client';
 
 export interface UsersListResponse {
   users: User[];

@@ -1,16 +1,20 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from './components/ui/toaster';
-import { MainLayout } from './components/layout/main-layout';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+
 import { ProtectedRoute } from './components/auth/protected-route';
 import { PublicRoute } from './components/auth/public-route';
-
-// Pages
+import { MainLayout } from './components/layout/main-layout';
+import { TeacherLayout } from './components/teacher/teacher-layout';
+import { Toaster } from './components/ui/toaster';
+import { DashboardPage } from './pages/dashboard';
 import { HomePage } from './pages/home';
 import { LoginPage } from './pages/login';
 import { RegisterPage } from './pages/register';
-import { DashboardPage } from './pages/dashboard';
+import { TeacherCourseDetailPage } from './pages/teacher/course-detail';
+import { TeacherCoursesPage } from './pages/teacher/courses';
+import { TeacherDashboardPage } from './pages/teacher/dashboard';
+import { UserRole } from './types/auth';
 
 // Create Query Client
 const queryClient = new QueryClient({
@@ -62,6 +66,34 @@ function App() {
 
             {/* Catch all - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+
+          {/* Teacher Routes - separate layout */}
+          <Route element={<TeacherLayout />}>
+            <Route
+              path="/teacher/dashboard"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <TeacherDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/courses"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <TeacherCoursesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/courses/:courseId"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <TeacherCourseDetailPage />
+                </ProtectedRoute>
+              }
+            />
           </Route>
         </Routes>
       </BrowserRouter>

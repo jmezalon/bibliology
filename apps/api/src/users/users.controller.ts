@@ -9,12 +9,16 @@ import {
   ParseIntPipe,
   UseGuards,
 } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { CurrentUser, Roles } from '../auth/decorators';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { UserDto } from '../auth/dto';
 import { UserRole } from '@prisma/client';
+
+import { CurrentUser, Roles } from '../auth/decorators';
+import { UserDto } from '../auth/dto';
+import { RolesGuard } from '../auth/guards/roles.guard';
+
+import { UpdateUserDto } from './dto/update-user.dto';
+import { UsersService } from './users.service';
+
+
 
 @Controller('users')
 @UseGuards(RolesGuard)

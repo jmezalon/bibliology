@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+
 import { useAuthStore } from '../../store/auth.store';
 import { UserRole } from '../../types/auth';
 
@@ -19,7 +20,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
   // Refresh user data on mount if authenticated
   useEffect(() => {
     if (isAuthenticated && !user) {
-      refreshUser();
+      void refreshUser();
     }
   }, [isAuthenticated, user, refreshUser]);
 

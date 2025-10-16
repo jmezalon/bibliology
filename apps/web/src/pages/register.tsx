@@ -1,11 +1,12 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
 import { BookOpen } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
-import { useAuthStore } from '../store/auth.store';
+import { Input } from '../components/ui/input';
 import { useToast } from '../hooks/use-toast';
+import { useAuthStore } from '../store/auth.store';
 import type { RegisterRequest } from '../types/auth';
 
 export function RegisterPage() {
@@ -24,7 +25,7 @@ export function RegisterPage() {
 
   const onSubmit = async (data: RegisterRequest & { confirmPassword: string }) => {
     try {
-      const { confirmPassword, ...registerData } = data;
+      const { confirmPassword: _confirmPassword, ...registerData } = data;
 
       await registerUser(registerData);
 
@@ -35,10 +36,14 @@ export function RegisterPage() {
       });
 
       navigate('/dashboard', { replace: true });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error && 'response' in error
+        ? ((error as { response?: { data?: { message?: string } } }).response?.data?.message || 'Failed to create account. Please try again.')
+        : 'Failed to create account. Please try again.';
+
       toast({
         title: 'Registration failed',
-        description: error.response?.data?.message || 'Failed to create account. Please try again.',
+        description: errorMessage,
         variant: 'destructive',
       });
     }
@@ -57,7 +62,7 @@ export function RegisterPage() {
           <CardDescription>Enter your details to get started with Bibliology</CardDescription>
         </CardHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)}>
           <CardContent className="space-y-4">
             <Input
               label="Full Name"

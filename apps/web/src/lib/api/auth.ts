@@ -1,5 +1,6 @@
-import apiClient from './client';
 import type { AuthResponse, LoginRequest, RegisterRequest, User } from '../../types/auth';
+
+import apiClient from './client';
 
 /**
  * Authentication API endpoints

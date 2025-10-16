@@ -1,9 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { getInitials } from '../../lib/utils';
 import { useAuthStore } from '../../store/auth.store';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
-import { getInitials } from '../../lib/utils';
 
 export function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
@@ -68,7 +69,7 @@ export function Header() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={handleLogout}
+                onClick={() => void handleLogout()}
                 title="Logout"
               >
                 <LogOut className="h-4 w-4" />

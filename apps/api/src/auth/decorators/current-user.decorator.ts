@@ -1,11 +1,15 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+
 import { UserDto } from '../dto';
 
 export const CurrentUser = createParamDecorator(
-  (data: keyof UserDto | undefined, ctx: ExecutionContext) => {
-    const request = ctx.switchToHttp().getRequest();
+  (data: keyof UserDto | undefined, ctx: ExecutionContext): UserDto | UserDto[keyof UserDto] | undefined => {
+    const request = ctx.switchToHttp().getRequest<Express.Request>();
     const user = request.user;
 
-    return data ? user?.[data] : user;
+    if (data && user) {
+      return user[data];
+    }
+    return user;
   },
 );

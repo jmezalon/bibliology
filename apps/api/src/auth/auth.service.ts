@@ -5,10 +5,12 @@ import {
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
-import { RegisterDto, LoginDto, AuthResponseDto, UserDto } from './dto';
 import { User, UserRole } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+
+import { PrismaService } from '../prisma/prisma.service';
+
+import { RegisterDto, LoginDto, AuthResponseDto, UserDto } from './dto';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
 
 @Injectable()
