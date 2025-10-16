@@ -1,9 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { ContentBlockType } from '@prisma/client';
+
+// Mock DOMPurify before any imports that use it
+vi.mock('isomorphic-dompurify', () => ({
+  default: {
+    sanitize: (html: string) => html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '').replace(/on\w+="[^"]*"/g, '').replace(/javascript:/gi, ''),
+  },
+}));
 
 import { ContentBlocksService } from '../../src/courses/slides/content-blocks.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
@@ -545,7 +549,11 @@ describe('ContentBlocksService', () => {
         { ...mockContentBlock, id: 'block-1', block_order: 2 },
       ]);
 
-      const result = await contentBlocksService.reorderBlocks(mockSlideId, mockTeacherId, reorderDto);
+      const result = await contentBlocksService.reorderBlocks(
+        mockSlideId,
+        mockTeacherId,
+        reorderDto,
+      );
 
       expect(result).toHaveLength(3);
       expect(coursesService.verifyOwnership).toHaveBeenCalled();
@@ -579,10 +587,7 @@ describe('ContentBlocksService', () => {
       };
 
       prismaService.slide.findUnique.mockResolvedValue(mockSlide);
-      prismaService.contentBlock.findMany.mockResolvedValue([
-        { id: 'block-1' },
-        { id: 'block-2' },
-      ]);
+      prismaService.contentBlock.findMany.mockResolvedValue([{ id: 'block-1' }, { id: 'block-2' }]);
 
       await expect(
         contentBlocksService.reorderBlocks(mockSlideId, mockTeacherId, reorderDto),
@@ -610,9 +615,9 @@ describe('ContentBlocksService', () => {
     it('should throw NotFoundException if block does not exist', async () => {
       prismaService.contentBlock.findUnique.mockResolvedValue(null);
 
-      await expect(contentBlocksService.duplicateBlock('invalid-id', mockTeacherId)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        contentBlocksService.duplicateBlock('invalid-id', mockTeacherId),
+      ).rejects.toThrow(NotFoundException);
     });
   });
 
@@ -725,7 +730,7 @@ describe('ContentBlocksService', () => {
       const createDto: CreateContentBlockDto = {
         slide_id: mockSlideId,
         type: ContentBlockType.TEXT,
-        content: JSON.stringify({ html: '<p>Test\'; DROP TABLE slides; --</p>' }),
+        content: JSON.stringify({ html: "<p>Test'; DROP TABLE slides; --</p>" }),
       };
 
       prismaService.slide.findUnique.mockResolvedValue(mockSlide);

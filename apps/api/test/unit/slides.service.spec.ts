@@ -1,14 +1,16 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import {
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { ContentBlockType } from '@prisma/client';
 
 import { SlidesService } from '../../src/courses/slides/slides.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { CoursesService } from '../../src/courses/courses.service';
-import { CreateSlideDto, UpdateSlideDto, BulkReorderSlidesDto, MoveSlideDto } from '../../src/courses/slides/dto';
+import {
+  CreateSlideDto,
+  UpdateSlideDto,
+  BulkReorderSlidesDto,
+  MoveSlideDto,
+} from '../../src/courses/slides/dto';
 
 // Mock Prisma class
 class MockPrismaService {
@@ -18,6 +20,7 @@ class MockPrismaService {
     create: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
+    deleteMany: vi.fn(),
     updateMany: vi.fn(),
     aggregate: vi.fn(),
   };
@@ -451,10 +454,7 @@ describe('SlidesService', () => {
       };
 
       prismaService.lesson.findUnique.mockResolvedValue(mockLesson);
-      prismaService.slide.findMany.mockResolvedValue([
-        { id: 'slide-1' },
-        { id: 'slide-2' },
-      ]);
+      prismaService.slide.findMany.mockResolvedValue([{ id: 'slide-1' }, { id: 'slide-2' }]);
 
       await expect(
         slidesService.bulkReorderSlides(mockLessonId, mockTeacherId, reorderDto),

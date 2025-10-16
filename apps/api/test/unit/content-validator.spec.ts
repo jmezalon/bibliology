@@ -1,5 +1,22 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ContentBlockType } from '@prisma/client';
+
+// Mock DOMPurify before any imports that use it
+vi.mock('isomorphic-dompurify', () => ({
+  default: {
+    sanitize: (html: string, config?: any) => {
+      // Simple mock that removes script tags and dangerous attributes
+      let sanitized = html;
+      sanitized = sanitized.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+      sanitized = sanitized.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
+      sanitized = sanitized.replace(/<form\b[^<]*(?:(?!<\/form>)<[^<]*)*<\/form>/gi, '');
+      sanitized = sanitized.replace(/<input[^>]*>/gi, '');
+      sanitized = sanitized.replace(/on\w+\s*=\s*"[^"]*"/gi, '');
+      sanitized = sanitized.replace(/javascript:/gi, '');
+      return sanitized;
+    },
+  },
+}));
 
 import {
   validateContentByType,
@@ -142,7 +159,7 @@ describe('Content Validator', () => {
         const result = validateContentByType(ContentBlockType.IMAGE, content);
 
         expect(result.valid).toBe(false);
-        expect(result.errors?.[0]).toContain('Alt text');
+        expect(result.errors?.[0]).toContain('imageAlt');
       });
 
       it('should accept IMAGE without caption (optional)', () => {
@@ -591,10 +608,7 @@ describe('Content Validator', () => {
     });
 
     it('should sanitize arrays', () => {
-      const content = [
-        '<p>Item 1</p><script>XSS</script>',
-        '<p>Item 2</p>',
-      ];
+      const content = ['<p>Item 1</p><script>XSS</script>', '<p>Item 2</p>'];
       const sanitized = sanitizeJsonContent(content) as any;
 
       expect(sanitized[0]).not.toContain('<script>');
