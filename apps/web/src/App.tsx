@@ -15,6 +15,7 @@ import { RegisterPage } from './pages/register';
 import { TeacherCourseDetailPage } from './pages/teacher/course-detail';
 import { TeacherCoursesPage } from './pages/teacher/courses';
 import { TeacherDashboardPage } from './pages/teacher/dashboard';
+import { LessonBuilderPage } from './pages/teacher/lesson-builder';
 import { UserRole } from './types/auth';
 
 // Create Query Client
@@ -102,6 +103,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
                   <TeacherCourseDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/courses/:courseId/lessons/:lessonId/edit"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <LessonBuilderPage />
                 </ProtectedRoute>
               }
             />
