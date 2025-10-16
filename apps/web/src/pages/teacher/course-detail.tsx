@@ -8,7 +8,7 @@ import {
   BarChart3,
   FileText,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { Container } from '../../components/layout/container';
@@ -23,18 +23,42 @@ import {
   CardHeader,
   CardTitle,
 } from '../../components/ui/card';
+import { coursesApi, lessonsApi } from '../../lib/api';
 import type { Course, Lesson } from '../../types/course';
 
 export function TeacherCourseDetailPage() {
   const { courseId } = useParams<{ courseId: string }>();
   const navigate = useNavigate();
   const [draggedLesson, setDraggedLesson] = useState<Lesson | null>(null);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - replace with actual API calls
-  const course: Course | null = null;
-  const lessons: Lesson[] = [];
+  // Fetch course and lessons on mount
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!courseId) return;
 
-  // Mock course data for display when courseId exists but no real data
+      try {
+        setIsLoading(true);
+        const [courseData, lessonsData] = await Promise.all([
+          coursesApi.getById(courseId),
+          lessonsApi.getAllForCourse(courseId, 1, 100),
+        ]);
+        setCourse(courseData);
+        setLessons(lessonsData.data);
+      } catch (error) {
+        console.error('Failed to fetch course data:', error);
+        // Course not found or error - will show error state
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchData();
+  }, [courseId]);
+
+  // Display course for UI rendering
   const displayCourse =
     course ||
     ({
@@ -50,17 +74,43 @@ export function TeacherCourseDetailPage() {
     averageRating: 0,
   };
 
-  const handleAddLesson = () => {
-    navigate(`/teacher/courses/${courseId}/lessons/new`);
+  const handleAddLesson = async () => {
+    if (!courseId) return;
+
+    // Prompt for lesson title
+    const title = prompt('Enter lesson title:');
+    if (!title) return;
+
+    try {
+      const lesson = await lessonsApi.create({
+        course_id: courseId,
+        title_en: title,
+        description_en: 'Add a description for this lesson',
+        duration_minutes: 30,
+      });
+
+      // Navigate to the lesson builder
+      navigate(`/teacher/courses/${courseId}/lessons/${lesson.id}/edit`);
+    } catch (error) {
+      console.error('Failed to create lesson:', error);
+      alert('Failed to create lesson. Please try again.');
+    }
   };
 
   const handleEditLesson = (lesson: Lesson) => {
     navigate(`/teacher/courses/${courseId}/lessons/${lesson.id}/edit`);
   };
 
-  const handleDeleteLesson = (lesson: Lesson) => {
+  const handleDeleteLesson = async (lesson: Lesson) => {
     if (window.confirm(`Are you sure you want to delete "${lesson.title_en}"?`)) {
-      console.log('Delete lesson:', lesson.id);
+      try {
+        await lessonsApi.delete(lesson.id);
+        // Remove from local state
+        setLessons((prev) => prev.filter((l) => l.id !== lesson.id));
+      } catch (error) {
+        console.error('Failed to delete lesson:', error);
+        alert('Failed to delete lesson. Please try again.');
+      }
     }
   };
 
@@ -86,6 +136,14 @@ export function TeacherCourseDetailPage() {
       console.log('Reorder:', draggedLesson.order, 'to', targetLesson.order);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-muted/40 flex items-center justify-center">
+        <p className="text-muted-foreground">Loading course...</p>
+      </div>
+    );
+  }
 
   if (!course && courseId) {
     return (
@@ -190,7 +248,7 @@ export function TeacherCourseDetailPage() {
                 <CardTitle>Course Lessons</CardTitle>
                 <CardDescription>Drag and drop to reorder lessons</CardDescription>
               </div>
-              <Button onClick={handleAddLesson}>
+              <Button onClick={() => void handleAddLesson()}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Lesson
               </Button>
@@ -203,7 +261,7 @@ export function TeacherCourseDetailPage() {
                   description="Create your first lesson to start building your course content"
                   action={{
                     label: 'Create First Lesson',
-                    onClick: handleAddLesson,
+                    onClick: () => void handleAddLesson(),
                   }}
                 />
               ) : (
@@ -222,7 +280,7 @@ export function TeacherCourseDetailPage() {
                         lesson={lesson}
                         isDragging={draggedLesson?.id === lesson.id}
                         onEdit={handleEditLesson}
-                        onDelete={handleDeleteLesson}
+                        onDelete={(lesson) => void handleDeleteLesson(lesson)}
                         onView={handleViewLesson}
                         onTogglePublish={handleTogglePublish}
                       />

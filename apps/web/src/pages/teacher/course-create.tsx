@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 import { Textarea } from '../../components/ui/textarea';
+import { coursesApi } from '../../lib/api';
 import { CourseLevel, type CreateCourseRequest } from '../../types/course';
 
 export function CourseCreatePage() {
@@ -57,7 +58,7 @@ export function CourseCreatePage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -66,17 +67,19 @@ export function CourseCreatePage() {
 
     setIsSubmitting(true);
 
-    // TODO: Call API to create course
-    // When implemented, this will be async:
-    // const response = await createCourse(formData);
-    console.log('Creating course:', formData);
+    try {
+      const course = await coursesApi.create(formData);
+      console.log('Course created successfully:', course);
 
-    // For now, simulate a successful creation
-    setTimeout(() => {
+      // Navigate to the created course detail page
+      navigate(`/teacher/courses/${course.id}`);
+    } catch (error) {
+      console.error('Failed to create course:', error);
+      // TODO: Show error toast notification
+      alert('Failed to create course. Please try again.');
+    } finally {
       setIsSubmitting(false);
-      // Navigate to the courses list
-      navigate('/teacher/courses');
-    }, 1000);
+    }
   };
 
   const handleChange = (field: keyof CreateCourseRequest, value: string | CourseLevel) => {
@@ -112,7 +115,7 @@ export function CourseCreatePage() {
       </div>
 
       <Container size="default" className="py-8">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={(e) => void handleSubmit(e)}>
           <Card>
             <CardHeader>
               <CardTitle>Course Information</CardTitle>

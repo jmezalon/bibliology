@@ -1,5 +1,5 @@
 import { Plus, Search, BookOpen } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Container } from '../../components/layout/container';
@@ -7,15 +7,33 @@ import { CourseCard } from '../../components/teacher/course-card';
 import { EmptyState } from '../../components/teacher/empty-state';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
+import { coursesApi } from '../../lib/api';
 import type { Course } from '../../types/course';
 
 export function TeacherCoursesPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<'all' | 'published' | 'draft'>('all');
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data - replace with actual API call
-  const courses: Course[] = [];
+  // Fetch courses on mount
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setIsLoading(true);
+        const response = await coursesApi.getAll(1, 100); // Get all courses
+        setCourses(response.data);
+      } catch (error) {
+        console.error('Failed to fetch courses:', error);
+        // TODO: Show error toast
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    void fetchCourses();
+  }, []);
 
   const filteredCourses = courses.filter((course) => {
     const matchesSearch =
@@ -38,11 +56,17 @@ export function TeacherCoursesPage() {
     navigate(`/teacher/courses/${course.id}/edit`);
   };
 
-  const handleDeleteCourse = (course: Course) => {
+  const handleDeleteCourse = async (course: Course) => {
     // Show confirmation dialog
     if (window.confirm(`Are you sure you want to delete "${course.title_en}"?`)) {
-      // Call API to delete course
-      console.log('Delete course:', course.id);
+      try {
+        await coursesApi.delete(course.id);
+        // Remove from local state
+        setCourses((prev) => prev.filter((c) => c.id !== course.id));
+      } catch (error) {
+        console.error('Failed to delete course:', error);
+        alert('Failed to delete course. Please try again.');
+      }
     }
   };
 
@@ -115,7 +139,11 @@ export function TeacherCoursesPage() {
         </div>
 
         {/* Course Grid */}
-        {filteredCourses.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading courses...</p>
+          </div>
+        ) : filteredCourses.length === 0 ? (
           courses.length === 0 ? (
             <EmptyState
               icon={BookOpen}
@@ -140,7 +168,7 @@ export function TeacherCoursesPage() {
                 key={course.id}
                 course={course}
                 onEdit={handleEditCourse}
-                onDelete={handleDeleteCourse}
+                onDelete={(course) => void handleDeleteCourse(course)}
                 onView={handleViewCourse}
               />
             ))}
