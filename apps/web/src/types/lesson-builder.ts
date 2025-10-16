@@ -30,19 +30,75 @@ export enum TransitionType {
   ZOOM = 'ZOOM',
 }
 
+// Extended metadata interfaces for each block type
+export interface HeadingBlockMetadata {
+  level?: 1 | 2 | 3;
+  alignment?: 'left' | 'center' | 'right';
+}
+
+export interface ImageBlockMetadata {
+  imageUrl?: string;
+  imageAlt?: string;
+  caption?: string;
+}
+
+export interface VerseBlockMetadata {
+  verseReference?: string;
+  translation?: 'KJV' | 'NIV' | 'ESV' | 'NKJV' | 'LSG' | 'NBS' | 'BDS';
+}
+
+export interface VocabularyBlockMetadata {
+  term_en?: string;
+  term_fr?: string;
+  partOfSpeech?: 'noun' | 'verb' | 'adjective' | 'adverb' | 'pronoun' | 'preposition' | 'conjunction' | 'interjection' | 'other';
+  pronunciation?: string;
+}
+
+export interface ListBlockMetadata {
+  listStyle?: 'bullet' | 'numbered';
+  items?: string[];
+}
+
+export interface CalloutBlockMetadata {
+  calloutType?: 'info' | 'warning' | 'success' | 'error';
+  title?: string;
+}
+
+export interface DividerBlockMetadata {
+  style?: 'solid' | 'dashed' | 'dotted';
+  width?: 'full' | 'half' | 'quarter';
+  color?: string;
+}
+
+// Union type for all metadata types
+export type BlockMetadata =
+  | HeadingBlockMetadata
+  | ImageBlockMetadata
+  | VerseBlockMetadata
+  | VocabularyBlockMetadata
+  | ListBlockMetadata
+  | CalloutBlockMetadata
+  | DividerBlockMetadata
+  | Record<string, unknown>;
+
+// Bilingual content structure
+export interface BilingualContent {
+  content_en?: {
+    html: string;
+    text: string;
+  };
+  content_fr?: {
+    html: string;
+    text: string;
+  };
+}
+
 export interface ContentBlock {
   id: string;
   type: ContentBlockType;
-  content: string; // JSON string for rich content
+  content: string; // JSON string for rich content (HTML)
   order: number;
-  metadata?: {
-    imageUrl?: string;
-    imageAlt?: string;
-    verseReference?: string;
-    verseTranslation?: string;
-    calloutType?: 'info' | 'warning' | 'success' | 'error';
-    listStyle?: 'bullet' | 'numbered';
-  };
+  metadata?: BlockMetadata;
 }
 
 export interface Slide {
@@ -107,10 +163,17 @@ export interface CreateContentBlockRequest {
   type: ContentBlockType;
   content: string;
   order?: number;
-  metadata?: ContentBlock['metadata'];
+  metadata?: BlockMetadata;
 }
 
 export interface UpdateContentBlockRequest extends Partial<CreateContentBlockRequest> {}
+
+export interface ReorderContentBlocksRequest {
+  block_orders: {
+    block_id: string;
+    order: number;
+  }[];
+}
 
 // UI State types
 export interface LessonBuilderState {
@@ -131,4 +194,13 @@ export interface SlideTemplate {
   description_fr: string;
   icon: string; // Lucide icon name
   defaultBlocks: Omit<ContentBlock, 'id' | 'order'>[];
+}
+
+// Block info for palette
+export interface BlockInfo {
+  type: ContentBlockType;
+  name: string;
+  description: string;
+  icon: string; // Lucide icon name
+  category: 'text' | 'media' | 'interactive' | 'layout';
 }

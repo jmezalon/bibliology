@@ -1,24 +1,30 @@
-import Link from '@tiptap/extension-link';
-import Placeholder from '@tiptap/extension-placeholder';
-import Underline from '@tiptap/extension-underline';
-import { useEditor, EditorContent } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import {
-  Bold,
-  Italic,
-  Underline as UnderlineIcon,
-  List,
-  ListOrdered,
-  Trash2,
+  AlertCircle,
+  Copy,
   GripVertical,
+  Settings,
+  Trash2,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
+import { validateBlock } from '../../lib/block-validation';
 import { cn } from '../../lib/utils';
-import type { ContentBlock as ContentBlockType } from '../../types/lesson-builder';
+import type {
+  ContentBlock as ContentBlockType,
+} from '../../types/lesson-builder';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover';
+
+import { CalloutBlock } from './blocks/callout-block';
+import { DividerBlock } from './blocks/divider-block';
+import { HeadingBlock } from './blocks/heading-block';
+import { ImageBlock } from './blocks/image-block';
+import { ListBlock } from './blocks/list-block';
+import { TextBlock } from './blocks/text-block';
+import { VerseBlock } from './blocks/verse-block';
+import { VocabularyBlock } from './blocks/vocabulary-block';
 
 interface ContentBlockProps {
   block: ContentBlockType;
@@ -26,6 +32,8 @@ interface ContentBlockProps {
   onSelect: () => void;
   onUpdate: (content: string, metadata?: ContentBlockType['metadata']) => void;
   onDelete: () => void;
+  onDuplicate: () => void;
+  isDragging?: boolean;
 }
 
 export function ContentBlock({
@@ -34,245 +42,137 @@ export function ContentBlock({
   onSelect,
   onUpdate,
   onDelete,
+  onDuplicate,
+  isDragging = false,
 }: ContentBlockProps) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [metadata, setMetadata] = useState(block.metadata || {});
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [currentLanguage, setCurrentLanguage] = useState<'en' | 'fr'>('en');
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link.configure({
-        openOnClick: false,
-      }),
-      Placeholder.configure({
-        placeholder: 'Start typing...',
-      }),
-    ],
-    content: block.content,
-    editable: isEditing,
-    onUpdate: ({ editor }) => {
-      onUpdate(editor.getHTML(), metadata);
-    },
+  // Drag and drop setup
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging: isSortableDragging,
+  } = useSortable({
+    id: block.id,
   });
 
-  useEffect(() => {
-    if (editor) {
-      editor.setEditable(isEditing);
-    }
-  }, [isEditing, editor]);
-
-  const handleDoubleClick = () => {
-    setIsEditing(true);
-    onSelect();
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
   };
 
-  const handleBlur = () => {
-    setIsEditing(false);
-  };
+  // Validate block
+  const validation = validateBlock(block.type, block.content, block.metadata as Record<string, unknown>);
+  const hasValidationErrors = !validation.isValid;
 
-  const renderBlockByType = () => {
+  // Render the appropriate block component
+  const renderBlockContent = () => {
+    const commonProps = {
+      editable: true,
+      language: currentLanguage,
+      onLanguageChange: setCurrentLanguage,
+    };
+
     switch (block.type) {
-      case 'TEXT' as typeof block.type:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'TEXT':
         return (
-          <div
-            className={cn(
-              'prose prose-sm dark:prose-invert max-w-none min-h-[60px]',
-              !isEditing && 'cursor-pointer',
-            )}
-            onDoubleClick={handleDoubleClick}
-          >
-            {isEditing && editor && (
-              <div className="border-b border-gray-200 dark:border-gray-700 pb-2 mb-2 flex gap-1">
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => editor.chain().focus().toggleBold().run()}
-                  title="Bold"
-                >
-                  <Bold className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => editor.chain().focus().toggleItalic().run()}
-                  title="Italic"
-                >
-                  <Italic className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => editor.chain().focus().toggleUnderline().run()}
-                  title="Underline"
-                >
-                  <UnderlineIcon className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => editor.chain().focus().toggleBulletList().run()}
-                  title="Bullet List"
-                >
-                  <List className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="h-8 w-8"
-                  onClick={() => editor.chain().focus().toggleOrderedList().run()}
-                  title="Numbered List"
-                >
-                  <ListOrdered className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-            <EditorContent editor={editor} onBlur={handleBlur} />
-          </div>
+          <TextBlock
+            content={block.content}
+            onUpdate={(content) => onUpdate(content, block.metadata)}
+            {...commonProps}
+          />
         );
 
-      case 'HEADING' as typeof block.type:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'HEADING':
         return (
-          <div
-            className={cn(
-              'prose prose-lg dark:prose-invert max-w-none min-h-[60px]',
-              !isEditing && 'cursor-pointer',
-            )}
-            onDoubleClick={handleDoubleClick}
-          >
-            <EditorContent editor={editor} onBlur={handleBlur} />
-          </div>
+          <HeadingBlock
+            content={block.content}
+            onUpdate={onUpdate}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={block.metadata as any}
+            {...commonProps}
+          />
         );
 
-      case 'IMAGE' as typeof block.type:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'IMAGE':
         return (
-          <div className="space-y-2">
-            <div className="space-y-2">
-              <Label htmlFor={`image-url-${block.id}`}>Image URL</Label>
-              <Input
-                id={`image-url-${block.id}`}
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                value={metadata.imageUrl || ''}
-                onChange={(e) => {
-                  const newMetadata = { ...metadata, imageUrl: e.target.value };
-                  setMetadata(newMetadata);
-                  onUpdate(block.content, newMetadata);
-                }}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor={`image-alt-${block.id}`}>Alt Text</Label>
-              <Input
-                id={`image-alt-${block.id}`}
-                placeholder="Image description"
-                value={metadata.imageAlt || ''}
-                onChange={(e) => {
-                  const newMetadata = { ...metadata, imageAlt: e.target.value };
-                  setMetadata(newMetadata);
-                  onUpdate(block.content, newMetadata);
-                }}
-              />
-            </div>
-            {metadata.imageUrl && (
-              <img
-                src={metadata.imageUrl}
-                alt={metadata.imageAlt || ''}
-                className="w-full rounded-lg border border-gray-200 dark:border-gray-700"
-              />
-            )}
-          </div>
+          <ImageBlock
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={(block.metadata || {}) as any}
+            onUpdate={(metadata) => onUpdate(block.content, metadata)}
+            {...commonProps}
+          />
         );
 
-      case 'VERSE' as typeof block.type:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'VERSE':
         return (
-          <div className="space-y-2">
-            <div className="space-y-2">
-              <Label htmlFor={`verse-ref-${block.id}`}>Verse Reference</Label>
-              <Input
-                id={`verse-ref-${block.id}`}
-                placeholder="e.g., John 3:16"
-                value={metadata.verseReference || ''}
-                onChange={(e) => {
-                  const newMetadata = { ...metadata, verseReference: e.target.value };
-                  setMetadata(newMetadata);
-                  onUpdate(block.content, newMetadata);
-                }}
-              />
-            </div>
-            <div
-              className={cn(
-                'prose prose-sm dark:prose-invert max-w-none min-h-[60px]',
-                !isEditing && 'cursor-pointer',
-              )}
-              onDoubleClick={handleDoubleClick}
-            >
-              <EditorContent editor={editor} onBlur={handleBlur} />
-            </div>
-            {metadata.verseReference && (
-              <div className="text-sm text-gray-600 dark:text-gray-400 italic">
-                — {metadata.verseReference}
-              </div>
-            )}
-          </div>
+          <VerseBlock
+            content={block.content}
+            onUpdate={onUpdate}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={block.metadata as any}
+            {...commonProps}
+          />
         );
 
-      case 'CALLOUT' as typeof block.type:
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'VOCABULARY':
         return (
-          <div className="space-y-2">
-            <div className="space-y-2">
-              <Label htmlFor={`callout-type-${block.id}`}>Callout Type</Label>
-              <select
-                id={`callout-type-${block.id}`}
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={metadata.calloutType || 'info'}
-                onChange={(e) => {
-                  const newMetadata = {
-                    ...metadata,
-                    calloutType: e.target.value as 'info' | 'warning' | 'success' | 'error',
-                  };
-                  setMetadata(newMetadata);
-                  onUpdate(block.content, newMetadata);
-                }}
-              >
-                <option value="info">Info</option>
-                <option value="warning">Warning</option>
-                <option value="success">Success</option>
-                <option value="error">Error</option>
-              </select>
-            </div>
-            <div
-              className={cn(
-                'p-4 rounded-lg border-l-4',
-                metadata.calloutType === 'info' && 'bg-blue-50 border-blue-500 dark:bg-blue-950',
-                metadata.calloutType === 'warning' &&
-                  'bg-yellow-50 border-yellow-500 dark:bg-yellow-950',
-                metadata.calloutType === 'success' &&
-                  'bg-green-50 border-green-500 dark:bg-green-950',
-                metadata.calloutType === 'error' && 'bg-red-50 border-red-500 dark:bg-red-950',
-                !isEditing && 'cursor-pointer',
-              )}
-              onDoubleClick={handleDoubleClick}
-            >
-              <EditorContent editor={editor} onBlur={handleBlur} />
-            </div>
-          </div>
+          <VocabularyBlock
+            content={block.content}
+            onUpdate={onUpdate}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={block.metadata as any}
+            {...commonProps}
+          />
+        );
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'LIST':
+        return (
+          <ListBlock
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={(block.metadata || {}) as any}
+            onUpdate={(metadata) => onUpdate(block.content, metadata)}
+            {...commonProps}
+          />
+        );
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'CALLOUT':
+        return (
+          <CalloutBlock
+            content={block.content}
+            onUpdate={onUpdate}
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={block.metadata as any}
+            {...commonProps}
+          />
+        );
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-enum-comparison
+      case 'DIVIDER':
+        return (
+          <DividerBlock
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            metadata={(block.metadata || {}) as any}
+            onUpdate={(metadata) => onUpdate(block.content, metadata)}
+            editable={true}
+          />
         );
 
       default:
         return (
-          <div
-            className={cn(
-              'prose prose-sm dark:prose-invert max-w-none min-h-[60px]',
-              !isEditing && 'cursor-pointer',
-            )}
-            onDoubleClick={handleDoubleClick}
-          >
-            <EditorContent editor={editor} onBlur={handleBlur} />
+          <div className="text-sm text-gray-500 dark:text-gray-400">
+            Unknown block type: {block.type}
           </div>
         );
     }
@@ -280,40 +180,134 @@ export function ContentBlock({
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
       className={cn(
         'relative group rounded-lg border-2 p-4 transition-all',
         isSelected
-          ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800'
-          : 'border-gray-200 dark:border-gray-700 hover:border-blue-300',
+          ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800 shadow-lg'
+          : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700',
+        (isDragging || isSortableDragging) && 'opacity-50',
       )}
       onClick={onSelect}
     >
       {/* Block Type Badge */}
-      <div className="absolute -top-2 -left-2 z-10 px-2 py-0.5 text-xs font-medium bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded">
-        {block.type}
+      <div
+        className={cn(
+          'absolute -top-2 -left-2 z-10 px-2 py-0.5 text-xs font-medium rounded',
+          'bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-600',
+          hasValidationErrors && 'bg-amber-100 dark:bg-amber-900 border-amber-500',
+        )}
+      >
+        <div className="flex items-center gap-1">
+          <span>{block.type}</span>
+          {hasValidationErrors && (
+            <AlertCircle className="h-3 w-3 text-amber-600 dark:text-amber-400" />
+          )}
+        </div>
       </div>
 
-      {/* Delete Button */}
-      <Button
-        size="icon"
-        variant="ghost"
+      {/* Action Buttons */}
+      <div
         className={cn(
-          'absolute -top-2 -right-2 z-10 h-6 w-6 bg-white dark:bg-gray-800 hover:bg-red-50 hover:text-red-600 border border-gray-300 dark:border-gray-600 shadow-sm transition-opacity',
+          'absolute -top-2 -right-2 z-10 flex items-center gap-1 transition-opacity',
           isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         )}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        title="Delete block"
       >
-        <Trash2 className="h-3 w-3" />
-      </Button>
+        {/* Settings */}
+        <Popover open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              size="icon"
+              variant="ghost"
+              className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-blue-50 hover:text-blue-600 border border-gray-300 dark:border-gray-600 shadow-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSettingsOpen(true);
+              }}
+              title="Block settings"
+            >
+              <Settings className="h-3 w-3" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-64" align="end">
+            <div className="space-y-3">
+              <div className="space-y-1">
+                <h4 className="font-medium text-sm">Block Settings</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400">
+                  {block.type} Block
+                </p>
+              </div>
+
+              {hasValidationErrors && (
+                <div className="p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-xs">
+                      <p className="font-medium text-amber-800 dark:text-amber-200 mb-1">
+                        Validation Errors
+                      </p>
+                      <ul className="list-disc list-inside space-y-1 text-amber-700 dark:text-amber-300">
+                        {validation.errors.map((error, i) => (
+                          <li key={i}>{error.message}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="text-xs text-gray-600 dark:text-gray-400 space-y-1">
+                <div className="flex justify-between">
+                  <span>Block ID:</span>
+                  <span className="font-mono">{block.id.slice(0, 8)}...</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Order:</span>
+                  <span>{block.order + 1}</span>
+                </div>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {/* Duplicate */}
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-green-50 hover:text-green-600 border border-gray-300 dark:border-gray-600 shadow-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDuplicate();
+          }}
+          title="Duplicate block"
+        >
+          <Copy className="h-3 w-3" />
+        </Button>
+
+        {/* Delete */}
+        <Button
+          size="icon"
+          variant="ghost"
+          className="h-6 w-6 bg-white dark:bg-gray-800 hover:bg-red-50 hover:text-red-600 border border-gray-300 dark:border-gray-600 shadow-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          title="Delete block"
+        >
+          <Trash2 className="h-3 w-3" />
+        </Button>
+      </div>
 
       {/* Drag Handle */}
       <div
+        {...attributes}
+        {...listeners}
         className={cn(
-          'absolute -left-8 top-1/2 -translate-y-1/2 flex h-8 w-6 items-center justify-center rounded-md bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 cursor-grab active:cursor-grabbing transition-opacity',
+          'absolute -left-8 top-1/2 -translate-y-1/2 flex h-8 w-6 items-center justify-center rounded-md',
+          'bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600',
+          'cursor-grab active:cursor-grabbing transition-opacity',
           isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100',
         )}
         title="Drag to reorder"
@@ -322,7 +316,7 @@ export function ContentBlock({
       </div>
 
       {/* Content */}
-      {renderBlockByType()}
+      <div className="relative">{renderBlockContent()}</div>
     </div>
   );
 }
