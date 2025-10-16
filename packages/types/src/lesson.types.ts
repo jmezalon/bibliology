@@ -142,9 +142,9 @@ export interface ContentBlock {
   slide_id: string;
   block_order: number;
   block_type: ContentBlockType;
-  content_en: Record<string, any>; // JSON
-  content_fr: Record<string, any> | null; // JSON
-  style_config: Record<string, any> | null; // JSON
+  content_en: Record<string, unknown>; // JSON
+  content_fr: Record<string, unknown> | null; // JSON
+  style_config: Record<string, unknown> | null; // JSON
   created_at: Date;
   updated_at: Date;
 }
@@ -153,17 +153,17 @@ export interface CreateContentBlockInput {
   slide_id: string;
   block_order: number;
   block_type: ContentBlockType;
-  content_en: Record<string, any>;
-  content_fr?: Record<string, any>;
-  style_config?: Record<string, any>;
+  content_en: Record<string, unknown>;
+  content_fr?: Record<string, unknown>;
+  style_config?: Record<string, unknown>;
 }
 
 export interface UpdateContentBlockInput {
   block_order?: number;
   block_type?: ContentBlockType;
-  content_en?: Record<string, any>;
-  content_fr?: Record<string, any>;
-  style_config?: Record<string, any>;
+  content_en?: Record<string, unknown>;
+  content_fr?: Record<string, unknown>;
+  style_config?: Record<string, unknown>;
 }
 
 export enum LessonProgressStatus {

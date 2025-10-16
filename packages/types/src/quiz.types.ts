@@ -75,13 +75,13 @@ export interface Question {
   quiz_id: string;
   question_order: number;
   question_type: QuestionType;
-  question_text_en: Record<string, any>; // JSON
-  question_text_fr: Record<string, any> | null; // JSON
-  options_en: Record<string, any> | null; // JSON
-  options_fr: Record<string, any> | null; // JSON
-  correct_answers: Record<string, any>; // JSON
-  explanation_en: Record<string, any> | null; // JSON
-  explanation_fr: Record<string, any> | null; // JSON
+  question_text_en: Record<string, unknown>; // JSON
+  question_text_fr: Record<string, unknown> | null; // JSON
+  options_en: Record<string, unknown> | null; // JSON
+  options_fr: Record<string, unknown> | null; // JSON
+  correct_answers: Record<string, unknown>; // JSON
+  explanation_en: Record<string, unknown> | null; // JSON
+  explanation_fr: Record<string, unknown> | null; // JSON
   points: number;
   created_at: Date;
   updated_at: Date;
@@ -91,26 +91,26 @@ export interface CreateQuestionInput {
   quiz_id: string;
   question_order: number;
   question_type: QuestionType;
-  question_text_en: Record<string, any>;
-  question_text_fr?: Record<string, any>;
-  options_en?: Record<string, any>;
-  options_fr?: Record<string, any>;
-  correct_answers: Record<string, any>;
-  explanation_en?: Record<string, any>;
-  explanation_fr?: Record<string, any>;
+  question_text_en: Record<string, unknown>;
+  question_text_fr?: Record<string, unknown>;
+  options_en?: Record<string, unknown>;
+  options_fr?: Record<string, unknown>;
+  correct_answers: Record<string, unknown>;
+  explanation_en?: Record<string, unknown>;
+  explanation_fr?: Record<string, unknown>;
   points?: number;
 }
 
 export interface UpdateQuestionInput {
   question_order?: number;
   question_type?: QuestionType;
-  question_text_en?: Record<string, any>;
-  question_text_fr?: Record<string, any>;
-  options_en?: Record<string, any>;
-  options_fr?: Record<string, any>;
-  correct_answers?: Record<string, any>;
-  explanation_en?: Record<string, any>;
-  explanation_fr?: Record<string, any>;
+  question_text_en?: Record<string, unknown>;
+  question_text_fr?: Record<string, unknown>;
+  options_en?: Record<string, unknown>;
+  options_fr?: Record<string, unknown>;
+  correct_answers?: Record<string, unknown>;
+  explanation_en?: Record<string, unknown>;
+  explanation_fr?: Record<string, unknown>;
   points?: number;
 }
 
@@ -152,7 +152,7 @@ export interface CreateQuizSubmissionInput {
 export interface SubmitQuizInput {
   answers: {
     question_id: string;
-    answer_given: Record<string, any>;
+    answer_given: Record<string, unknown>;
   }[];
   time_spent_seconds?: number;
 }
@@ -161,7 +161,7 @@ export interface QuestionAnswer {
   id: string;
   submission_id: string;
   question_id: string;
-  answer_given: Record<string, any>; // JSON
+  answer_given: Record<string, unknown>; // JSON
   is_correct: boolean;
   points_earned: number;
   answered_at: Date;

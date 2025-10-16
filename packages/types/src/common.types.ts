@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> {
   meta: PaginationMeta;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
@@ -33,7 +33,7 @@ export interface ErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
   };
   timestamp: string;
 }
@@ -41,7 +41,7 @@ export interface ErrorResponse {
 export interface ValidationError {
   field: string;
   message: string;
-  value?: any;
+  value?: unknown;
 }
 
 export interface ValidationErrorResponse extends ErrorResponse {
@@ -86,7 +86,7 @@ export interface ActivityLog {
   entity_id: string | null;
   ip_address: string | null;
   user_agent: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
   created_at: Date;
 }
 
