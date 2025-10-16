@@ -151,6 +151,7 @@ Once your API service is deployed:
    ```
 
 Alternatively, run migrations locally using the External Database URL:
+
 ```bash
 cd /Users/mezalonm/Library/Mobile\ Documents/com~apple~CloudDocs/bibliology
 DATABASE_URL="<External PostgreSQL URL>" pnpm --filter @bibliology/api db:migrate:deploy
@@ -196,14 +197,17 @@ NODE_ENV=production
 ### 2.4 Get API Production URL
 
 Once deployed, Vercel will give you a production URL like:
+
 - `https://bibliology-xyz123.vercel.app`
 
 **SAVE AS**: `API_URL` value for GitHub Secrets should be your Render API URL:
+
 - `https://bibliology-api.onrender.com`
 
 ### 2.5 Update CORS_ORIGIN
 
 Go back to Render → API Service → Environment Variables:
+
 - Update `CORS_ORIGIN` to your Vercel production URL
 - Click "Save Changes" (will redeploy)
 
@@ -244,29 +248,32 @@ You have several options for production file storage:
 1. Go to https://github.com/jmezalon/bibliology/settings/secrets/actions
 2. Click "New repository secret" for each:
 
-| Secret Name | Value | Where to Get It |
-|------------|-------|-----------------|
-| `RENDER_DEPLOY_HOOK_API` | Deploy hook URL | Render → API Service → Settings → Deploy Hook |
-| `RENDER_DEPLOY_HOOK_WORKER` | Deploy hook URL | Render → Worker Service → Settings → Deploy Hook |
-| `VERCEL_TOKEN` | Vercel API token | Vercel → Account Settings → Tokens |
-| `API_URL` | Production API URL | `https://bibliology-api.onrender.com` |
+| Secret Name                 | Value              | Where to Get It                                  |
+| --------------------------- | ------------------ | ------------------------------------------------ |
+| `RENDER_DEPLOY_HOOK_API`    | Deploy hook URL    | Render → API Service → Settings → Deploy Hook    |
+| `RENDER_DEPLOY_HOOK_WORKER` | Deploy hook URL    | Render → Worker Service → Settings → Deploy Hook |
+| `VERCEL_TOKEN`              | Vercel API token   | Vercel → Account Settings → Tokens               |
+| `API_URL`                   | Production API URL | `https://bibliology-api.onrender.com`            |
 
 ## Step 5: Deploy
 
 ### Automatic Deployment (Recommended)
 
 Push to main branch:
+
 ```bash
 git push origin main
 ```
 
 This will trigger:
+
 1. CI workflow (lint, test, build, security)
 2. Deploy workflow (API → Frontend → Worker)
 
 ### Manual Deployment
 
 Trigger from GitHub Actions:
+
 1. Go to https://github.com/jmezalon/bibliology/actions/workflows/deploy.yml
 2. Click "Run workflow"
 3. Select branch: `main`
@@ -288,34 +295,41 @@ After deployment, verify:
 ## Monitoring
 
 ### Render Logs
+
 - API: https://dashboard.render.com → bibliology-api → Logs
 - Worker: https://dashboard.render.com → bibliology-worker → Logs
 
 ### Vercel Logs
+
 - https://vercel.com/dashboard → Your Project → Deployments → [Latest] → Logs
 
 ### GitHub Actions
+
 - https://github.com/jmezalon/bibliology/actions
 
 ## Troubleshooting
 
 ### API Won't Start
+
 - Check Render logs for errors
 - Verify DATABASE_URL is correct
 - Verify JWT secrets are set
 - Ensure migrations have run
 
 ### Frontend Can't Connect to API
+
 - Check VITE_API_URL in Vercel
 - Check CORS_ORIGIN in Render API
 - Verify API is running and healthy
 
 ### Worker Not Processing Jobs
+
 - Check Redis connection
 - Verify worker logs in Render
 - Ensure environment variables match API
 
 ### Database Migration Errors
+
 - Use External Database URL for local migrations
 - Check PostgreSQL version compatibility
 - Verify database user has proper permissions
@@ -333,6 +347,7 @@ After deployment, verify:
 **Total**: $0/month on free tiers (suitable for development/testing)
 
 For production scale, expect ~$20-50/month for:
+
 - Render: $7/month (always-on API)
 - PostgreSQL: $7/month (shared)
 - Redis: Free

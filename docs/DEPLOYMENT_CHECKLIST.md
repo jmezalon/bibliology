@@ -33,12 +33,14 @@ Use this checklist to deploy Bibliology to production. Check off each item as yo
 ## Step 4: Set Up Storage (Choose One)
 
 ### Option A: Cloudflare R2 (Recommended)
+
 - [ ] Create Cloudflare account
 - [ ] Create R2 bucket (`bibliology-prod`)
 - [ ] Create API token with R2 permissions
 - [ ] **SAVE** endpoint, access key, secret key
 
 ### Option B: AWS S3
+
 - [ ] Create AWS account
 - [ ] Create S3 bucket (`bibliology-prod`)
 - [ ] Create IAM user with S3 permissions
@@ -84,6 +86,7 @@ Use this checklist to deploy Bibliology to production. Check off each item as yo
 ## Step 6: Run Database Migrations
 
 ### Option A: Using External Database URL (Recommended)
+
 ```bash
 cd /Users/mezalonm/Library/Mobile\ Documents/com~apple~CloudDocs/bibliology
 DATABASE_URL="<External PostgreSQL URL>" pnpm --filter @bibliology/api db:migrate:deploy
@@ -95,6 +98,7 @@ DATABASE_URL="<External PostgreSQL URL>" pnpm --filter @bibliology/api db:seed
 - [ ] Verify no errors
 
 ### Option B: Using Render Shell
+
 ```bash
 render services link
 render shell bibliology-api
@@ -169,6 +173,7 @@ Go to https://github.com/jmezalon/bibliology/settings/secrets/actions
 ## Step 13: Test Production Deployment
 
 ### Frontend Tests
+
 - [ ] Visit your Vercel URL
 - [ ] Homepage loads correctly
 - [ ] CSS styles are applied
@@ -177,6 +182,7 @@ Go to https://github.com/jmezalon/bibliology/settings/secrets/actions
 - [ ] Click "Register" - should show registration page
 
 ### Authentication Tests
+
 - [ ] Register a new account (use real email)
 - [ ] Should redirect to dashboard after registration
 - [ ] Logout
@@ -184,6 +190,7 @@ Go to https://github.com/jmezalon/bibliology/settings/secrets/actions
 - [ ] Should see dashboard
 
 ### API Tests
+
 ```bash
 # Health check
 curl https://bibliology-api.onrender.com/health
@@ -199,6 +206,7 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 - [ ] Check Render logs for request logs
 
 ### Teacher Dashboard Tests (if applicable)
+
 - [ ] Login as teacher account
 - [ ] Can access `/teacher/dashboard`
 - [ ] Can see "My Courses" page
@@ -222,6 +230,7 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 ## Post-Deployment (Optional)
 
 ### Custom Domain
+
 - [ ] Purchase domain (if needed)
 - [ ] Add domain to Vercel project
 - [ ] Update DNS records
@@ -229,17 +238,20 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 - [ ] Add GitHub Secret for custom domain
 
 ### Monitoring & Alerts
+
 - [ ] Set up error monitoring (Sentry, LogRocket, etc.)
 - [ ] Configure email notifications in Render
 - [ ] Set up uptime monitoring (UptimeRobot, etc.)
 - [ ] Create status page (optional)
 
 ### Database Backups
+
 - [ ] Enable automatic backups in Render PostgreSQL
 - [ ] Test restore procedure
 - [ ] Document backup schedule
 
 ### Security Hardening
+
 - [ ] Review CORS settings (tighten if needed)
 - [ ] Review rate limiting settings
 - [ ] Enable 2FA on all accounts (GitHub, Render, Vercel)
@@ -247,6 +259,7 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 - [ ] Schedule secret rotation (90 days)
 
 ### Performance Optimization
+
 - [ ] Configure CDN for static assets
 - [ ] Enable Redis caching
 - [ ] Review database query performance
@@ -255,6 +268,7 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 ## Troubleshooting
 
 ### API Won't Start
+
 1. Check Render logs for error messages
 2. Verify all environment variables are set
 3. Verify DATABASE_URL is correct (Internal URL)
@@ -262,6 +276,7 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 5. Check PostgreSQL database is "Available"
 
 ### Frontend Can't Connect to API
+
 1. Check VITE_API_URL in Vercel
 2. Check CORS_ORIGIN in Render API
 3. Verify API health check works
@@ -269,12 +284,14 @@ curl -X POST https://bibliology-api.onrender.com/api/auth/register \
 5. Ensure no trailing slashes in URLs
 
 ### Database Migration Errors
+
 1. Use External Database URL for migrations
 2. Check Render logs for specific error
 3. Verify database connection works
 4. Try running migrations manually via Render Shell
 
 ### Worker Not Processing Jobs
+
 1. Check Worker logs in Render
 2. Verify Redis connection settings
 3. Ensure Worker has same environment as API

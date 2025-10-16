@@ -34,9 +34,7 @@ export function ComingSoonPage({ title, description }: ComingSoonPageProps) {
               <Button onClick={() => navigate(-1)} variant="outline">
                 Go Back
               </Button>
-              <Button onClick={() => navigate('/teacher/dashboard')}>
-                Return to Dashboard
-              </Button>
+              <Button onClick={() => navigate('/teacher/dashboard')}>Return to Dashboard</Button>
             </div>
           </CardContent>
         </Card>
