@@ -34,7 +34,7 @@ export function RegisterPage() {
     try {
       const { confirmPassword: _confirmPassword, ...registerData } = data;
 
-      await registerUser(registerData);
+      const newUser = await registerUser(registerData);
 
       toast({
         title: 'Account created!',
@@ -42,7 +42,13 @@ export function RegisterPage() {
         variant: 'success',
       });
 
-      navigate('/dashboard', { replace: true });
+      // Redirect based on user role (future-proof for teacher registration)
+      const redirectPath =
+        newUser.role === 'TEACHER' || newUser.role === 'ADMIN'
+          ? '/teacher/dashboard'
+          : '/dashboard';
+
+      navigate(redirectPath, { replace: true });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error && 'response' in error

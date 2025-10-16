@@ -19,7 +19,7 @@ import type { LoginRequest } from '../types/auth';
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading, user } = useAuthStore();
+  const { login, isLoading } = useAuthStore();
   const { toast } = useToast();
 
   const {
@@ -33,7 +33,7 @@ export function LoginPage() {
 
   const onSubmit = async (data: LoginRequest) => {
     try {
-      await login(data);
+      const loggedInUser = await login(data);
 
       toast({
         title: 'Welcome back!',
@@ -43,7 +43,7 @@ export function LoginPage() {
 
       // Redirect based on user role
       const redirectPath =
-        user?.role === 'TEACHER' || user?.role === 'ADMIN'
+        loggedInUser.role === 'TEACHER' || loggedInUser.role === 'ADMIN'
           ? '/teacher/dashboard'
           : from === '/dashboard'
             ? '/dashboard'

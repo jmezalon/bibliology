@@ -11,8 +11,8 @@ interface AuthState {
   error: string | null;
 
   // Actions
-  login: (credentials: LoginRequest) => Promise<void>;
-  register: (data: RegisterRequest) => Promise<void>;
+  login: (credentials: LoginRequest) => Promise<User>;
+  register: (data: RegisterRequest) => Promise<User>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   clearError: () => void;
@@ -46,6 +46,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
+
+          return response.user;
         } catch (error: unknown) {
           const errorMessage =
             error instanceof Error && 'response' in error
@@ -79,6 +81,8 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
             error: null,
           });
+
+          return response.user;
         } catch (error: unknown) {
           const errorMessage =
             error instanceof Error && 'response' in error
