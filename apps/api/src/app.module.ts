@@ -16,7 +16,7 @@ import { UsersModule } from './users/users.module';
     // Environment configuration
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '../../.env',
+      envFilePath: '.env',
     }),
 
     // Logging
