@@ -12,6 +12,7 @@ import { DashboardPage } from './pages/dashboard';
 import { HomePage } from './pages/home';
 import { LoginPage } from './pages/login';
 import { RegisterPage } from './pages/register';
+import { CourseCreatePage } from './pages/teacher/course-create';
 import { TeacherCourseDetailPage } from './pages/teacher/course-detail';
 import { TeacherCoursesPage } from './pages/teacher/courses';
 import { TeacherDashboardPage } from './pages/teacher/dashboard';
@@ -95,6 +96,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
                   <TeacherCoursesPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/courses/new"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <CourseCreatePage />
                 </ProtectedRoute>
               }
             />
