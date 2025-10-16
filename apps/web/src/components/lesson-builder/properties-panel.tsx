@@ -1,4 +1,4 @@
-import type { Slide, LessonWithSlides, TransitionType } from '../../types/lesson-builder';
+import type { Slide, LessonWithSlides } from '../../types/lesson-builder';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../ui/accordion';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
@@ -11,13 +11,6 @@ interface PropertiesPanelProps {
   onLessonUpdate: (data: Partial<LessonWithSlides>) => void;
   onSlideUpdate: (data: Partial<Slide>) => void;
 }
-
-const TRANSITIONS = [
-  { value: 'NONE', label: 'None' },
-  { value: 'FADE', label: 'Fade' },
-  { value: 'SLIDE', label: 'Slide' },
-  { value: 'ZOOM', label: 'Zoom' },
-];
 
 export function PropertiesPanel({
   lesson,
@@ -44,7 +37,7 @@ export function PropertiesPanel({
         {/* Slide Settings Tab */}
         <TabsContent value="slide" className="p-4 space-y-4">
           {currentSlide ? (
-            <Accordion type="multiple" defaultValue={['title', 'notes', 'timing']}>
+            <Accordion type="multiple" defaultValue={['title', 'notes']}>
               {/* Slide Title */}
               <AccordionItem value="title">
                 <AccordionTrigger>Title</AccordionTrigger>
@@ -81,8 +74,8 @@ export function PropertiesPanel({
                       <Label htmlFor="notes-en">Notes (English)</Label>
                       <Textarea
                         id="notes-en"
-                        value={currentSlide.teacher_notes_en || ''}
-                        onChange={(e) => onSlideUpdate({ teacher_notes_en: e.target.value })}
+                        value={currentSlide.notes_en || ''}
+                        onChange={(e) => onSlideUpdate({ notes_en: e.target.value })}
                         placeholder="Private notes for this slide"
                         rows={4}
                       />
@@ -91,62 +84,11 @@ export function PropertiesPanel({
                       <Label htmlFor="notes-fr">Notes (French)</Label>
                       <Textarea
                         id="notes-fr"
-                        value={currentSlide.teacher_notes_fr || ''}
-                        onChange={(e) => onSlideUpdate({ teacher_notes_fr: e.target.value })}
+                        value={currentSlide.notes_fr || ''}
+                        onChange={(e) => onSlideUpdate({ notes_fr: e.target.value })}
                         placeholder="Notes privées"
                         rows={4}
                       />
-                    </div>
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
-
-              {/* Timing & Transition */}
-              <AccordionItem value="timing">
-                <AccordionTrigger>Timing & Transition</AccordionTrigger>
-                <AccordionContent>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="estimated-time">Estimated Time (seconds)</Label>
-                      <Input
-                        id="estimated-time"
-                        type="number"
-                        min="0"
-                        step="30"
-                        value={currentSlide.estimated_time_seconds || 0}
-                        onChange={(e) =>
-                          onSlideUpdate({
-                            estimated_time_seconds: parseInt(e.target.value) || 0,
-                          })
-                        }
-                      />
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Approximately {Math.ceil((currentSlide.estimated_time_seconds || 0) / 60)}{' '}
-                        minute
-                        {Math.ceil((currentSlide.estimated_time_seconds || 0) / 60) !== 1
-                          ? 's'
-                          : ''}
-                      </p>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="transition">Transition Effect</Label>
-                      <select
-                        id="transition"
-                        className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                        value={currentSlide.transition}
-                        onChange={(e) =>
-                          onSlideUpdate({
-                            transition: e.target.value as TransitionType,
-                          })
-                        }
-                      >
-                        {TRANSITIONS.map((transition) => (
-                          <option key={transition.value} value={transition.value}>
-                            {transition.label}
-                          </option>
-                        ))}
-                      </select>
                     </div>
                   </div>
                 </AccordionContent>

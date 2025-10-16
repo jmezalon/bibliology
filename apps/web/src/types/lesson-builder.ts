@@ -114,15 +114,11 @@ export interface Slide {
   id: string;
   lesson_id: string;
   layout: SlideLayoutType;
+  slide_order: number; // Renamed from 'order' to match backend
   title_en?: string;
   title_fr?: string;
-  teacher_notes_en?: string;
-  teacher_notes_fr?: string;
-  background_color?: string;
-  background_image_url?: string;
-  transition: TransitionType;
-  estimated_time_seconds?: number;
-  order: number;
+  notes_en?: string; // Renamed from teacher_notes_en to match backend
+  notes_fr?: string; // Renamed from teacher_notes_fr to match backend
   content_blocks: ContentBlock[];
   created_at: Date;
   updated_at: Date;
@@ -152,12 +148,8 @@ export interface CreateSlideRequest {
 }
 
 export interface UpdateSlideRequest extends Partial<CreateSlideRequest> {
-  teacher_notes_en?: string;
-  teacher_notes_fr?: string;
-  background_color?: string;
-  background_image_url?: string;
-  transition?: TransitionType;
-  estimated_time_seconds?: number;
+  notes_en?: string; // Renamed to match backend
+  notes_fr?: string; // Renamed to match backend
 }
 
 export interface ReorderSlidesRequest {

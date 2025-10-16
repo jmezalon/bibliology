@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Copy, GripVertical, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 import { cn } from '../../lib/utils';
 import type { Slide } from '../../types/lesson-builder';
@@ -16,7 +16,7 @@ interface SlideThumbnailProps {
   onDuplicate: () => void;
 }
 
-export function SlideThumbnail({
+export const SlideThumbnail = memo(function SlideThumbnail({
   slide,
   index,
   isActive,
@@ -59,17 +59,7 @@ export function SlideThumbnail({
         onClick={onClick}
       >
         {/* Slide Preview Content */}
-        <div
-          className="w-full h-full p-2 text-xs overflow-hidden"
-          style={{
-            backgroundColor: slide.background_color || undefined,
-            backgroundImage: slide.background_image_url
-              ? `url(${slide.background_image_url})`
-              : undefined,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        >
+        <div className="w-full h-full p-2 text-xs overflow-hidden">
           {/* Show slide title or layout type */}
           <div className="font-semibold truncate text-gray-900 dark:text-gray-100">
             {slide.title_en || slide.layout}
@@ -126,4 +116,4 @@ export function SlideThumbnail({
       </button>
     </div>
   );
-}
+});

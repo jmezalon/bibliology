@@ -119,12 +119,6 @@ export function SlideCanvas({
             maxWidth: '960px',
             minHeight: '540px',
             aspectRatio: '16 / 9',
-            backgroundColor: slide.background_color || undefined,
-            backgroundImage: slide.background_image_url
-              ? `url(${slide.background_image_url})`
-              : undefined,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
           }}
         >
           {/* Slide Content Area */}

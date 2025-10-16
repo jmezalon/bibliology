@@ -256,9 +256,9 @@ export function useReorderSlides(lessonId: string) {
         const updatedSlides = previousLesson.slides
           .map((slide) => ({
             ...slide,
-            order: orderMap.get(slide.id) ?? slide.order,
+            slide_order: orderMap.get(slide.id) ?? slide.slide_order,
           }))
-          .sort((a, b) => a.order - b.order);
+          .sort((a, b) => a.slide_order - b.slide_order);
 
         queryClient.setQueryData<LessonWithSlides>(['lessons', lessonId], {
           ...previousLesson,

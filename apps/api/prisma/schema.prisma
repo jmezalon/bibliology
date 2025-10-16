@@ -204,6 +204,7 @@ model Slide {
 
   @@unique([lesson_id, slide_order])
   @@index([lesson_id])
+  @@index([updated_at]) // For sorting by recent changes
   @@map("slides")
 }
 
@@ -231,6 +232,7 @@ model ContentBlock {
   @@unique([slide_id, block_order])
   @@index([slide_id])
   @@index([block_type])
+  @@index([updated_at]) // For sorting by recent changes
   @@map("content_blocks")
 }
 

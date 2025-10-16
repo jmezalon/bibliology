@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { AlertCircle, Copy, GripVertical, Settings, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, memo } from 'react';
 
 import { validateBlock } from '../../lib/block-validation';
 import { cn } from '../../lib/utils';
@@ -28,7 +28,7 @@ interface ContentBlockProps {
   isDragging?: boolean;
 }
 
-export function ContentBlock({
+export const ContentBlock = memo(function ContentBlock({
   block,
   isSelected,
   onSelect,
@@ -313,4 +313,4 @@ export function ContentBlock({
       <div className="relative">{renderBlockContent()}</div>
     </div>
   );
-}
+});

@@ -1,5 +1,5 @@
 import { ArrowLeft, Save, Eye, Monitor } from 'lucide-react';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 import { PropertiesPanel } from '../../components/lesson-builder/properties-panel';
@@ -16,6 +16,13 @@ import {
   useDuplicateSlide,
   useReorderSlides,
 } from '../../hooks/use-lesson';
+import {
+  useCreateContentBlock,
+  useUpdateContentBlock,
+  useDeleteContentBlock,
+  useDuplicateContentBlock,
+  useReorderContentBlocks,
+} from '../../hooks/use-slides';
 import { toast } from '../../hooks/use-toast';
 import { debounce } from '../../lib/utils';
 import type { UpdateLessonRequest } from '../../types/course';
@@ -38,13 +45,26 @@ export function LessonBuilderPage() {
   // Fetch lesson data
   const { data: lesson, isLoading, isError } = useLesson(lessonId);
 
-  // Mutations
+  // Slide mutations
   const updateLessonMutation = useUpdateLesson(lessonId || '');
   const createSlideMutation = useCreateSlide(lessonId || '');
   const updateSlideMutation = useUpdateSlide(lessonId || '', currentSlideId || '');
   const deleteSlideMutation = useDeleteSlide(lessonId || '');
   const duplicateSlideMutation = useDuplicateSlide(lessonId || '');
   const reorderSlidesMutation = useReorderSlides(lessonId || '');
+
+  // Content block mutations
+  const createContentBlockMutation = useCreateContentBlock(currentSlideId || '', lessonId || '');
+  const updateContentBlockMutation = useUpdateContentBlock(currentSlideId || '', lessonId || '');
+  const deleteContentBlockMutation = useDeleteContentBlock(currentSlideId || '', lessonId || '');
+  const duplicateContentBlockMutation = useDuplicateContentBlock(
+    currentSlideId || '',
+    lessonId || '',
+  );
+  const reorderContentBlocksMutation = useReorderContentBlocks(
+    currentSlideId || '',
+    lessonId || '',
+  );
 
   // Set current slide when lesson loads
   useEffect(() => {
@@ -224,31 +244,66 @@ export function LessonBuilderPage() {
     debouncedAutoSave();
   };
 
-  // Content block operations (placeholder - needs API endpoints)
-  const handleContentBlockUpdate = (
-    blockId: string,
-    content: string,
-    metadata?: Record<string, unknown>,
-  ) => {
-    // TODO: Implement content block update API
-    console.log('Update content block:', blockId, content, metadata);
-    debouncedAutoSave();
-  };
+  // Content block operations
+  const handleContentBlockUpdate = useCallback(
+    (blockId: string, content: string, metadata?: Record<string, unknown>) => {
+      if (!currentSlideId) return;
+      void updateContentBlockMutation.mutateAsync({
+        blockId,
+        data: { content, metadata },
+      });
+      debouncedAutoSave();
+    },
+    [currentSlideId, updateContentBlockMutation, debouncedAutoSave],
+  );
 
-  const handleContentBlockDelete = (blockId: string) => {
-    // TODO: Implement content block delete API
-    console.log('Delete content block:', blockId);
-    debouncedAutoSave();
-  };
+  const handleContentBlockDelete = useCallback(
+    async (blockId: string) => {
+      if (!currentSlideId) return;
+      await deleteContentBlockMutation.mutateAsync(blockId);
+    },
+    [currentSlideId, deleteContentBlockMutation],
+  );
 
-  const handleContentBlockAdd = (type: ContentBlockType) => {
-    // TODO: Implement content block create API
-    console.log('Add content block:', type);
-    debouncedAutoSave();
-  };
+  const handleContentBlockAdd = useCallback(
+    async (type: ContentBlockType) => {
+      if (!currentSlideId) return;
 
-  // Get current slide
-  const currentSlide = lesson?.slides.find((s) => s.id === currentSlideId) || null;
+      // Get the current number of blocks to set the order
+      const currentSlide = lesson?.slides.find((s) => s.id === currentSlideId);
+      const blockOrder = currentSlide?.content_blocks.length || 0;
+
+      await createContentBlockMutation.mutateAsync({
+        slide_id: currentSlideId,
+        type,
+        content: JSON.stringify({}), // Empty content, user will fill it in
+        order: blockOrder,
+      });
+    },
+    [currentSlideId, lesson?.slides, createContentBlockMutation],
+  );
+
+  const handleContentBlockDuplicate = useCallback(
+    async (blockId: string) => {
+      if (!currentSlideId) return;
+      await duplicateContentBlockMutation.mutateAsync(blockId);
+    },
+    [currentSlideId, duplicateContentBlockMutation],
+  );
+
+  const handleContentBlockReorder = useCallback(
+    async (blockOrders: { block_id: string; order: number }[]) => {
+      if (!currentSlideId) return;
+      await reorderContentBlocksMutation.mutateAsync({ block_orders: blockOrders });
+    },
+    [currentSlideId, reorderContentBlocksMutation],
+  );
+
+  // Get current slide - memoized to prevent recalculations
+  const currentSlide = useMemo(
+    () => lesson?.slides.find((s) => s.id === currentSlideId) || null,
+    [lesson?.slides, currentSlideId],
+  );
 
   // Loading state
   if (isLoading) {
@@ -378,14 +433,14 @@ export function LessonBuilderPage() {
           <SlideToolbar
             slide={currentSlide}
             onLayoutChange={(layout) => handleSlideUpdate({ layout })}
-            onBackgroundColorChange={(color) => handleSlideUpdate({ background_color: color })}
-            onBackgroundImageChange={(url) => handleSlideUpdate({ background_image_url: url })}
           />
           <SlideCanvas
             slide={currentSlide}
             onContentBlockUpdate={handleContentBlockUpdate}
-            onContentBlockDelete={handleContentBlockDelete}
-            onContentBlockAdd={handleContentBlockAdd}
+            onContentBlockDelete={(blockId) => void handleContentBlockDelete(blockId)}
+            onContentBlockAdd={(type) => void handleContentBlockAdd(type)}
+            onContentBlockDuplicate={(blockId) => void handleContentBlockDuplicate(blockId)}
+            onContentBlockReorder={(blockOrders) => void handleContentBlockReorder(blockOrders)}
           />
         </div>
 
