@@ -9,7 +9,7 @@ export class AppService {
   async getHealth() {
     try {
       // Check database connection
-      await this.prisma.$queryRaw`SELECT 1`;
+      await this.prisma.$queryRaw<Array<{ '?column?': number }>>`SELECT 1`;
 
       return {
         status: 'ok',

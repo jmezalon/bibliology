@@ -29,7 +29,7 @@ export class AuthService {
     const { email, password, name, language_pref } = registerDto;
 
     // Check if user already exists
-    const existingUser = await this.prisma.user.findUnique({
+    const existingUser: User | null = await this.prisma.user.findUnique({
       where: { email },
     });
 
@@ -41,7 +41,7 @@ export class AuthService {
     const password_hash = await bcrypt.hash(password, 10);
 
     // Create user with last_login set on creation
-    const user = await this.prisma.user.create({
+    const user: User = await this.prisma.user.create({
       data: {
         email,
         password_hash,
@@ -56,7 +56,7 @@ export class AuthService {
     const access_token = this.generateToken(user);
 
     // Log activity (fire-and-forget)
-    this.logActivity(user.id, 'REGISTER').catch((error) => {
+    void this.logActivity(user.id, 'REGISTER').catch((error: unknown) => {
       this.logger.error('Failed to log registration activity', error);
     });
 
@@ -98,7 +98,7 @@ export class AuthService {
     const access_token = this.generateToken(user);
 
     // Log activity (fire-and-forget)
-    this.logActivity(user.id, 'LOGIN').catch((error) => {
+    void this.logActivity(user.id, 'LOGIN').catch((error: unknown) => {
       this.logger.error('Failed to log login activity', error);
     });
 

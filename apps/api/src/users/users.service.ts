@@ -23,7 +23,7 @@ export class UsersService {
 
     const where = role ? { role } : {};
 
-    const [users, total] = await Promise.all([
+    const [users, total]: [User[], number] = await Promise.all([
       this.prisma.user.findMany({
         where,
         skip,
@@ -43,7 +43,7 @@ export class UsersService {
    * Get user by ID
    */
   async findOne(id: string, requestingUserId: string, requestingUserRole: UserRole): Promise<UserDto> {
-    const user = await this.prisma.user.findUnique({
+    const user: User | null = await this.prisma.user.findUnique({
       where: { id },
     });
 
@@ -69,7 +69,7 @@ export class UsersService {
     requestingUserRole: UserRole,
   ): Promise<UserDto> {
     // Check if user exists
-    const user = await this.prisma.user.findUnique({
+    const user: User | null = await this.prisma.user.findUnique({
       where: { id },
     });
 
@@ -87,7 +87,7 @@ export class UsersService {
       throw new ForbiddenException('Only admins can change user roles');
     }
 
-    const updatedUser = await this.prisma.user.update({
+    const updatedUser: User = await this.prisma.user.update({
       where: { id },
       data: updateUserDto,
     });
