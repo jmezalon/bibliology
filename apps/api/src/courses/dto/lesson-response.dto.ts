@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { LessonStatus, SlideLayout, ContentBlockType, Prisma } from '@prisma/client';
 import { IsArray, IsUUID, ArrayMinSize, ArrayMaxSize } from 'class-validator';
-import { LessonStatus, SlideLayout, ContentBlockType } from '@prisma/client';
 
 export class ContentBlockDto {
   @ApiProperty()
@@ -13,13 +13,13 @@ export class ContentBlockDto {
   block_type: ContentBlockType;
 
   @ApiProperty({ description: 'Content in English (JSONB)' })
-  content_en: any;
+  content_en: Prisma.JsonValue;
 
   @ApiPropertyOptional({ description: 'Content in French (JSONB)' })
-  content_fr?: any;
+  content_fr?: Prisma.JsonValue | null;
 
   @ApiPropertyOptional({ description: 'Style configuration (JSONB)' })
-  style_config?: any;
+  style_config?: Prisma.JsonValue | null;
 
   @ApiProperty()
   created_at: Date;

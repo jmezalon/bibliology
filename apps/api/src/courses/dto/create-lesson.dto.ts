@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsInt, IsEnum, IsBoolean, Min, MaxLength, Matches } from 'class-validator';
 import { LessonStatus } from '@prisma/client';
+import { IsString, IsNotEmpty, IsOptional, IsInt, IsEnum, IsBoolean, Min, MaxLength, Matches } from 'class-validator';
 
 export class CreateLessonDto {
   @ApiProperty({ description: 'Course ID this lesson belongs to' })

@@ -22,10 +22,12 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
-import { CoursesService } from './courses.service';
+
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+
+import { CoursesService } from './courses.service';
 import {
   CreateCourseDto,
   UpdateCourseDto,

@@ -5,14 +5,36 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import { LessonStatus, Prisma } from '@prisma/client';
+
 import { PrismaService } from '../prisma/prisma.service';
-import { LessonStatus } from '@prisma/client';
+
 import {
   CreateCourseDto,
   UpdateCourseDto,
   CourseResponseDto,
   CourseListResponseDto,
 } from './dto';
+
+// Type for course with teacher and counts
+type CourseWithRelations = Prisma.CourseGetPayload<{
+  include: {
+    teacher: {
+      select: {
+        id: true;
+        name: true;
+        email: true;
+        avatar_url: true;
+      };
+    };
+    _count: {
+      select: {
+        lessons: true;
+        enrollments: true;
+      };
+    };
+  };
+}>;
 
 @Injectable()
 export class CoursesService {
@@ -332,7 +354,9 @@ export class CoursesService {
   /**
    * Map Prisma course object to CourseResponseDto
    */
-  private mapToCourseResponse(course: any): CourseResponseDto {
+  private mapToCourseResponse = (
+    course: CourseWithRelations,
+  ): CourseResponseDto => {
     return {
       id: course.id,
       slug: course.slug,
@@ -355,5 +379,5 @@ export class CoursesService {
       lessonCount: course._count?.lessons,
       enrollmentCount: course._count?.enrollments,
     };
-  }
+  };
 }

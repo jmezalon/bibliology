@@ -5,7 +5,11 @@ import {
   BadRequestException,
   ForbiddenException,
 } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+
 import { PrismaService } from '../prisma/prisma.service';
+
+import { CoursesService } from './courses.service';
 import {
   CreateLessonDto,
   UpdateLessonDto,
@@ -13,7 +17,31 @@ import {
   LessonListResponseDto,
   ReorderSlidesDto,
 } from './dto';
-import { CoursesService } from './courses.service';
+
+// Type for lesson with course, slides, and content blocks
+type LessonWithRelations = Prisma.LessonGetPayload<{
+  include: {
+    course: {
+      select: {
+        id: true;
+        title_en: true;
+        title_fr: true;
+        slug: true;
+        teacher_id: true;
+      };
+    };
+    slides: {
+      include: {
+        content_blocks: true;
+      };
+    };
+    _count: {
+      select: {
+        slides: true;
+      };
+    };
+  };
+}>;
 
 @Injectable()
 export class LessonsService {
@@ -335,23 +363,25 @@ export class LessonsService {
   /**
    * Map Prisma lesson object to LessonResponseDto
    */
-  private mapToLessonResponse(lesson: any): LessonResponseDto {
+  private mapToLessonResponse = (
+    lesson: Partial<LessonWithRelations>,
+  ): LessonResponseDto => {
     const response: LessonResponseDto = {
-      id: lesson.id,
-      slug: lesson.slug,
-      course_id: lesson.course_id,
-      title_en: lesson.title_en,
+      id: lesson.id!,
+      slug: lesson.slug!,
+      course_id: lesson.course_id!,
+      title_en: lesson.title_en!,
       title_fr: lesson.title_fr,
       description_en: lesson.description_en,
       description_fr: lesson.description_fr,
-      lesson_order: lesson.lesson_order,
-      status: lesson.status,
+      lesson_order: lesson.lesson_order!,
+      status: lesson.status!,
       estimated_minutes: lesson.estimated_minutes,
-      imported_from_pptx: lesson.imported_from_pptx,
+      imported_from_pptx: lesson.imported_from_pptx!,
       original_filename: lesson.original_filename,
       import_date: lesson.import_date,
-      created_at: lesson.created_at,
-      updated_at: lesson.updated_at,
+      created_at: lesson.created_at!,
+      updated_at: lesson.updated_at!,
       published_at: lesson.published_at,
     };
 
@@ -365,7 +395,7 @@ export class LessonsService {
     }
 
     if (lesson.slides) {
-      response.slides = lesson.slides.map((slide: any) => ({
+      response.slides = lesson.slides.map((slide) => ({
         id: slide.id,
         slide_order: slide.slide_order,
         layout: slide.layout,
@@ -375,7 +405,7 @@ export class LessonsService {
         notes_fr: slide.notes_fr,
         created_at: slide.created_at,
         updated_at: slide.updated_at,
-        content_blocks: slide.content_blocks.map((block: any) => ({
+        content_blocks: slide.content_blocks.map((block) => ({
           id: block.id,
           block_order: block.block_order,
           block_type: block.block_type,
@@ -389,5 +419,5 @@ export class LessonsService {
     }
 
     return response;
-  }
+  };
 }

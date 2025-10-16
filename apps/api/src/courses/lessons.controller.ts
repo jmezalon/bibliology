@@ -22,10 +22,11 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
-import { LessonsService } from './lessons.service';
+
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+
 import {
   CreateLessonDto,
   UpdateLessonDto,
@@ -33,6 +34,7 @@ import {
   LessonListResponseDto,
   ReorderSlidesDto,
 } from './dto';
+import { LessonsService } from './lessons.service';
 
 @ApiTags('lessons')
 @ApiBearerAuth()
