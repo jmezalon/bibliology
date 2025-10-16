@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/commo
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserDto } from '../auth/dto';
-import { UserRole } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -12,6 +12,11 @@ export class UsersService {
    * Get all users (Admin only)
    */
   async findAll(page: number = 1, limit: number = 10, role?: UserRole): Promise<{ users: UserDto[]; total: number }> {
+    // Validate and sanitize pagination parameters
+    if (page < 1) page = 1;
+    if (limit < 1) limit = 10;
+    if (limit > 100) limit = 100; // Max 100 items per page to prevent DoS
+
     const skip = (page - 1) * limit;
 
     const where = role ? { role } : {};
@@ -27,7 +32,7 @@ export class UsersService {
     ]);
 
     return {
-      users: users.map(this.sanitizeUser),
+      users: users.map((user) => this.sanitizeUser(user)),
       total,
     };
   }
@@ -134,7 +139,7 @@ export class UsersService {
   /**
    * Sanitize user (remove sensitive data)
    */
-  private sanitizeUser(user: any): UserDto {
+  private sanitizeUser(user: User): UserDto {
     return {
       id: user.id,
       email: user.email,

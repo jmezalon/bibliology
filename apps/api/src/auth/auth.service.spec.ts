@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { vi } from 'vitest';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -13,17 +14,17 @@ describe('AuthService', () => {
 
   const mockPrismaService = {
     user: {
-      findUnique: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
+      findUnique: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
     },
     activityLog: {
-      create: jest.fn(),
+      create: vi.fn(),
     },
   };
 
   const mockJwtService = {
-    sign: jest.fn(),
+    sign: vi.fn(),
   };
 
   beforeEach(async () => {
@@ -47,7 +48,7 @@ describe('AuthService', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('register', () => {

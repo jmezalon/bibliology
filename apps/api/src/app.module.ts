@@ -37,6 +37,17 @@ import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
         autoLogging: {
           ignore: (req) => req.url === '/api/health',
         },
+        // Redact sensitive fields from logs
+        redact: {
+          paths: [
+            'req.headers.authorization',
+            'req.headers.cookie',
+            'req.body.password',
+            'req.body.access_token',
+            'res.headers["set-cookie"]',
+          ],
+          remove: true,
+        },
       },
     }),
 

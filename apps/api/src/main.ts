@@ -16,6 +16,12 @@ async function bootstrap() {
   // Get config service
   const configService = app.get(ConfigService);
 
+  // Validate critical environment variables
+  const jwtSecret = configService.get<string>('JWT_SECRET');
+  if (!jwtSecret || jwtSecret === 'your-super-secret-jwt-key-change-this-in-production') {
+    throw new Error('JWT_SECRET must be set to a secure value in environment variables');
+  }
+
   // Security
   app.use(helmet());
 
