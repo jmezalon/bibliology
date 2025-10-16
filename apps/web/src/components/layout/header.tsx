@@ -32,7 +32,11 @@ export function Header() {
         {isAuthenticated && (
           <nav className="hidden md:flex items-center gap-6">
             <Link
-              to="/dashboard"
+              to={
+                user?.role === 'TEACHER' || user?.role === 'ADMIN'
+                  ? '/teacher/dashboard'
+                  : '/dashboard'
+              }
               className="text-sm font-medium transition-colors hover:text-primary"
             >
               Dashboard

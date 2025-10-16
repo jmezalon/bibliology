@@ -19,7 +19,7 @@ import type { LoginRequest } from '../types/auth';
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login, isLoading } = useAuthStore();
+  const { login, isLoading, user } = useAuthStore();
   const { toast } = useToast();
 
   const {
@@ -41,7 +41,15 @@ export function LoginPage() {
         variant: 'success',
       });
 
-      navigate(from, { replace: true });
+      // Redirect based on user role
+      const redirectPath =
+        user?.role === 'TEACHER' || user?.role === 'ADMIN'
+          ? '/teacher/dashboard'
+          : from === '/dashboard'
+            ? '/dashboard'
+            : from;
+
+      navigate(redirectPath, { replace: true });
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error && 'response' in error
