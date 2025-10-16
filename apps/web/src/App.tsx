@@ -11,6 +11,7 @@ import { DashboardPage } from './pages/dashboard';
 import { HomePage } from './pages/home';
 import { LoginPage } from './pages/login';
 import { RegisterPage } from './pages/register';
+import { ComingSoonPage } from './pages/coming-soon';
 import { TeacherCourseDetailPage } from './pages/teacher/course-detail';
 import { TeacherCoursesPage } from './pages/teacher/courses';
 import { TeacherDashboardPage } from './pages/teacher/dashboard';
@@ -54,6 +55,16 @@ function App() {
               }
             />
 
+            <Route
+              path="/courses"
+              element={
+                <ComingSoonPage
+                  title="Course Catalog"
+                  description="Browse our comprehensive collection of biblical studies courses"
+                />
+              }
+            />
+
             {/* Protected Routes */}
             <Route
               path="/dashboard"
@@ -91,6 +102,50 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
                   <TeacherCourseDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/students"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <ComingSoonPage
+                    title="Student Management"
+                    description="View and manage your enrolled students"
+                  />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/analytics"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <ComingSoonPage
+                    title="Analytics & Reports"
+                    description="Track student progress and course performance metrics"
+                  />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/resources"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <ComingSoonPage
+                    title="Teaching Resources"
+                    description="Access teaching materials and documentation"
+                  />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/teacher/settings"
+              element={
+                <ProtectedRoute allowedRoles={[UserRole.TEACHER, UserRole.ADMIN]}>
+                  <ComingSoonPage
+                    title="Account Settings"
+                    description="Manage your profile and preferences"
+                  />
                 </ProtectedRoute>
               }
             />
