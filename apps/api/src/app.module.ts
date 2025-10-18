@@ -4,12 +4,16 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { CoursesModule } from './courses/courses.module';
+import { EnrollmentsModule } from './enrollments/enrollments.module';
+import { NotesModule } from './notes/notes.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ProgressModule } from './progress/progress.module';
 import { UsersModule } from './users/users.module';
 
 @Module({
@@ -18,6 +22,7 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      ignoreEnvFile: process.env.NODE_ENV === 'test', // Use process.env in tests
     }),
 
     // Logging
@@ -65,9 +70,13 @@ import { UsersModule } from './users/users.module';
     PrismaModule,
 
     // Features
+    AnalyticsModule,
     AuthModule,
     UsersModule,
     CoursesModule,
+    EnrollmentsModule,
+    NotesModule,
+    ProgressModule,
   ],
   controllers: [AppController],
   providers: [

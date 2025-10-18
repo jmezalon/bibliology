@@ -21,9 +21,10 @@ export const apiClient: AxiosInstance = axios.create({
  */
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    // Log in development
-    if (import.meta.env.DEV) {
-      console.log(`[API Request] ${config.method?.toUpperCase()} ${config.url}`);
+    // Add JWT token from localStorage
+    const token = localStorage.getItem('auth_token');
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
@@ -42,11 +43,6 @@ apiClient.interceptors.request.use(
  */
 apiClient.interceptors.response.use(
   (response) => {
-    // Log in development
-    if (import.meta.env.DEV) {
-      console.log(`[API Response] ${response.status} ${response.config.url}`);
-    }
-
     return response;
   },
   (error: AxiosError) => {
