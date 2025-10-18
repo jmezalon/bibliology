@@ -22,6 +22,7 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 #### Enrollments (enrollments.e2e-spec.ts)
 
 **Covered Scenarios:**
+
 - ✅ Student can enroll in a published course
 - ✅ Cannot enroll twice in the same course (409 Conflict)
 - ✅ Cannot enroll in non-existent course (404)
@@ -34,6 +35,7 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 - ✅ Authorization: Teachers cannot enroll as students
 
 **Endpoints Tested:**
+
 - `POST /api/enrollments/courses/:courseId` - Enroll in course
 - `GET /api/enrollments/me` - Get my enrollments
 - `GET /api/enrollments/me?status=ACTIVE` - Filter enrollments by status
@@ -42,6 +44,7 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 #### Progress Tracking (progress.e2e-spec.ts)
 
 **Covered Scenarios:**
+
 - ✅ Creates initial progress when first accessed
 - ✅ Returns existing progress
 - ✅ Updates progress manually
@@ -56,12 +59,14 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 - ✅ Requires enrollment to access lesson progress (403)
 
 **Endpoints Tested:**
+
 - `GET /api/lessons/:lessonId/progress` - Get lesson progress
 - `POST /api/lessons/:lessonId/progress` - Update lesson progress
 - `POST /api/lessons/:lessonId/slides/view` - Mark slide as viewed
 - `GET /api/courses/:courseId/progress` - Get course progress
 
 **Auto-Completion Logic:**
+
 - Lesson status transitions: NOT_STARTED → IN_PROGRESS → COMPLETED
 - Completion happens when `total_slides_viewed >= total_slides_in_lesson`
 - Enrollment progress updates automatically when lessons complete
@@ -70,6 +75,7 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 #### Student Notes (notes.e2e-spec.ts)
 
 **Covered Scenarios:**
+
 - ✅ Create notes on any slide
 - ✅ Handle very long notes (10,000 characters)
 - ✅ Validate required fields (400 error)
@@ -83,6 +89,7 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 - ✅ Authorization required for all operations
 
 **Endpoints Tested:**
+
 - `POST /api/notes` - Create note
 - `GET /api/lessons/:lessonId/notes` - Get all notes for a lesson
 - `PUT /api/notes/:id` - Update note
@@ -91,6 +98,7 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 #### Student Journey Integration (student-journey.e2e-spec.ts)
 
 **Complete Workflow Test:**
+
 1. Student enrolls in course
 2. Views lesson progress (initially NOT_STARTED)
 3. Views first slide with time tracking
@@ -106,12 +114,14 @@ All integration tests are located in `apps/api/test/integration/` and follow the
 13. Total time tracked accurately
 
 **Additional Test Cases:**
+
 - ✅ Navigate slides out of order
 - ✅ Multiple notes on same slide
 - ✅ Edit and delete notes during lesson
 - ✅ Data isolation between multiple students
 
 **Verification Points:**
+
 - Progress percentages calculated correctly
 - Time tracking accumulates properly
 - Completion timestamps set when appropriate
@@ -139,6 +149,7 @@ pnpm test -- --watch
 ### Prerequisites
 
 Before running tests, ensure:
+
 1. PostgreSQL database is running (via docker-compose)
 2. Database schema is up to date (`pnpm db:migrate:deploy`)
 3. Environment variables are set correctly
@@ -146,12 +157,14 @@ Before running tests, ensure:
 ### Test Database
 
 Tests use the same database as development. Each test:
+
 - Cleans all relevant tables in `beforeEach` hooks
 - Creates fresh test data
 - Runs isolated from other tests
 - Cleans up after itself
 
 **Note:** Tests will delete data from these tables:
+
 - studentNote
 - lessonProgress
 - enrollment
@@ -264,6 +277,7 @@ The following frontend component tests still need to be created:
 **File:** `apps/web/src/components/lesson-viewer/lesson-viewer.test.tsx`
 
 **Required Tests:**
+
 - [ ] Renders lesson content correctly
 - [ ] Navigate between slides (forward/backward)
 - [ ] Updates progress on slide change
@@ -278,6 +292,7 @@ The following frontend component tests still need to be created:
 ### Performance Tests
 
 **Required Tests:**
+
 - [ ] Lesson with 50+ slides loads within 2 seconds
 - [ ] Progress updates don't block UI interactions
 - [ ] Notes auto-save efficiently (debounced, max 1 request/second)
@@ -286,6 +301,7 @@ The following frontend component tests still need to be created:
 ### Integration Tests (Frontend)
 
 **Required Tests:**
+
 - [ ] Complete lesson viewing flow
 - [ ] Progress syncs across browser tabs
 - [ ] Offline mode (if implemented)
@@ -352,6 +368,7 @@ await prisma.slide.createMany({
 ## Continuous Integration
 
 Tests run automatically on:
+
 - Every pull request
 - Every push to main branch
 - Before deployment
@@ -363,6 +380,7 @@ Tests run automatically on:
 ### Tests Failing Locally
 
 1. **Database Connection Issues**
+
    ```bash
    # Ensure database is running
    docker-compose up -d postgres
@@ -372,6 +390,7 @@ Tests run automatically on:
    ```
 
 2. **Port Already in Use**
+
    ```bash
    # Kill process on port 3000
    lsof -ti:3000 | xargs kill -9
@@ -392,12 +411,14 @@ Tests run automatically on:
 ## Code Coverage
 
 Current coverage targets:
+
 - Statements: > 80%
 - Branches: > 75%
 - Functions: > 80%
 - Lines: > 80%
 
 Run coverage report:
+
 ```bash
 pnpm test -- --coverage
 ```

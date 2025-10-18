@@ -28,9 +28,7 @@ export const notesApi = {
    * Get all notes for a lesson
    */
   getLessonNotes: async (lessonId: string): Promise<StudentNote[]> => {
-    const response = await apiClient.get<StudentNote[]>(
-      `/lessons/${lessonId}/notes`,
-    );
+    const response = await apiClient.get<StudentNote[]>(`/lessons/${lessonId}/notes`);
     return response.data;
   },
 
@@ -53,14 +51,8 @@ export const notesApi = {
   /**
    * Update a note
    */
-  update: async (
-    noteId: string,
-    data: UpdateNoteRequest,
-  ): Promise<StudentNote> => {
-    const response = await apiClient.put<StudentNote>(
-      `/notes/${noteId}`,
-      data,
-    );
+  update: async (noteId: string, data: UpdateNoteRequest): Promise<StudentNote> => {
+    const response = await apiClient.put<StudentNote>(`/notes/${noteId}`, data);
     return response.data;
   },
 

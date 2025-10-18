@@ -48,12 +48,7 @@ export function SlideContentRenderer({ blocks, language }: SlideContentRendererP
     switch (block.type) {
       case ContentBlockType.TEXT:
         return (
-          <TextBlock
-            key={block.id}
-            content={block.content}
-            onUpdate={() => {}}
-            {...commonProps}
-          />
+          <TextBlock key={block.id} content={block.content} onUpdate={() => {}} {...commonProps} />
         );
 
       case ContentBlockType.HEADING:

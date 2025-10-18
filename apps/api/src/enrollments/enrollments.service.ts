@@ -18,10 +18,7 @@ export class EnrollmentsService {
   /**
    * Enroll a student in a course
    */
-  async enrollInCourse(
-    studentId: string,
-    courseId: string,
-  ): Promise<EnrollmentResponseDto> {
+  async enrollInCourse(studentId: string, courseId: string): Promise<EnrollmentResponseDto> {
     // Check if course exists and is published
     const course = await this.prisma.course.findUnique({
       where: { id: courseId },
@@ -131,10 +128,7 @@ export class EnrollmentsService {
   /**
    * Get all students enrolled in a course (for teachers)
    */
-  async getCourseStudents(
-    courseId: string,
-    teacherId: string,
-  ): Promise<EnrollmentResponseDto[]> {
+  async getCourseStudents(courseId: string, teacherId: string): Promise<EnrollmentResponseDto[]> {
     // Verify teacher owns the course
     const course = await this.prisma.course.findFirst({
       where: {
@@ -144,9 +138,7 @@ export class EnrollmentsService {
     });
 
     if (!course) {
-      throw new ForbiddenException(
-        'You do not have permission to view this course',
-      );
+      throw new ForbiddenException('You do not have permission to view this course');
     }
 
     const enrollments = await this.prisma.enrollment.findMany({
@@ -174,10 +166,7 @@ export class EnrollmentsService {
   /**
    * Unenroll from a course
    */
-  async unenrollFromCourse(
-    enrollmentId: string,
-    studentId: string,
-  ): Promise<void> {
+  async unenrollFromCourse(enrollmentId: string, studentId: string): Promise<void> {
     const enrollment = await this.prisma.enrollment.findUnique({
       where: { id: enrollmentId },
     });
@@ -187,9 +176,7 @@ export class EnrollmentsService {
     }
 
     if (enrollment.student_id !== studentId) {
-      throw new ForbiddenException(
-        'You do not have permission to unenroll from this course',
-      );
+      throw new ForbiddenException('You do not have permission to unenroll from this course');
     }
 
     await this.prisma.enrollment.update({

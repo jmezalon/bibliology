@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any */
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { LessonProgressStatus } from '@prisma/client';
 
 import { PrismaService } from '../prisma/prisma.service';
@@ -22,10 +18,7 @@ export class ProgressService {
   /**
    * Get student's progress for a specific lesson
    */
-  async getLessonProgress(
-    lessonId: string,
-    studentId: string,
-  ): Promise<LessonProgressResponseDto> {
+  async getLessonProgress(lessonId: string, studentId: string): Promise<LessonProgressResponseDto> {
     // Get the enrollment for this lesson's course
     const lesson = await this.prisma.lesson.findUnique({
       where: { id: lessonId },
@@ -192,17 +185,13 @@ export class ProgressService {
     }
 
     // Calculate new total slides viewed
-    const totalSlidesViewed = Math.max(
-      progress.total_slides_viewed,
-      markSlideDto.slide_index + 1,
-    );
+    const totalSlidesViewed = Math.max(progress.total_slides_viewed, markSlideDto.slide_index + 1);
 
     // Update progress
     return this.updateLessonProgress(lessonId, studentId, {
       current_slide_index: markSlideDto.slide_index,
       total_slides_viewed: totalSlidesViewed,
-      time_spent_seconds:
-        progress.time_spent_seconds + markSlideDto.time_spent_seconds,
+      time_spent_seconds: progress.time_spent_seconds + markSlideDto.time_spent_seconds,
       status:
         totalSlidesViewed >= lesson.slides.length
           ? LessonProgressStatus.COMPLETED
@@ -213,10 +202,7 @@ export class ProgressService {
   /**
    * Get overall course progress for a student
    */
-  async getCourseProgress(
-    courseId: string,
-    studentId: string,
-  ): Promise<CourseProgressResponseDto> {
+  async getCourseProgress(courseId: string, studentId: string): Promise<CourseProgressResponseDto> {
     // Get enrollment
     const enrollment = await this.prisma.enrollment.findUnique({
       where: {
@@ -281,22 +267,17 @@ export class ProgressService {
     );
     const estimatedTimeRemainingSeconds =
       totalEstimatedMinutes > 0
-        ? (totalEstimatedMinutes * 60 *
-            (enrollment.total_lessons - lessonsCompleted)) /
+        ? (totalEstimatedMinutes * 60 * (enrollment.total_lessons - lessonsCompleted)) /
           enrollment.total_lessons
         : null;
 
     // Map lesson progress
     const lessonProgress = enrollment.course.lessons.map((lesson) => {
-      const progress = enrollment.lesson_progress.find(
-        (p) => p.lesson_id === lesson.id,
-      );
+      const progress = enrollment.lesson_progress.find((p) => p.lesson_id === lesson.id);
 
       const completionPercentage = progress
         ? lesson.slides.length > 0
-          ? Math.round(
-              (progress.total_slides_viewed / lesson.slides.length) * 100,
-            )
+          ? Math.round((progress.total_slides_viewed / lesson.slides.length) * 100)
           : 0
         : 0;
 
@@ -323,9 +304,7 @@ export class ProgressService {
       total_time_spent_seconds: totalTimeSpent,
       estimated_time_remaining_seconds: estimatedTimeRemainingSeconds,
       last_accessed_at: enrollment.last_accessed_at,
-      lesson_progress: lessonProgress.sort(
-        (a, b) => a.lesson_order - b.lesson_order,
-      ),
+      lesson_progress: lessonProgress.sort((a, b) => a.lesson_order - b.lesson_order),
     };
   }
 
@@ -370,15 +349,10 @@ export class ProgressService {
    * Map lesson progress to DTO
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private mapToLessonProgressDto(
-    progress: any,
-    totalSlides: number,
-  ): LessonProgressResponseDto {
+  private mapToLessonProgressDto(progress: any, totalSlides: number): LessonProgressResponseDto {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const completionPercentage =
-      totalSlides > 0
-        ? Math.round((progress.total_slides_viewed / totalSlides) * 100)
-        : 0;
+      totalSlides > 0 ? Math.round((progress.total_slides_viewed / totalSlides) * 100) : 0;
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return
     return {

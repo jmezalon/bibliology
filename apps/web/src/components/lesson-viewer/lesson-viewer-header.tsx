@@ -50,12 +50,7 @@ export function LessonViewerHeader({
         {/* Right: Controls */}
         <div className="flex items-center gap-2 flex-shrink-0">
           {/* Language Toggle */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onLanguageToggle}
-            className="min-w-[80px]"
-          >
+          <Button variant="outline" size="sm" onClick={onLanguageToggle} className="min-w-[80px]">
             <Globe className="h-4 w-4 mr-2" />
             {language === 'en' ? 'EN' : 'FR'}
           </Button>
@@ -68,11 +63,7 @@ export function LessonViewerHeader({
               onClick={onFullScreenToggle}
               className="hidden sm:flex"
             >
-              {isFullScreen ? (
-                <Minimize className="h-4 w-4" />
-              ) : (
-                <Maximize className="h-4 w-4" />
-              )}
+              {isFullScreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
             </Button>
           )}
         </div>

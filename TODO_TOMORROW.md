@@ -3,6 +3,7 @@
 ## 📋 Current Status
 
 ### ✅ What's Working
+
 - **Deployment**: All services deployed successfully
   - API to Render: ✅ Live
   - Frontend to Vercel: ✅ Live
@@ -11,6 +12,7 @@
 - **Code Quality**: ESLint passing, TypeScript typecheck passing, builds successful
 
 ### ❌ What's Failing
+
 - **Test Suite**: 12 tests failing in CI/CD pipeline
   - 10 tests in `test/unit/content-validator.spec.ts`
   - 2 tests in `test/unit/content-blocks.service.spec.ts`
@@ -20,11 +22,13 @@
 ## 🔧 Issue: Test Failures Due to Validation Changes
 
 ### Root Cause
+
 We relaxed validation schemas in `/apps/api/src/courses/slides/validators/content-validator.ts` to fix runtime errors. The tests still expect strict validation with required fields.
 
 ### Failing Tests Breakdown
 
 #### 1. Content Validator Tests (10 failures)
+
 **File**: `test/unit/content-validator.spec.ts`
 
 Tests expect validation to **reject** content, but now validation **accepts** it:
@@ -52,6 +56,7 @@ Tests expect validation to **reject** content, but now validation **accepts** it
    - `should reject CALLOUT without text` - Now accepts (html is optional)
 
 #### 2. Content Blocks Service Tests (2 failures)
+
 **File**: `test/unit/content-blocks.service.spec.ts`
 
 1. `should throw BadRequestException for invalid content structure` - Type error instead
@@ -62,9 +67,11 @@ Tests expect validation to **reject** content, but now validation **accepts** it
 ## 📝 Tasks for Tomorrow
 
 ### Priority 1: Fix Test Suite ⚠️
+
 **Goal**: Make CI/CD pipeline green by fixing all 12 failing tests
 
 **Option A: Update Tests to Match Relaxed Validation** (Recommended)
+
 ```typescript
 // Update test expectations from:
 expect(result.valid).toBe(false);
@@ -74,26 +81,31 @@ expect(result.valid).toBe(true);
 ```
 
 **Files to Update**:
+
 - `/apps/api/test/unit/content-validator.spec.ts`
 - `/apps/api/test/unit/content-blocks.service.spec.ts`
 
 **Option B: Restore Strict Validation**
+
 - Revert validation changes in `/apps/api/src/courses/slides/validators/content-validator.ts`
 - Update frontend to always send required fields
 - Update default content generation in `lesson-builder.tsx`
 
 ### Priority 2: Review Validation Strategy 🤔
+
 **Decision Needed**: What's the right validation balance?
 
 **Current State**: All fields optional (flexible, but less data integrity)
 **Previous State**: Most fields required (strict, but caused runtime errors)
 
 **Questions to Answer**:
+
 1. Should blocks be saveable in incomplete states (drafts)?
 2. Which fields are truly required for a block to be "valid"?
 3. Do we need separate validation for create vs. update operations?
 
 **Suggested Approach**:
+
 - Keep relaxed validation for **create** operations (allow drafts)
 - Add stricter validation for **publish** operations
 - Add UI-level validation to guide users
@@ -103,6 +115,7 @@ expect(result.valid).toBe(true);
 ## 🗺️ Reference: Current Validation State
 
 ### Modified Schemas (All fields optional)
+
 **File**: `/apps/api/src/courses/slides/validators/content-validator.ts`
 
 ```typescript
@@ -153,16 +166,19 @@ const CalloutContentSchema = z.object({
 ## 💡 Additional Improvements to Consider
 
 ### 1. Block Validation UX
+
 - Add real-time validation feedback in the UI
 - Show which fields are required before publishing
 - Add "incomplete block" visual indicator
 
 ### 2. Test Coverage
+
 - Add tests for partial/draft content blocks
 - Add tests for publish validation (when implemented)
 - Update test data to use current field names (html vs text)
 
 ### 3. Content Block Enhancements
+
 - Consider adding a `status` field to blocks (draft/complete/published)
 - Add validation messages that guide users
 - Implement autosave for incomplete blocks
@@ -172,6 +188,7 @@ const CalloutContentSchema = z.object({
 ## 📊 Today's Accomplishments
 
 ### Code Quality
+
 - ✅ Removed all console.log statements
 - ✅ Fixed 60 ESLint errors (type safety improvements)
 - ✅ Applied Prettier formatting
@@ -179,6 +196,7 @@ const CalloutContentSchema = z.object({
 - ✅ Successful production build
 
 ### Bug Fixes
+
 - ✅ Fixed "Unknown block type" error (backend serialization)
 - ✅ Fixed TEXT block showing raw JSON
 - ✅ Fixed null metadata breaking content blocks
@@ -187,6 +205,7 @@ const CalloutContentSchema = z.object({
 - ✅ Implemented preview mode for students
 
 ### Deployment
+
 - ✅ Fixed missing type definitions
 - ✅ Added missing components
 - ✅ Deployed to production successfully

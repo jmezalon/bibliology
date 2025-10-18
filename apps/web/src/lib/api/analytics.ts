@@ -56,15 +56,10 @@ export const analyticsApi = {
   /**
    * Get most popular lessons
    */
-  getPopularLessons: async (
-    limit = 10,
-  ): Promise<PopularLessonsResponse> => {
-    const response = await apiClient.get<PopularLessonsResponse>(
-      '/analytics/lessons/popular',
-      {
-        params: { limit },
-      },
-    );
+  getPopularLessons: async (limit = 10): Promise<PopularLessonsResponse> => {
+    const response = await apiClient.get<PopularLessonsResponse>('/analytics/lessons/popular', {
+      params: { limit },
+    });
     return response.data;
   },
 
@@ -72,8 +67,7 @@ export const analyticsApi = {
    * Get platform engagement metrics
    */
   getEngagementMetrics: async (): Promise<EngagementMetrics> => {
-    const response =
-      await apiClient.get<EngagementMetrics>('/analytics/engagement');
+    const response = await apiClient.get<EngagementMetrics>('/analytics/engagement');
     return response.data;
   },
 
@@ -81,9 +75,7 @@ export const analyticsApi = {
    * Get analytics for a specific course
    */
   getCourseAnalytics: async (courseId: string): Promise<CourseAnalytics> => {
-    const response = await apiClient.get<CourseAnalytics>(
-      `/analytics/courses/${courseId}`,
-    );
+    const response = await apiClient.get<CourseAnalytics>(`/analytics/courses/${courseId}`);
     return response.data;
   },
 };

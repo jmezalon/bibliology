@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Request } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
 
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -51,11 +43,7 @@ export class ProgressController {
     @Body() updateDto: UpdateProgressDto,
     @Request() req: RequestWithUser,
   ): Promise<LessonProgressResponseDto> {
-    return this.progressService.updateLessonProgress(
-      lessonId,
-      req.user.id,
-      updateDto,
-    );
+    return this.progressService.updateLessonProgress(lessonId, req.user.id, updateDto);
   }
 
   /**
@@ -69,11 +57,7 @@ export class ProgressController {
     @Body() markSlideDto: MarkSlideViewedDto,
     @Request() req: RequestWithUser,
   ): Promise<LessonProgressResponseDto> {
-    return this.progressService.markSlideViewed(
-      lessonId,
-      req.user.id,
-      markSlideDto,
-    );
+    return this.progressService.markSlideViewed(lessonId, req.user.id, markSlideDto);
   }
 
   /**

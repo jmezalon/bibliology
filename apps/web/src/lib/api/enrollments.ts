@@ -41,18 +41,14 @@ export const enrollmentsApi = {
    * Enroll in a course
    */
   enroll: async (courseId: string): Promise<Enrollment> => {
-    const response = await apiClient.post<Enrollment>(
-      `/enrollments/courses/${courseId}`,
-    );
+    const response = await apiClient.post<Enrollment>(`/enrollments/courses/${courseId}`);
     return response.data;
   },
 
   /**
    * Get current student's enrollments
    */
-  getMyEnrollments: async (
-    status?: 'ACTIVE' | 'COMPLETED' | 'DROPPED',
-  ): Promise<Enrollment[]> => {
+  getMyEnrollments: async (status?: 'ACTIVE' | 'COMPLETED' | 'DROPPED'): Promise<Enrollment[]> => {
     const response = await apiClient.get<Enrollment[]>('/enrollments/me', {
       params: status ? { status } : {},
     });
@@ -78,9 +74,7 @@ export const enrollmentsApi = {
    * Get students enrolled in a course (for teachers)
    */
   getCourseStudents: async (courseId: string): Promise<Enrollment[]> => {
-    const response = await apiClient.get<Enrollment[]>(
-      `/courses/${courseId}/students`,
-    );
+    const response = await apiClient.get<Enrollment[]>(`/courses/${courseId}/students`);
     return response.data;
   },
 };

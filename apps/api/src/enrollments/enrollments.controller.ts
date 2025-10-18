@@ -56,9 +56,7 @@ export class EnrollmentsController {
    * Get enrollment by ID
    */
   @Get(':id')
-  async getEnrollmentById(
-    @Param('id') id: string,
-  ): Promise<EnrollmentResponseDto> {
+  async getEnrollmentById(@Param('id') id: string): Promise<EnrollmentResponseDto> {
     return this.enrollmentsService.getEnrollmentById(id);
   }
 
@@ -73,10 +71,7 @@ export class EnrollmentsController {
     @Param('id') enrollmentId: string,
     @Request() req: RequestWithUser,
   ): Promise<void> {
-    return this.enrollmentsService.unenrollFromCourse(
-      enrollmentId,
-      req.user.id,
-    );
+    return this.enrollmentsService.unenrollFromCourse(enrollmentId, req.user.id);
   }
 }
 

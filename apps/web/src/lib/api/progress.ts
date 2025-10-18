@@ -65,9 +65,7 @@ export const progressApi = {
    * Get lesson progress for current student
    */
   getLessonProgress: async (lessonId: string): Promise<LessonProgress> => {
-    const response = await apiClient.get<LessonProgress>(
-      `/lessons/${lessonId}/progress`,
-    );
+    const response = await apiClient.get<LessonProgress>(`/lessons/${lessonId}/progress`);
     return response.data;
   },
 
@@ -78,10 +76,7 @@ export const progressApi = {
     lessonId: string,
     data: UpdateProgressRequest,
   ): Promise<LessonProgress> => {
-    const response = await apiClient.post<LessonProgress>(
-      `/lessons/${lessonId}/progress`,
-      data,
-    );
+    const response = await apiClient.post<LessonProgress>(`/lessons/${lessonId}/progress`, data);
     return response.data;
   },
 
@@ -92,10 +87,7 @@ export const progressApi = {
     lessonId: string,
     data: MarkSlideViewedRequest,
   ): Promise<LessonProgress> => {
-    const response = await apiClient.post<LessonProgress>(
-      `/lessons/${lessonId}/slides/view`,
-      data,
-    );
+    const response = await apiClient.post<LessonProgress>(`/lessons/${lessonId}/slides/view`, data);
     return response.data;
   },
 
@@ -103,9 +95,7 @@ export const progressApi = {
    * Get overall course progress
    */
   getCourseProgress: async (courseId: string): Promise<CourseProgress> => {
-    const response = await apiClient.get<CourseProgress>(
-      `/courses/${courseId}/progress`,
-    );
+    const response = await apiClient.get<CourseProgress>(`/courses/${courseId}/progress`);
     return response.data;
   },
 };

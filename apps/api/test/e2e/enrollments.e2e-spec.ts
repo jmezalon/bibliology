@@ -87,12 +87,10 @@ describe('Enrollments (e2e)', () => {
     });
 
     // Login as student to get auth token
-    const loginResponse = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({
-        email: 'student@test.com',
-        password: 'password123',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/api/auth/login').send({
+      email: 'student@test.com',
+      password: 'password123',
+    });
 
     authToken = loginResponse.body.access_token;
   });
@@ -283,19 +281,15 @@ describe('Enrollments (e2e)', () => {
 
   describe('Authorization', () => {
     it('should return 401 without auth token', async () => {
-      await request(app.getHttpServer())
-        .get('/api/enrollments/me')
-        .expect(401);
+      await request(app.getHttpServer()).get('/api/enrollments/me').expect(401);
     });
 
     it('should deny teacher access to student enrollments', async () => {
       // Login as teacher
-      const teacherLogin = await request(app.getHttpServer())
-        .post('/api/auth/login')
-        .send({
-          email: 'teacher@test.com',
-          password: 'password123',
-        });
+      const teacherLogin = await request(app.getHttpServer()).post('/api/auth/login').send({
+        email: 'teacher@test.com',
+        password: 'password123',
+      });
 
       await request(app.getHttpServer())
         .post(`/api/enrollments/courses/${courseId}`)

@@ -52,7 +52,7 @@ export function NotesPanel({ slideId, initialNotes = '', onSave, language }: Not
     <div
       className={cn(
         'fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-all duration-300 shadow-lg',
-        isOpen ? 'h-80' : 'h-12'
+        isOpen ? 'h-80' : 'h-12',
       )}
     >
       {/* Header */}

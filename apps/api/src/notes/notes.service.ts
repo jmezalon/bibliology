@@ -1,17 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-return */
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import {
-  StudentNoteResponseDto,
-  CreateNoteDto,
-  UpdateNoteDto,
-} from './dto';
+import { StudentNoteResponseDto, CreateNoteDto, UpdateNoteDto } from './dto';
 
 @Injectable()
 export class NotesService {
@@ -20,10 +12,7 @@ export class NotesService {
   /**
    * Get all notes for a lesson (for current student)
    */
-  async getLessonNotes(
-    lessonId: string,
-    studentId: string,
-  ): Promise<StudentNoteResponseDto[]> {
+  async getLessonNotes(lessonId: string, studentId: string): Promise<StudentNoteResponseDto[]> {
     const notes = await this.prisma.studentNote.findMany({
       where: {
         lesson_id: lessonId,
@@ -40,10 +29,7 @@ export class NotesService {
   /**
    * Create a new note
    */
-  async createNote(
-    studentId: string,
-    createDto: CreateNoteDto,
-  ): Promise<StudentNoteResponseDto> {
+  async createNote(studentId: string, createDto: CreateNoteDto): Promise<StudentNoteResponseDto> {
     // Verify lesson exists
     const lesson = await this.prisma.lesson.findUnique({
       where: { id: createDto.lesson_id },
@@ -108,9 +94,7 @@ export class NotesService {
     }
 
     if (note.student_id !== studentId) {
-      throw new ForbiddenException(
-        'You do not have permission to delete this note',
-      );
+      throw new ForbiddenException('You do not have permission to delete this note');
     }
 
     await this.prisma.studentNote.delete({
@@ -121,10 +105,7 @@ export class NotesService {
   /**
    * Get a single note by ID
    */
-  async getNoteById(
-    noteId: string,
-    studentId: string,
-  ): Promise<StudentNoteResponseDto> {
+  async getNoteById(noteId: string, studentId: string): Promise<StudentNoteResponseDto> {
     const note = await this.prisma.studentNote.findUnique({
       where: { id: noteId },
     });

@@ -28,7 +28,6 @@ export function useLessonViewer({
   onSlideChange,
   onLanguageChange,
 }: UseLessonViewerOptions) {
-
   // State
   const [state, setState] = useState<LessonViewerState>({
     currentSlideIndex: initialSlideIndex,
@@ -73,7 +72,7 @@ export function useLessonViewer({
       params.set('slide', String(index + 1));
       window.history.replaceState({}, '', `?${params.toString()}`);
     },
-    [totalSlides, onSlideChange]
+    [totalSlides, onSlideChange],
   );
 
   const goToNextSlide = useCallback(() => {

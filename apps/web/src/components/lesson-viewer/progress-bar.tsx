@@ -54,7 +54,7 @@ export function ProgressBar({
           <div
             className={cn(
               'flex items-center gap-1',
-              allSlidesViewed && 'text-green-600 dark:text-green-500'
+              allSlidesViewed && 'text-green-600 dark:text-green-500',
             )}
           >
             <CheckCircle2 className="h-4 w-4" />

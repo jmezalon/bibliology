@@ -72,12 +72,10 @@ describe('Notes (e2e)', () => {
     lessonId = lesson.id;
 
     // Login
-    const loginResponse = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({
-        email: 'student@test.com',
-        password: 'password123',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/api/auth/login').send({
+      email: 'student@test.com',
+      password: 'password123',
+    });
 
     authToken = loginResponse.body.access_token;
   });
@@ -348,9 +346,7 @@ describe('Notes (e2e)', () => {
 
   describe('Authorization', () => {
     it('should return 401 without auth token', async () => {
-      await request(app.getHttpServer())
-        .get(`/api/lessons/${lessonId}/notes`)
-        .expect(401);
+      await request(app.getHttpServer()).get(`/api/lessons/${lessonId}/notes`).expect(401);
     });
   });
 });

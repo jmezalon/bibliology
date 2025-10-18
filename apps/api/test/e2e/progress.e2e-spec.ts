@@ -110,12 +110,10 @@ describe('Progress Tracking (e2e)', () => {
     enrollmentId = enrollment.id;
 
     // Login
-    const loginResponse = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({
-        email: 'student@test.com',
-        password: 'password123',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/api/auth/login').send({
+      email: 'student@test.com',
+      password: 'password123',
+    });
 
     authToken = loginResponse.body.access_token;
   });

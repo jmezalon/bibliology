@@ -14,7 +14,6 @@ import { ProgressBar } from './progress-bar';
 import { SlideContentRenderer } from './slide-content-renderer';
 import { SlideNavigation } from './slide-navigation';
 
-
 /**
  * LessonViewer
  * Main component for viewing lessons as a student
@@ -154,7 +153,7 @@ export function LessonViewer() {
     <div
       className={cn(
         'flex flex-col h-screen bg-gray-50 dark:bg-gray-900',
-        isFullScreen && 'fixed inset-0 z-50'
+        isFullScreen && 'fixed inset-0 z-50',
       )}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

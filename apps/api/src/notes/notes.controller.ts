@@ -18,11 +18,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { RequestWithUser } from '../common/types/request-with-user.interface';
 
-import {
-  StudentNoteResponseDto,
-  CreateNoteDto,
-  UpdateNoteDto,
-} from './dto';
+import { StudentNoteResponseDto, CreateNoteDto, UpdateNoteDto } from './dto';
 import { NotesService } from './notes.service';
 
 @Controller()
@@ -90,10 +86,7 @@ export class NotesController {
   @Delete('notes/:id')
   @Roles(UserRole.STUDENT)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deleteNote(
-    @Param('id') noteId: string,
-    @Request() req: RequestWithUser,
-  ): Promise<void> {
+  async deleteNote(@Param('id') noteId: string, @Request() req: RequestWithUser): Promise<void> {
     return this.notesService.deleteNote(noteId, req.user.id);
   }
 }

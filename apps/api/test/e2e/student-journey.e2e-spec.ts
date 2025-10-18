@@ -119,12 +119,10 @@ describe('Student Journey (Integration)', () => {
     });
 
     // Login
-    const loginResponse = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({
-        email: 'student@test.com',
-        password: 'password123',
-      });
+    const loginResponse = await request(app.getHttpServer()).post('/api/auth/login').send({
+      email: 'student@test.com',
+      password: 'password123',
+    });
 
     authToken = loginResponse.body.access_token;
   });
@@ -416,12 +414,10 @@ describe('Student Journey (Integration)', () => {
       },
     });
 
-    const login2 = await request(app.getHttpServer())
-      .post('/api/auth/login')
-      .send({
-        email: 'student2@test.com',
-        password: 'password123',
-      });
+    const login2 = await request(app.getHttpServer()).post('/api/auth/login').send({
+      email: 'student2@test.com',
+      password: 'password123',
+    });
 
     const authToken2 = login2.body.access_token;
 

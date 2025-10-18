@@ -2,11 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '../prisma/prisma.service';
 
-import {
-  LessonAnalyticsDto,
-  PopularLessonsResponseDto,
-  EngagementMetricsDto,
-} from './dto';
+import { LessonAnalyticsDto, PopularLessonsResponseDto, EngagementMetricsDto } from './dto';
 
 @Injectable()
 export class AnalyticsService {
@@ -88,14 +84,11 @@ export class AnalyticsService {
     const analyticsData: LessonAnalyticsDto[] = lessonProgress.map((progress) => {
       const lesson = lessons.find((l) => l.id === progress.lesson_id);
       const completion = completions.find((c) => c.lesson_id === progress.lesson_id);
-      const avgCompletionTime = completionTimes.find(
-        (t) => t.lesson_id === progress.lesson_id,
-      );
+      const avgCompletionTime = completionTimes.find((t) => t.lesson_id === progress.lesson_id);
 
       const totalViews = progress._count.lesson_id;
       const totalCompletions = completion?._count.lesson_id || 0;
-      const completionRate =
-        totalViews > 0 ? (totalCompletions / totalViews) * 100 : 0;
+      const completionRate = totalViews > 0 ? (totalCompletions / totalViews) * 100 : 0;
 
       return {
         lesson_id: progress.lesson_id,
@@ -106,9 +99,7 @@ export class AnalyticsService {
         total_views: totalViews,
         total_completions: totalCompletions,
         completion_rate: Math.round(completionRate),
-        average_time_spent_seconds: Math.round(
-          progress._sum.time_spent_seconds! / totalViews,
-        ),
+        average_time_spent_seconds: Math.round(progress._sum.time_spent_seconds! / totalViews),
         average_completion_time_seconds: avgCompletionTime?._avg.time_spent_seconds
           ? Math.round(avgCompletionTime._avg.time_spent_seconds)
           : null,
@@ -155,17 +146,13 @@ export class AnalyticsService {
     });
 
     // Enrollment statistics
-    const [
-      totalEnrollments,
-      activeEnrollments,
-      completedEnrollments,
-      droppedEnrollments,
-    ] = await Promise.all([
-      this.prisma.enrollment.count(),
-      this.prisma.enrollment.count({ where: { status: 'ACTIVE' } }),
-      this.prisma.enrollment.count({ where: { status: 'COMPLETED' } }),
-      this.prisma.enrollment.count({ where: { status: 'DROPPED' } }),
-    ]);
+    const [totalEnrollments, activeEnrollments, completedEnrollments, droppedEnrollments] =
+      await Promise.all([
+        this.prisma.enrollment.count(),
+        this.prisma.enrollment.count({ where: { status: 'ACTIVE' } }),
+        this.prisma.enrollment.count({ where: { status: 'COMPLETED' } }),
+        this.prisma.enrollment.count({ where: { status: 'DROPPED' } }),
+      ]);
 
     // Average completion rate
     const enrollments = await this.prisma.enrollment.findMany({
@@ -176,8 +163,7 @@ export class AnalyticsService {
 
     const avgCompletionRate =
       enrollments.length > 0
-        ? enrollments.reduce((sum, e) => sum + e.progress_percentage, 0) /
-          enrollments.length
+        ? enrollments.reduce((sum, e) => sum + e.progress_percentage, 0) / enrollments.length
         : 0;
 
     // Total lessons completed
@@ -206,9 +192,7 @@ export class AnalyticsService {
       average_course_completion_rate: Math.round(avgCompletionRate),
       total_lessons_completed: totalLessonsCompleted,
       total_time_spent_seconds: timeStats._sum.time_spent_seconds || 0,
-      average_session_time_seconds: Math.round(
-        timeStats._avg.time_spent_seconds || 0,
-      ),
+      average_session_time_seconds: Math.round(timeStats._avg.time_spent_seconds || 0),
     };
   }
 
@@ -239,17 +223,12 @@ export class AnalyticsService {
 
     // Calculate metrics
     const totalEnrollments = course.enrollments.length;
-    const activeEnrollments = course.enrollments.filter(
-      (e) => e.status === 'ACTIVE',
-    ).length;
-    const completedEnrollments = course.enrollments.filter(
-      (e) => e.status === 'COMPLETED',
-    ).length;
+    const activeEnrollments = course.enrollments.filter((e) => e.status === 'ACTIVE').length;
+    const completedEnrollments = course.enrollments.filter((e) => e.status === 'COMPLETED').length;
 
     const avgProgress =
       totalEnrollments > 0
-        ? course.enrollments.reduce((sum, e) => sum + e.progress_percentage, 0) /
-          totalEnrollments
+        ? course.enrollments.reduce((sum, e) => sum + e.progress_percentage, 0) / totalEnrollments
         : 0;
 
     // Lesson-level analytics
@@ -263,9 +242,7 @@ export class AnalyticsService {
         total_views: progressRecords.length,
         total_completions: completions.length,
         completion_rate:
-          progressRecords.length > 0
-            ? (completions.length / progressRecords.length) * 100
-            : 0,
+          progressRecords.length > 0 ? (completions.length / progressRecords.length) * 100 : 0,
         average_time_spent:
           progressRecords.length > 0
             ? progressRecords.reduce((sum, p) => sum + p.time_spent_seconds, 0) /
